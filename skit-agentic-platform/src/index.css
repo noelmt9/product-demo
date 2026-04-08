@@ -15,4 +15,38 @@
   .text-numeric {
     font-variant-numeric: tabular-nums;
   }
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out;
+  }
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, 20px) scale(1.05); }
+  66% { transform: translate(20px, -15px) scale(1.1); }
+}
+
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(15px, -25px) scale(0.9); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.3; }
+}
+
+.orb-1 { animation: orbFloat1 8s ease-in-out infinite, pulseGlow 4s ease-in-out infinite; }
+.orb-2 { animation: orbFloat2 10s ease-in-out infinite, pulseGlow 5s ease-in-out infinite 1s; }
+.orb-3 { animation: orbFloat3 12s ease-in-out infinite, pulseGlow 6s ease-in-out infinite 2s; }

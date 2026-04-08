@@ -177,6 +177,24 @@ export const agents = [
     keyMetric: "99.86% compliance score",
     lastAction: "Flagged 1 potential TCPA time-zone violation on NY account.",
     status: "Active"
+  },
+  {
+    name: "Upsell Opportunity",
+    role: "Growth & Client Expansion",
+    color: "emerald",
+    description: "Identifies segments outperforming benchmarks and drafts upsell cases for clients. Turns the platform from a collection tool into a growth tool.",
+    keyMetric: "3 upsell signals active, $205K projected",
+    lastAction: "Auto-finance <$3K cohort crossed 4% liquidation. Upsell brief drafted.",
+    status: "Active"
+  },
+  {
+    name: "Data Enrichment",
+    role: "Skip Trace & Contact Recovery",
+    color: "indigo",
+    description: "Continuously skip-traces unreachable accounts, refreshes stale contact data, and tracks collections from accounts the client could never have worked.",
+    keyMetric: "$127K from previously unreachable accounts",
+    lastAction: "340 of 1,200 unreachable accounts now have fresh contact info. 6 converted ($18,400).",
+    status: "Active"
   }
 ];
 

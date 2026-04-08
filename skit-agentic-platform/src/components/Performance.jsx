@@ -37,11 +37,11 @@ const cohortTrendData = {
 };
 
 const cohortMetrics = [
-  { name: "High propensity / Low balance", liquidation: 4.1, contact: 48, collections: 49800, change: "+24%", changeColor: "green" },
-  { name: "High propensity / High balance", liquidation: 3.8, contact: 52, collections: 94200, change: "+40%", changeColor: "green", highlight: true },
-  { name: "Medium propensity / All balances", liquidation: 2.2, contact: 36, collections: 57600, change: "+18%", changeColor: "green" },
-  { name: "Low propensity / Low balance", liquidation: 0.4, contact: 12, collections: 8400, change: "+12%", changeColor: "green" },
-  { name: "Low propensity / High balance", liquidation: 1.9, contact: 28, collections: 77400, change: "+8%", changeColor: "green" }
+  { name: "High propensity / Low balance", liquidation: 4.1, contact: 48, collections: 49800, change: "+24%", changeColor: "green", cost: 8100, margin: 41700, costPerDollar: 0.16 },
+  { name: "High propensity / High balance", liquidation: 3.8, contact: 52, collections: 94200, change: "+40%", changeColor: "green", highlight: true, cost: 14200, margin: 80000, costPerDollar: 0.15 },
+  { name: "Medium propensity / All balances", liquidation: 2.2, contact: 36, collections: 57600, change: "+18%", changeColor: "green", cost: 18400, margin: 39200, costPerDollar: 0.32 },
+  { name: "Low propensity / Low balance", liquidation: 0.4, contact: 12, collections: 8400, change: "+12%", changeColor: "green", cost: 9200, margin: -800, costPerDollar: 1.10, negativeMargin: true },
+  { name: "Low propensity / High balance", liquidation: 1.9, contact: 28, collections: 77400, change: "+8%", changeColor: "green", cost: 22100, margin: 55300, costPerDollar: 0.29 }
 ];
 
 const analystRecommendations = [
@@ -228,6 +228,42 @@ export default function Performance({ onNavigate }) {
         </ResponsiveContainer>
       </Section>
 
+      {/* Upsell Signals */}
+      <section className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="material-symbols-outlined text-gray-700">rocket_launch</span>
+          <h2 className="text-base font-semibold text-gray-900">Intelligence: Upsell Signals</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white border-2 border-teal-200 rounded-lg p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded text-white" style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}>Outperforming</span>
+              <span className="text-sm font-bold text-gray-900">Auto-Finance &lt;$3K Portfolio</span>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">Outperforming at 4.1%, versus 1.6x above the aggregate benchmark. Client has 22,000 similar accounts in-house.</p>
+            <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+              <span>Confidence: <strong className="text-teal-600">High</strong></span>
+              <span>|</span>
+              <span>Projected: <strong>$205K over 60 days</strong></span>
+            </div>
+            <button className="px-4 py-2 rounded-lg text-white text-xs font-bold" style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}>Draft Upsell Case</button>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-700">Negative Trend</span>
+              <span className="text-sm font-bold text-gray-900">Fintech Tier 2: Latency Drop</span>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">Contact rate declined significantly by 18%. This unit economics forecast suggests escalation.</p>
+            <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+              <span>Severity: <strong className="text-amber-600">Medium</strong></span>
+              <span>|</span>
+              <span>Est. impact: <strong>-$34K/month</strong></span>
+            </div>
+            <button className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-xs font-bold hover:bg-gray-200 transition-colors">Review Economic Draft</button>
+          </div>
+        </div>
+      </section>
+
       {/* Row 3: Cohort Performance Cards */}
       <Section title="Cohort Performance">
         <div className="grid grid-cols-3 gap-4">
@@ -270,6 +306,28 @@ export default function Performance({ onNavigate }) {
                   <div className="text-sm font-semibold text-gray-900">${(cohort.collections / 1000).toFixed(0)}k</div>
                 </div>
               </div>
+
+              {/* Unit Economics */}
+              <div className={`grid grid-cols-3 gap-2 mt-3 pt-3 border-t ${cohort.negativeMargin ? 'border-red-100 bg-red-50/50 -mx-4 px-4 -mb-4 pb-4 rounded-b-lg' : 'border-gray-100'}`}>
+                <div>
+                  <div className="text-xs text-gray-500">Cost</div>
+                  <div className="text-sm font-semibold text-gray-900">${(cohort.cost / 1000).toFixed(1)}k</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Margin</div>
+                  <div className={`text-sm font-semibold ${cohort.negativeMargin ? 'text-red-600' : 'text-green-600'}`}>${cohort.negativeMargin ? '' : '+'}{(cohort.margin / 1000).toFixed(1)}k</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">$/dollar</div>
+                  <div className={`text-sm font-semibold ${cohort.negativeMargin ? 'text-red-600' : 'text-gray-900'}`}>${cohort.costPerDollar.toFixed(2)}</div>
+                </div>
+              </div>
+              {cohort.negativeMargin && (
+                <div className="text-xs text-red-600 font-medium mt-2 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">warning</span>
+                  Negative margin — suggest channel substitution to email-only
+                </div>
+              )}
 
               {cohort.highlight && (
                 <>

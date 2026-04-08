@@ -67,10 +67,56 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
 
   return (
     <div className="p-8 bg-gray-50">
-      {/* Header */}
+      {/* Header — Revenue Protection framing */}
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Quality</h1>
-        <p className="text-sm text-gray-600 mt-1">Compliance monitoring, quality scoring, and agent performance</p>
+        <h1 className="text-xl font-semibold text-gray-900">Quality & Compliance</h1>
+        <p className="text-sm text-gray-600 mt-1">Compliance as revenue protection, quality scoring, and agent performance</p>
+      </div>
+
+      {/* Revenue Protection Hero */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-extrabold text-gray-900 mb-1">43 violations prevented today.</h2>
+            <h3 className="text-xl font-bold text-gray-700">Estimated exposure avoided: <span className="text-emerald-600">$64,500</span></h3>
+          </div>
+          <div className="flex gap-6 text-center">
+            <div>
+              <div className="text-2xl font-extrabold text-gray-900">99.86%</div>
+              <div className="text-xs text-gray-500">Score</div>
+            </div>
+            <div>
+              <div className="text-2xl font-extrabold text-gray-900">18 hrs</div>
+              <div className="text-xs text-gray-500">Avg Resolution</div>
+            </div>
+          </div>
+        </div>
+        {/* Breakdown */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="bg-red-50 rounded-lg p-3">
+            <div className="flex items-center gap-1 mb-1"><span className="w-2 h-2 rounded-full bg-red-500" /><span className="text-[10px] font-bold text-red-700 uppercase">Critical</span></div>
+            <div className="text-lg font-bold text-red-700">0</div>
+            <div className="text-[10px] text-gray-500">No lawsuit-risk issues</div>
+          </div>
+          <div className="bg-amber-50 rounded-lg p-3">
+            <div className="flex items-center gap-1 mb-1"><span className="w-2 h-2 rounded-full bg-amber-500" /><span className="text-[10px] font-bold text-amber-700 uppercase">Warning</span></div>
+            <div className="text-lg font-bold text-amber-700">3</div>
+            <div className="text-[10px] text-gray-500">Human agent timing issues — training deployed</div>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-3">
+            <div className="flex items-center gap-1 mb-1"><span className="w-2 h-2 rounded-full bg-blue-500" /><span className="text-[10px] font-bold text-blue-700 uppercase">Info</span></div>
+            <div className="text-lg font-bold text-blue-700">1</div>
+            <div className="text-[10px] text-gray-500">AI timezone error — fix within 4 hours</div>
+          </div>
+        </div>
+        {/* Client-Ready Narrative */}
+        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="material-symbols-outlined text-sm text-gray-500">description</span>
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Client-Ready Narrative</span>
+          </div>
+          <p className="text-sm text-gray-700">4 flags detected this week. 3 low-severity human agent timing issues (training deployed within 24 hours). 1 AI timezone error corrected within 4 hours. <strong>Zero open risk.</strong> All corrective actions documented and verifiable.</p>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -145,6 +191,13 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Severity Legend */}
+      <div className="flex gap-4 mb-4">
+        <span className="inline-flex items-center gap-1 text-xs font-bold"><span className="w-2 h-2 rounded-full bg-red-500" />CRITICAL — lawsuit risk</span>
+        <span className="inline-flex items-center gap-1 text-xs font-bold"><span className="w-2 h-2 rounded-full bg-amber-500" />WARNING — process gap</span>
+        <span className="inline-flex items-center gap-1 text-xs font-bold"><span className="w-2 h-2 rounded-full bg-blue-500" />INFO — coaching opportunity</span>
       </div>
 
       {/* Flagged Issues */}

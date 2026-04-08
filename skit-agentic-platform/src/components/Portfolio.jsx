@@ -207,6 +207,43 @@ export default function Portfolio() {
         </div>
       </div>
 
+      {/* Enrichment Pipeline */}
+      <section className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="material-symbols-outlined text-gray-700">filter_alt</span>
+          <h2 className="text-base font-semibold text-gray-900">Enrichment Pipeline</h2>
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          {[
+            { label: 'Unreachable', value: '1,847', icon: 'person_off', color: '#ef4444', bg: 'bg-red-50' },
+            { label: 'Enriched', value: '1,312', icon: 'person_search', color: '#3BA7F6', bg: 'bg-blue-50' },
+            { label: 'Contacted', value: '487', icon: 'call', color: '#f59e0b', bg: 'bg-amber-50' },
+            { label: 'Converted', value: '89', icon: 'check_circle', color: '#10b981', bg: 'bg-emerald-50', highlight: true },
+          ].map((stage, idx, arr) => (
+            <div key={idx} className="relative">
+              <div className={`${stage.bg} rounded-xl p-6 text-center ${stage.highlight ? 'ring-2 ring-emerald-300' : ''}`}>
+                <span className="material-symbols-outlined text-3xl mb-2" style={{color: stage.color}}>{stage.icon}</span>
+                <div className="text-2xl font-extrabold text-gray-900">{stage.value}</div>
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mt-1">{stage.label}</div>
+              </div>
+              {idx < arr.length - 1 && (
+                <div className="absolute top-1/2 -right-4 transform -translate-y-1/2 text-gray-300 z-10">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-emerald-600">payments</span>
+            <span className="text-sm font-bold text-emerald-800">Revenue from previously unreachable accounts:</span>
+            <span className="text-lg font-extrabold text-emerald-700">$127,400</span>
+          </div>
+          <span className="text-xs text-emerald-600 font-medium">Accounts client could not reach on their own</span>
+        </div>
+      </section>
+
       {/* Upload Action - Primary CTA */}
       {!uploadStep && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6 mb-6">

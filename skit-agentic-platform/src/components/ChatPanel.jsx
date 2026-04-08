@@ -2,26 +2,14 @@ const mockMessages = [
   {
     id: 1,
     type: 'user',
-    content: 'Can you email me a summary of what improvements we\'ve made on the Apex portfolio in the last two weeks?'
+    content: 'Generate this week\'s client report'
   },
   {
     id: 2,
     type: 'agent',
-    agent: 'Analyst',
-    color: '#3b82f6',
-    content: 'I can put that together. Just want to confirm — do you want me to include:\n\n• Strategy changes and their measured impact\n• Cohort re-scoring updates\n• KPI movement (Week 1 → Week 3)\n• Compliance and quality highlights\n\nAnd should this go to your email, or the client stakeholder group as well?'
-  },
-  {
-    id: 3,
-    type: 'user',
-    content: 'All of those. Just me for now.'
-  },
-  {
-    id: 4,
-    type: 'agent',
-    agent: 'Analyst',
-    color: '#3b82f6',
-    content: 'Done. I\'ve sent the two-week improvement summary to your email. Covers 5 strategy changes, 340 accounts re-scored, liquidation improvement from 1.8% to 2.7%, and compliance/quality highlights. Let me know if you want me to adjust anything before sharing with the client.'
+    agent: 'Report Generator',
+    color: '#3BA7F6',
+    content: 'INTELLIGENCE LAYER\n\nEXECUTIVE SUMMARY\nPerformance metrics indicate a 3% stabilization in high-intent conversion paths. Agent interventions have successfully mitigated compliance drift noticed in Q1.\n\nKPI MOVEMENT\n• Recovery Rate: 2.7% (+0.4%)\n• Contact Rate: 38% (-2% vs target)\n• Avg Latency: 4.2 days\n\nSTRATEGY CHANGES\n• Day 12: Voice AI increased to 5x/week on high-prop\n• Day 17: Settlement SMS launched for broken-PTP\n\nCOMPLIANCE STATUS\n• 43 violations prevented, $64.5K exposure avoided\n• Score: 99.86%\n\nENRICHMENT\n• $127K from previously unreachable accounts\n\nRECOMMENDED NEXT STEPS\n• Expand settlement strategy to medium-propensity\n• Schedule activation review with client'
   }
 ];
 
@@ -41,14 +29,14 @@ export default function ChatPanel({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-slate-50 to-white">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}>
               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">Ask Agent</h3>
-              <p className="text-xs text-gray-500">AI-powered assistance</p>
+              <h3 className="text-sm font-semibold text-gray-900">Report Generator</h3>
+              <p className="text-xs text-gray-500">Agentic Briefing Mode</p>
             </div>
           </div>
           <button
@@ -107,19 +95,24 @@ export default function ChatPanel({ isOpen, onClose }) {
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="Ask anything..."
+                placeholder="Ask for further details or adjustments..."
                 className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all"
                 disabled
               />
             </div>
             <button
-              className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-10 h-10 text-white rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}
               disabled
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
             </button>
+          </div>
+          <div className="flex gap-2 mt-2">
+            <button className="px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">Compare with last month</button>
+            <button className="px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">Add to dashboard</button>
           </div>
         </div>
       </div>

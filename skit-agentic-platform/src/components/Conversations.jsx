@@ -276,7 +276,63 @@ export default function Conversations() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-gray-900">Conversations</h1>
-        <p className="text-sm text-gray-600 mt-1">Multi-channel consumer journeys and outcomes</p>
+        <p className="text-sm text-gray-600 mt-1">Multi-channel consumer journeys, replay, and outcomes</p>
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-3 gap-6 mb-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <p className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-1">Total Interactions</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-gray-900">14,282</span>
+            <span className="text-xs font-medium text-teal-600">+8.2%</span>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <p className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-1">Avg Sentiment</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-green-600">Positive</span>
+            <span className="text-xs font-medium text-green-600">82/100</span>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <p className="text-xs uppercase tracking-wider text-gray-500 font-bold mb-1">Resolution Rate</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-gray-900">2.4%</span>
+            <span className="text-xs font-medium text-teal-600">+0.3%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Consumer Journey Replay - Featured */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="material-symbols-outlined text-gray-700">route</span>
+          <h2 className="text-base font-semibold text-gray-900">Consumer Journey Replay — #APX-3107</h2>
+        </div>
+        <div className="relative pl-8 border-l-2 border-gray-200 space-y-6">
+          {[
+            { day: 'Day 1', channel: 'Voice AI', outcome: 'No answer', sentiment: 'neutral', color: '#3b82f6', reason: 'First contact attempt — voice selected due to high-balance profile.' },
+            { day: 'Day 3', channel: 'SMS', outcome: 'Opened, no click', sentiment: 'neutral', color: '#10b981', reason: 'SMS fallback — consumer opened but didn\'t engage with link.' },
+            { day: 'Day 5', channel: 'Voice AI', outcome: 'Connected → "Can\'t pay that much" → Settlement offered → PTP set', sentiment: 'engaged', color: '#3b82f6', reason: 'Consumer engaged. AI offered settlement within client params. PTP set for Day 10.' },
+            { day: 'Day 10', channel: 'PTP SMS → Payment Bot', outcome: '$5,100 settled ✓', sentiment: 'satisfied', color: '#10b981', reason: 'Consumer clicked PTP link, completed payment via bot. 15% settlement.' },
+          ].map((step, idx) => (
+            <div key={idx} className="relative">
+              <div className="absolute -left-[25px] top-0 w-3 h-3 rounded-full border-2 border-white shadow-sm" style={{backgroundColor: step.color}} />
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-xs font-bold text-gray-500">{step.day}</span>
+                <JourneyIcon channel={step.channel} />
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  step.sentiment === 'satisfied' ? 'bg-green-100 text-green-700' :
+                  step.sentiment === 'engaged' ? 'bg-blue-100 text-blue-700' :
+                  'bg-gray-100 text-gray-500'
+                }`}>{step.sentiment}</span>
+              </div>
+              <p className="text-sm font-medium text-gray-900">{step.outcome}</p>
+              <p className="text-xs text-gray-500 italic mt-0.5">{step.reason}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Filter Bar */}

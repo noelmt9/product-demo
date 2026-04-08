@@ -10,28 +10,15 @@ import Conversations from './components/Conversations';
 import AgentPanel from './components/AgentPanel';
 import ChatPanel from './components/ChatPanel';
 import { agents } from './data';
+import skitIcon from './assets/skit-icon.png';
 
-const navGroups = [
-  {
-    items: [
-      { id: 'insights', label: 'Insights' },
-      { id: 'approvals', label: 'Approvals' },
-    ]
-  },
-  {
-    items: [
-      { id: 'portfolio', label: 'Portfolio' },
-      { id: 'performance', label: 'Performance' },
-      { id: 'payments', label: 'Payments' },
-    ]
-  },
-  {
-    items: [
-      { id: 'campaigns', label: 'Campaigns' },
-      { id: 'conversations', label: 'Conversations' },
-      { id: 'quality', label: 'Quality' },
-    ]
-  }
+const navItems = [
+  { id: 'insights', label: 'Insights', icon: 'insights' },
+  { id: 'performance', label: 'Performance', icon: 'speed' },
+  { id: 'portfolio', label: 'Portfolio', icon: 'analytics' },
+  { id: 'approvals', label: 'Approvals', icon: 'fact_check' },
+  { id: 'conversations', label: 'Conversations', icon: 'forum' },
+  { id: 'quality', label: 'Quality/Compliance', icon: 'rule' },
 ];
 
 const agentColorMap = {
@@ -39,22 +26,21 @@ const agentColorMap = {
   purple: '#8b5cf6',
   red: '#ef4444',
   teal: '#06b6d4',
-  amber: '#f59e0b'
+  amber: '#f59e0b',
+  emerald: '#10b981',
+  indigo: '#6366f1'
 };
 
 function App() {
   const [activeScreen, setActiveScreen] = useState('insights');
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [expandedAgent, setExpandedAgent] = useState(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [qualityTab, setQualityTab] = useState('overview');
   const mainContentRef = useRef(null);
 
-  // Scroll to top when changing screens
   useEffect(() => {
-    if (mainContentRef.current) {
-      mainContentRef.current.scrollTop = 0;
-    }
+    if (mainContentRef.current) mainContentRef.current.scrollTop = 0;
   }, [activeScreen]);
 
   const handleCoachActivityClick = () => {
@@ -62,9 +48,7 @@ function App() {
     setQualityTab('improvements');
   };
 
-  const handleNavigate = (screen) => {
-    setActiveScreen(screen);
-  };
+  const handleNavigate = (screen) => setActiveScreen(screen);
 
   const renderScreen = () => {
     switch (activeScreen) {
@@ -89,117 +73,108 @@ function App() {
     }
   };
 
+  const sideW = sidebarCollapsed ? 'w-[72px]' : 'w-64';
+  const mainML = sidebarCollapsed ? 'ml-[72px]' : 'ml-64';
+
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#f8f9ff]">
       {/* Sidebar */}
-      <div className="w-64 bg-slate-800 flex flex-col">
-        <div className="px-5 py-6 border-b border-slate-700">
-          <h1 className="text-base font-semibold text-white">Skit.ai</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Agentic Platform</p>
+      <div className={`${sideW} fixed left-0 top-0 h-screen flex flex-col z-50 transition-all duration-300`} style={{ background: '#162A44' }}>
+        {/* Logo + Collapse */}
+        <div className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'px-5'} py-5`}>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <img src={skitIcon} alt="Skit AI" className="w-8 h-8 flex-shrink-0 object-contain" />
+            {!sidebarCollapsed && (
+              <div className="min-w-0">
+                <h1 className="text-sm font-bold text-white tracking-tight leading-tight truncate">Skit AI</h1>
+                <p className="text-[9px] font-medium tracking-widest uppercase truncate" style={{color: '#5FCFC4'}}>Intelligent Layer</p>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className={`text-slate-400 hover:text-white transition-colors flex-shrink-0 ${sidebarCollapsed ? '' : 'ml-2'}`}
+          >
+            <span className="material-symbols-outlined text-lg">{sidebarCollapsed ? 'chevron_right' : 'chevron_left'}</span>
+          </button>
         </div>
 
-        <nav className="flex-1 py-4 overflow-y-auto">
-          {/* Navigation Groups */}
-          {navGroups.map((group, groupIdx) => (
-            <div key={groupIdx} className={groupIdx > 0 ? 'mt-5' : ''}>
-              {group.items.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveScreen(item.id)}
-                  className={`w-full text-left px-5 py-2 text-sm transition-colors relative ${
-                    activeScreen === item.id
-                      ? 'text-white bg-white/10'
-                      : 'text-slate-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {activeScreen === item.id && (
-                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-400" />
-                  )}
-                  {item.label}
-                </button>
-              ))}
-            </div>
+        {/* Nav */}
+        <nav className={`flex-1 ${sidebarCollapsed ? 'px-2' : 'px-3'} space-y-0.5 overflow-y-auto`}>
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveScreen(item.id)}
+              title={sidebarCollapsed ? item.label : undefined}
+              className={`w-full text-left flex items-center ${sidebarCollapsed ? 'justify-center' : ''} gap-3 py-2.5 px-3 rounded-lg transition-colors text-sm font-medium ${
+                activeScreen === item.id
+                  ? 'bg-white/10 text-[#5FCFC4]'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span className="material-symbols-outlined text-lg">{item.icon}</span>
+              {!sidebarCollapsed && <span>{item.label}</span>}
+            </button>
           ))}
 
           {/* Agents Section */}
-          <div className="mt-5 pt-4 border-t border-slate-700">
-            <div className="px-5 mb-2">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Agents</p>
-            </div>
+          <div className="mt-4 pt-4 border-t border-white/10">
+            {!sidebarCollapsed && <p className="text-[10px] uppercase tracking-widest text-slate-500 px-3 mb-2">Agents</p>}
             {agents.map((agent) => (
-              <div key={agent.name}>
-                <button
-                  onClick={() => setExpandedAgent(expandedAgent === agent.name ? null : agent.name)}
-                  className="w-full text-left px-5 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="inline-block w-2 h-2 rounded-full"
-                      style={{ backgroundColor: agentColorMap[agent.color] }}
-                    />
-                    <span>{agent.name}</span>
-                  </div>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${expandedAgent === agent.name ? 'rotate-90' : ''}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-                {expandedAgent === agent.name && (
-                  <div className="bg-slate-900/50 py-1">
-                    <button
-                      onClick={() => setSelectedAgent(agent.name)}
-                      className="w-full text-left px-10 py-1.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors"
-                    >
-                      Overview
-                    </button>
-                    <button
-                      onClick={() => setSelectedAgent(agent.name)}
-                      className="w-full text-left px-10 py-1.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors"
-                    >
-                      Recent Activity
-                    </button>
-                    <button
-                      onClick={() => setSelectedAgent(agent.name)}
-                      className="w-full text-left px-10 py-1.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors"
-                    >
-                      Configuration
-                    </button>
-                  </div>
-                )}
-              </div>
+              <button
+                key={agent.name}
+                onClick={() => setSelectedAgent(agent.name)}
+                title={sidebarCollapsed ? agent.name : undefined}
+                className={`w-full text-left ${sidebarCollapsed ? 'justify-center' : ''} px-3 py-1.5 text-xs text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2 rounded-lg`}
+              >
+                <span className="inline-block w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: agentColorMap[agent.color] || '#6b7280' }} />
+                {!sidebarCollapsed && <span className="truncate">{agent.name}</span>}
+              </button>
             ))}
           </div>
         </nav>
 
-        <div className="px-5 py-4 border-t border-slate-700 text-xs text-slate-500">
-          v0.1 Internal Prototype
+        {/* Bottom */}
+        <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-4 border-t border-white/10 pt-3`}>
+          {!sidebarCollapsed && (
+            <button className="w-full text-left flex items-center gap-3 py-2 px-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium">
+              <span className="material-symbols-outlined text-lg">settings</span>
+              <span>Settings</span>
+            </button>
+          )}
+          <div className={`flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : 'px-3'} pt-3 ${sidebarCollapsed ? '' : 'mt-2 border-t border-white/10'}`}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}>
+              AR
+            </div>
+            {!sidebarCollapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-white truncate">Alex Rivera</p>
+                <p className="text-[10px] text-slate-400 truncate">Operations Lead</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div ref={mainContentRef} className="flex-1 overflow-y-auto bg-white relative">
+      <div ref={mainContentRef} className={`flex-1 ${mainML} overflow-y-auto bg-[#f8f9ff] relative transition-all duration-300`}>
         {renderScreen()}
 
-        {/* Agent Detail Panel */}
         {selectedAgent && (
           <AgentPanel agent={selectedAgent} onClose={() => setSelectedAgent(null)} />
         )}
 
-        {/* Chat FAB Button */}
+        {/* Chat FAB */}
         <button
           onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center z-30 group"
+          className="fixed bottom-6 right-6 w-14 h-14 text-white rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center z-30 group"
+          style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}
         >
           <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </button>
 
-        {/* Chat Panel */}
         <ChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       </div>
     </div>
