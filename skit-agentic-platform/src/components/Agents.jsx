@@ -2,26 +2,26 @@ import { useState } from 'react';
 import { agents } from '../data';
 
 const overnightTimeline = [
-  { time: '08:15 AM', agent: 'Compliance', color: '#06b6d4', summary: 'Scanned 412 recordings. 0 critical violations. 2 low-risk deviations flagged.' },
+  { time: '08:15 AM', agent: 'Auditor', color: '#06b6d4', summary: 'Scanned 412 recordings. 0 critical violations. 2 low-risk deviations flagged.' },
   { time: '07:00 AM', agent: 'Manager', color: '#8b5cf6', summary: 'Optimized outbound frequency for Early-Arrears segment.' },
   { time: '06:30 AM', agent: 'Tracer', color: '#6366f1', summary: 'Skip trace batch complete. 78 new phone numbers appended.' },
   { time: '06:15 AM', agent: 'Analyst', color: '#3b82f6', summary: 'Identified $42K leakage in automated installment flows.' },
 ];
 
 const agentColors = {
-  Analyst: '#3b82f6', Manager: '#8b5cf6', Compliance: '#ef4444',
+  Analyst: '#3b82f6', Manager: '#8b5cf6', Auditor: '#ef4444',
   Coach: '#06b6d4', Collector: '#f59e0b', 'Upsell Opportunity': '#10b981', 'Tracer': '#6366f1'
 };
 
 const agentIcons = {
-  Analyst: 'query_stats', Manager: 'campaign', Compliance: 'shield',
+  Analyst: 'query_stats', Manager: 'campaign', Auditor: 'shield',
   Coach: 'school', Collector: 'call', 'Upsell Opportunity': 'trending_up', 'Tracer': 'database'
 };
 
 const agentLatestStatus = {
   Analyst: 'Re-scored 340 accounts',
   Manager: 'SMS cadence → 3x/week',
-  Compliance: '412 audits, 1 flag',
+  Auditor: '412 audits, 1 flag',
   Coach: '3 agents need coaching',
   Collector: '2,870 touchpoints today',
   'Upsell Opportunity': '$205K signals active',
@@ -55,7 +55,7 @@ const agentDetails = {
       { label: 'Content Variants', value: '8', target: '—', status: 'neutral' },
     ]
   },
-  Compliance: {
+  Auditor: {
     skills: ['Pre-launch content review', 'Conversation audit (all channels)', 'FDCPA/TCPA compliance check', 'State-specific rule enforcement', 'Compliance report generation', 'Corrective action tracking'],
     recentActions: [
       { time: '4h ago', action: 'Audited 412 conversations. 1 flag: potential timezone violation on NY account.' },

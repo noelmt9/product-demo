@@ -4,7 +4,7 @@ import { Section } from './shared';
 
 const agentColors = {
   'Collector': '#f59e0b',
-  'Compliance': '#ef4444',
+  'Auditor': '#ef4444',
   'Manager': '#8b5cf6'
 };
 
@@ -33,7 +33,7 @@ const improvementCases = [
     diagnosis: 'When consumers say "I\'m going through hardship" or similar, the current bot flow jumps directly to "Would you like to set up a payment plan?" Consumers perceive this as tone-deaf. They disengage before hearing the options. Human agents have the same pattern but less severe (28% drop-off).',
     proposedFix: 'Insert empathy acknowledgment step before any solution. New flow — acknowledge hardship, ask open question about their situation, then explore options based on response. New Voice AI conversation branch required. Human agents get a coaching brief.',
     deployment: [
-      { agent: 'Compliance', action: 'Updated empathetic bot script submitted for review. Waiting approval.' },
+      { agent: 'Auditor', action: 'Updated empathetic bot script submitted for review. Waiting approval.' },
       { agent: 'Collector', action: 'Pending Compliance approval.' },
       { agent: 'Collector', action: 'Human agent coaching brief drafted. Will be covered in Monday\'s medical debt sensitivity refresher.' }
     ],

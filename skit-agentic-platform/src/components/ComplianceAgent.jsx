@@ -6,7 +6,7 @@ export default function ComplianceAgent() {
     <div className="p-8 bg-gray-50">
       <AgentHeader
         color="#ef4444"
-        name="Compliance"
+        name="Auditor"
         role="Regulatory & Guardrails"
         description="Ensures every consumer interaction meets regulatory requirements (FDCPA, TCPA, state-specific rules) and client brand guidelines. Sets pre-launch guardrails for Team Lead's campaign design. Audits live conversations across all channels. Flags potential violations, generates compliance reports for client examiners."
       />

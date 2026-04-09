@@ -10,9 +10,9 @@ const allSuggestions = [
   { q: "What drove the liquidation rate increase this week?", agents: ['Analyst', 'Collector'] },
   { q: "Show me accounts most likely to settle", agents: ['Analyst', 'Manager'] },
   { q: "Where are we losing money?", agents: ['Analyst', 'Upsell Opportunity'] },
-  { q: "Summarize compliance issues this month", agents: ['Compliance', 'Coach'] },
+  { q: "Summarize compliance issues this month", agents: ['Auditor', 'Coach'] },
   { q: "How are enriched accounts performing?", agents: ['Tracer', 'Analyst'] },
-  { q: "Draft this week's client report", agents: ['Analyst', 'Compliance', 'Coach'] },
+  { q: "Draft this week's client report", agents: ['Analyst', 'Auditor', 'Coach'] },
   { q: "Which cohorts have the highest abandoned rate?", agents: ['Collector', 'Analyst'] },
   { q: "What's the RPC → PTP conversion by channel?", agents: ['Collector', 'Analyst'] },
 ];
@@ -40,7 +40,7 @@ const newsSetA = [
 const newsSetB = [
   { headline: 'Settlement SMS showing early results', body: '620 accounts targeted with 15% discount offer. 8% conversion in the first 48 hours, adding $48K to Week 3 collections.', time: '1h ago', agent: 'Manager', agentColor: '#8b5cf6', icon: 'campaign' },
   { headline: 'Skip trace batch complete', body: '78 new phone numbers appended overnight. Enrichment rate now at 71%, well above the 60% industry benchmark for secondary placements.', time: '4h ago', agent: 'Tracer', agentColor: '#6366f1', icon: 'database' },
-  { headline: 'Compliance score holding at 99.86%', body: '412 conversations audited today. 1 low-risk timezone flag on a NY account, already resolved. No critical violations.', time: '4h ago', agent: 'Compliance', agentColor: '#ef4444', icon: 'verified_user' },
+  { headline: 'Compliance score holding at 99.86%', body: '412 conversations audited today. 1 low-risk timezone flag on a NY account, already resolved. No critical violations.', time: '4h ago', agent: 'Auditor', agentColor: '#ef4444', icon: 'verified_user' },
   { headline: 'Spanish SMS outperforming English', body: '8% higher response rate in TX/FL for Spanish-preference accounts. 180 accounts contacted in first batch with strong early engagement.', time: '8h ago', agent: 'Collector', agentColor: '#f59e0b', icon: 'translate' },
 ];
 

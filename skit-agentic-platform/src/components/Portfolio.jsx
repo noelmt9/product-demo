@@ -536,7 +536,7 @@ export default function Portfolio() {
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 text-red-700 font-semibold flex-shrink-0 text-xs">3</span>
-                        <span><strong>Compliance</strong> scans for state-specific rules and account restrictions</span>
+                        <span><strong>Auditor</strong> scans for state-specific rules and account restrictions</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-purple-100 text-purple-700 font-semibold flex-shrink-0 text-xs">4</span>
@@ -777,7 +777,7 @@ export default function Portfolio() {
             <div className="bg-white border border-red-300 rounded-lg p-5 shadow-md">
               <div className="flex items-center gap-2 mb-4">
                 <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
-                <span className="text-sm font-semibold text-gray-900">Compliance</span>
+                <span className="text-sm font-semibold text-gray-900">Auditor</span>
                 <span className="text-xs text-gray-500">— Pre-scan</span>
                 <div className="w-4 h-4 border-2 border-red-200 border-t-red-600 rounded-full animate-spin ml-auto" />
               </div>

@@ -3,7 +3,7 @@ import { analystData, teamLeadData, complianceData, coachData, collectorData } f
 const agentDataMap = {
   'Analyst': { data: analystData, color: '#3b82f6', role: 'Context, Modeling & Performance' },
   'Manager': { data: teamLeadData, color: '#8b5cf6', role: 'Campaign Strategy & Optimization' },
-  'Compliance': { data: complianceData, color: '#ef4444', role: 'Regulatory & Guardrails' },
+  'Auditor': { data: complianceData, color: '#ef4444', role: 'Regulatory & Guardrails' },
   'Coach': { data: coachData, color: '#06b6d4', role: 'Quality & Training' },
   'Collector': { data: collectorData, color: '#f59e0b', role: 'Multichannel Execution' }
 };
@@ -19,7 +19,7 @@ const mockDocuments = {
     { name: 'Content_Library_Templates.docx', size: '1.2 MB', type: 'word' },
     { name: 'Channel_Cadence_Matrix.xlsx', size: '245 KB', type: 'excel' }
   ],
-  'Compliance': [
+  'Auditor': [
     { name: 'FDCPA_Compliance_Guide_2025.pdf', size: '4.2 MB', type: 'pdf' },
     { name: 'State_Regulations_Summary.pdf', size: '1.8 MB', type: 'pdf' },
     { name: 'TCPA_Rules_Reference.pdf', size: '920 KB', type: 'pdf' }
