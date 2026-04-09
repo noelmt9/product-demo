@@ -213,7 +213,7 @@ export default function Portfolio() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
-            Upload New Placement
+            Upload Accounts
           </button>
         </div>
       </div>
@@ -476,7 +476,7 @@ export default function Portfolio() {
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full">
             <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Upload New Placement File</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Upload Accounts File</h2>
                 <p className="text-sm text-gray-600 mt-1">CSV or Excel · Analyst will validate, model, and plan automatically</p>
               </div>
               <button onClick={() => { setUploadStep(null); setSelectedFile(null); }} className="text-gray-400 hover:text-gray-600">
