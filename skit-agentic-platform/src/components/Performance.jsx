@@ -153,128 +153,109 @@ const HL = ({ label, value, sub, color }) => (
   </div>
 );
 
-const FunnelStep = ({ label, value, sub, pct, isLast, isExpanded, onClick }) => (
-  <div className="flex items-center flex-1 min-w-0">
-    <div className="flex flex-col items-center flex-1 min-w-0">
-      <button
-        onClick={onClick}
-        className="w-full rounded-lg px-3 py-3 text-center border transition-all"
-        style={{
-          background: isExpanded ? '#f0faf8' : '#ffffff',
-          borderColor: isExpanded ? '#2196af' : '#d4eae5',
-          boxShadow: isExpanded ? '0 0 0 2px rgba(33,150,175,0.15)' : 'none',
-          cursor: 'pointer',
-        }}
-      >
-        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">{label}</div>
-        <div className="text-2xl font-extrabold text-gray-900">{value}</div>
-        {sub && <div className="text-[11px] text-gray-400 mt-0.5">{sub}</div>}
-      </button>
-      {pct && <div className="mt-1.5 text-xs font-semibold text-gray-400">{pct}</div>}
+// Bar-chart style funnel (like Google Analytics screenshot)
+const BarFunnel = ({ viewMode }) => {
+  // Account-level values
+  const accountSteps = [
+    { label: 'Accounts',  accounts: 12000, dollars: 33600000, pct: 100,  convPct: null,   dropPct: null },
+    { label: 'Contacted', accounts: 4560,  dollars: 14400000, pct: 38,   convPct: '38%',  dropPct: '62%' },
+    { label: 'RPC',       accounts: 3360,  dollars: 10100000, pct: 28,   convPct: '74%',  dropPct: '26%' },
+    { label: 'PTP',       accounts: 403,   dollars: 1780000,  pct: 3.4,  convPct: '12%',  dropPct: '88%' },
+    { label: 'Kept PTP',  accounts: 274,   dollars: 1210000,  pct: 2.3,  convPct: '68%',  dropPct: '32%' },
+    { label: 'Resolved',  accounts: 743,   dollars: 2870000,  pct: 6.2,  convPct: null,   dropPct: null },
+  ];
+
+  const maxVal = viewMode === 'accounts' ? 12000 : 33600000;
+  const fmtVal = (step) => viewMode === 'accounts'
+    ? step.accounts.toLocaleString()
+    : `$${(step.dollars / 1000000).toFixed(1)}M`;
+  const barPct = (step) => viewMode === 'accounts'
+    ? (step.accounts / maxVal) * 100
+    : (step.dollars / maxVal) * 100;
+
+  const BAR_COLOR = '#2196af';
+  const CONNECTOR_COLOR = '#d4eae5';
+  const MAX_BAR_HEIGHT = 160;
+
+  return (
+    <div className="flex items-end gap-0 w-full" style={{ height: MAX_BAR_HEIGHT + 80 }}>
+      {accountSteps.map((step, i) => {
+        const h = Math.max((barPct(step) / 100) * MAX_BAR_HEIGHT, 8);
+        const isLast = i === accountSteps.length - 1;
+        return (
+          <React.Fragment key={step.label}>
+            <div className="flex flex-col items-center flex-1">
+              {/* Value label above bar */}
+              <div className="text-xs font-bold text-gray-700 mb-1 tabular-nums">{fmtVal(step)}</div>
+              {/* Conversion badge */}
+              {step.convPct && (
+                <div className="text-[10px] font-semibold px-1.5 py-0.5 rounded mb-1" style={{ background: 'rgba(33,150,175,0.12)', color: '#2196af' }}>
+                  {step.convPct}
+                </div>
+              )}
+              {!step.convPct && i > 0 && <div className="mb-4" />}
+              {/* Bar */}
+              <div
+                className="w-full rounded-t-md transition-all"
+                style={{ height: h, backgroundColor: BAR_COLOR, opacity: 0.85 + i * 0.02 }}
+              />
+              {/* Step label */}
+              <div className="text-[10px] font-bold uppercase tracking-wide text-gray-500 mt-2 text-center leading-tight">{step.label}</div>
+              {/* Drop-off */}
+              {step.dropPct && (
+                <div className="text-[10px] text-red-400 font-medium mt-0.5">↓ {step.dropPct} drop</div>
+              )}
+            </div>
+            {/* Arrow connector */}
+            {!isLast && (
+              <div className="flex-shrink-0 flex items-end pb-8">
+                <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
+                  <rect x="0" y="8" width="20" height="4" rx="2" fill={CONNECTOR_COLOR} />
+                  <path d="M18 4 L26 10 L18 16" stroke={CONNECTOR_COLOR} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                </svg>
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
     </div>
-    {!isLast && (
-      <div className="flex flex-col items-center px-1 flex-shrink-0 mt-[-14px]">
-        <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
-          <path d="M0 8 H18 M12 2 L20 8 L12 14" stroke="#2196af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.35"/>
-        </svg>
-      </div>
-    )}
-  </div>
-);
+  );
+};
 
 // ── TAB: Overview ─────────────────────────────────────────────────────────────
 
-function OverviewTab({ onNavigate }) {
-  const [expandedFunnel, setExpandedFunnel] = React.useState(null);
-  const [expandedCohort, setExpandedCohort] = React.useState(null);
-
-  const funnelSteps = [
-    { label: 'Accounts',  value: '12,000', sub: 'Total placement',     pct: null,                key: 'Accounts' },
-    { label: 'Contacted', value: '4,560',  sub: '38% contact rate',    pct: '38% of placement',  key: 'Contacted' },
-    { label: 'RPC',       value: '3,360',  sub: 'Right party contact',  pct: '28% of placement',  key: 'RPC' },
-    { label: 'PTP',       value: '403',    sub: 'Promise to pay',      pct: '12% of RPC',        key: 'PTP' },
-    { label: 'Kept PTP',  value: '274',    sub: '68% adherence',       pct: '68% of PTP',        key: 'Kept PTP' },
-    { label: 'Resolved',  value: '743',    sub: 'Cumulative',          pct: '6.2% of placement', key: 'Resolved' },
-  ];
-
+function OverviewTab({ onNavigate, viewMode }) {
   return (
     <div className="px-8 py-6 space-y-6">
-      {/* KPI Summary row */}
-      <div className="grid grid-cols-7 gap-3">
-        {[
-          { label: 'Liquidation Rate', value: '2.7%', sub: '↑ vs 2.5% target', color: 'text-blue-600' },
-          { label: 'Contact Rate', value: '38%', sub: '↑ from 31% Wk1' },
-          { label: 'RPC Rate', value: '28%', sub: '↑ from 22% Wk1' },
-          { label: 'PTP Rate', value: '12%', sub: 'At target' },
-          { label: 'Kept-PTP', value: '68%', sub: '↓ 2pts from target', color: 'text-amber-600' },
-          { label: 'Resolution', value: '6.2%', sub: 'Cumulative' },
-          { label: 'Compliance', value: '99.86%', sub: '↑ vs 99.5% floor', color: 'text-green-600' },
-        ].map((k, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-lg p-3">
-            <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mb-1">{k.label}</div>
-            <div className={`text-xl font-extrabold ${k.color || 'text-gray-900'}`}>{k.value}</div>
-            <div className="text-[10px] text-gray-400 mt-0.5">{k.sub}</div>
-          </div>
-        ))}
-      </div>
 
-      {/* Collections funnel */}
+      {/* Collections funnel — bar chart style */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-6 pt-5 pb-2">
+        <div className="px-6 pt-5 pb-4">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Collections Funnel</h2>
-            <span className="text-xs text-gray-400">Week 3 · All channels</span>
-          </div>
-          <p className="text-xs text-gray-400 mb-5">End-to-end conversion — click any step for trend</p>
-          <div className="flex items-start gap-1">
-            {funnelSteps.map((step, i) => (
-              <FunnelStep
-                key={step.key}
-                label={step.label}
-                value={step.value}
-                sub={step.sub}
-                pct={step.pct}
-                isLast={i === funnelSteps.length - 1}
-                isExpanded={expandedFunnel === step.key}
-                onClick={() => setExpandedFunnel(expandedFunnel === step.key ? null : step.key)}
-              />
-            ))}
-          </div>
-          {expandedFunnel && (
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid #d4eae5' }}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-semibold text-gray-900">{expandedFunnel}</span>
-                <span className="text-xs text-gray-400">— 18-day trend</span>
-              </div>
-              <ResponsiveContainer width="100%" height={120}>
-                <AreaChart data={funnelTrendData[expandedFunnel]} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
-                  <defs>
-                    <linearGradient id="funnelGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="#2196af" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#2196af" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="day" tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="value" stroke="#2196af" fill="url(#funnelGrad)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
+            <div>
+              <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Collections Funnel</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Week 3 · All channels · End-to-end conversion</p>
             </div>
-          )}
+            <span className="text-xs text-gray-400">Viewing by: <strong className="text-gray-700">{viewMode === 'accounts' ? '# Accounts' : '$ Value'}</strong></span>
+          </div>
+
+          <div className="mt-5 px-2">
+            <BarFunnel viewMode={viewMode} />
+          </div>
         </div>
-        <div className="grid grid-cols-5 gap-px mt-4" style={{ borderTop: '1px solid #d4eae5' }}>
+
+        {/* Drop-off strip */}
+        <div className="grid grid-cols-5 gap-px" style={{ borderTop: '1px solid #d4eae5' }}>
           {[
-            { label: 'Unreached',   value: '7,440', note: 'Skip trace / re-attempt in progress' },
-            { label: 'No RPC',      value: '1,200', note: 'Connected but not right party' },
-            { label: 'No PTP',      value: '2,957', note: 'Engaged but no commitment' },
-            { label: 'Broken PTP',  value: '129',   note: '620 total broken this placement' },
-            { label: 'In progress', value: '469',   note: 'Active payment plans running' },
+            { label: 'Unreached',   accounts: '7,440', dollars: '$18.6M', note: 'Skip trace / re-attempt in progress' },
+            { label: 'No RPC',      accounts: '1,200', dollars: '$4.3M',  note: 'Connected but not right party' },
+            { label: 'No PTP',      accounts: '2,957', dollars: '$8.3M',  note: 'Engaged but no commitment' },
+            { label: 'Broken PTP',  accounts: '129',   dollars: '$0.6M',  note: '620 total broken this placement' },
+            { label: 'In progress', accounts: '469',   dollars: '$1.7M',  note: 'Active payment plans running' },
           ].map((d, i) => (
             <div key={i} className="px-4 py-3" style={{ backgroundColor: '#f8fcfb' }}>
               <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Drop-off: {d.label}</div>
-              <div className="text-sm font-bold text-red-500">{d.value}</div>
+              <div className="text-sm font-bold text-red-500">{viewMode === 'accounts' ? d.accounts : d.dollars}</div>
               <div className="text-[10px] text-gray-400 mt-0.5">{d.note}</div>
             </div>
           ))}
@@ -1130,6 +1111,7 @@ const TABS = [
 
 export default function Performance({ onNavigate }) {
   const [activeTab, setActiveTab] = React.useState('overview');
+  const [viewMode, setViewMode] = React.useState('accounts'); // 'accounts' | 'dollars'
 
   return (
     <div className="min-h-full bg-gray-50">
@@ -1143,13 +1125,33 @@ export default function Performance({ onNavigate }) {
             <h1 className="text-xl font-bold text-gray-900">Performance</h1>
             <p className="text-sm text-gray-500 mt-0.5">Apex Recovery Partners · Hypercare Week 3 · Day 18</p>
           </div>
-          <span
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
-            style={{ background: 'linear-gradient(135deg, rgba(33,150,175,0.12), rgba(97,171,94,0.12))', color: '#2196af', border: '1px solid rgba(33,150,175,0.3)' }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#61ab5e' }} />
-            Above activation target
-          </span>
+          <div className="flex items-center gap-3">
+            {/* Global Account / $ toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">View by:</span>
+              <div className="flex bg-gray-100 rounded-lg p-0.5">
+                <button
+                  onClick={() => setViewMode('accounts')}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'accounts' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  # Accounts
+                </button>
+                <button
+                  onClick={() => setViewMode('dollars')}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'dollars' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  $ Value
+                </button>
+              </div>
+            </div>
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
+              style={{ background: 'linear-gradient(135deg, rgba(33,150,175,0.12), rgba(97,171,94,0.12))', color: '#2196af', border: '1px solid rgba(33,150,175,0.3)' }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#61ab5e' }} />
+              Above activation target
+            </span>
+          </div>
         </div>
 
         {/* Hero cards */}
@@ -1238,13 +1240,13 @@ export default function Performance({ onNavigate }) {
       </div>
 
       {/* ── TAB CONTENT ─────────────────────────────────────────────────────── */}
-      {activeTab === 'overview'   && <OverviewTab onNavigate={onNavigate} />}
-      {activeTab === 'inbound'    && <InboundTab />}
-      {activeTab === 'promises'   && <PromisesTab />}
+      {activeTab === 'overview'   && <OverviewTab onNavigate={onNavigate} viewMode={viewMode} />}
+      {activeTab === 'inbound'    && <InboundTab viewMode={viewMode} />}
+      {activeTab === 'promises'   && <PromisesTab viewMode={viewMode} />}
       {activeTab === 'agents'     && <AgentPerformanceTab />}
       {activeTab === 'benchmark'  && <BenchmarkTab />}
       {activeTab === 'enrichment' && <EnrichmentTab />}
-      {activeTab === 'cohorts'    && <CohortsTab onNavigate={onNavigate} />}
+      {activeTab === 'cohorts'    && <CohortsTab onNavigate={onNavigate} viewMode={viewMode} />}
 
     </div>
   );
