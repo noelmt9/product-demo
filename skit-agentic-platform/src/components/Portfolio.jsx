@@ -2,6 +2,94 @@ import { useState } from 'react';
 import { portfolioData } from '../data';
 import { Section } from './shared';
 
+const propensitySegments = [
+  {
+    name: 'High Propensity / High Balance',
+    accounts: 1800,
+    preScore: 0.82,
+    postScore: 0.88,
+    shift: '+7.3%',
+    shiftDirection: 'up',
+    inputs: {
+      avgBalance: '$4,500',
+      debtAge: '8 months',
+      debtType: 'Credit Card (61%), Personal Loan (39%)',
+      ficoRange: '580-640',
+      pastPayments: '2+ prior payments on record',
+      creditScore: '590 avg',
+    },
+    reasoning: 'High FICO relative to portfolio, recent prior payment history, and shorter debt age indicate strong willingness to pay. Post-engagement score increased because 52% contact rate and 18% PTP rate confirmed behavioral signals. Settlement offers are converting at 8% — above the 5% benchmark for this debt age.',
+  },
+  {
+    name: 'High Propensity / Low Balance',
+    accounts: 2400,
+    preScore: 0.74,
+    postScore: 0.71,
+    shift: '-4.1%',
+    shiftDirection: 'down',
+    inputs: {
+      avgBalance: '$1,200',
+      debtAge: '11 months',
+      debtType: 'Medical (52%), Credit Card (48%)',
+      ficoRange: '560-610',
+      pastPayments: '1 prior payment on record',
+      creditScore: '570 avg',
+    },
+    reasoning: 'Pre-engagement score was high due to low balance (easier to resolve) and some payment history. Post-engagement dipped slightly because medical debt accounts showed lower response to digital-only outreach. Considering adding a voice AI touchpoint for the medical subset to improve engagement.',
+  },
+  {
+    name: 'Medium Propensity',
+    accounts: 4200,
+    preScore: 0.51,
+    postScore: 0.58,
+    shift: '+13.7%',
+    shiftDirection: 'up',
+    inputs: {
+      avgBalance: '$2,600',
+      debtAge: '14 months',
+      debtType: 'Credit Card (44%), Personal Loan (32%), Medical (24%)',
+      ficoRange: '520-580',
+      pastPayments: '0-1 prior payments',
+      creditScore: '540 avg',
+    },
+    reasoning: 'Largest cohort with mixed signals pre-engagement. Score improved significantly post-engagement because 340 accounts showed strong SMS/email engagement signals (clicks, opens) that weren\'t visible in static data. Re-scored 340 from Low → Medium. Multi-channel blitz is working — contact rate at 36% and climbing.',
+  },
+  {
+    name: 'Low Propensity / High Balance',
+    accounts: 1500,
+    preScore: 0.28,
+    postScore: 0.33,
+    shift: '+17.9%',
+    shiftDirection: 'up',
+    inputs: {
+      avgBalance: '$5,200',
+      debtAge: '22 months',
+      debtType: 'Personal Loan (55%), Credit Card (45%)',
+      ficoRange: '480-530',
+      pastPayments: 'No prior payments',
+      creditScore: '500 avg',
+    },
+    reasoning: 'Pre-engagement score low due to no payment history, older debt, and low FICO. Post-engagement improved because skip-traced contacts yielded 28% contact rate and human agents found 8% willing to discuss hardship plans. Revenue per agent-hour still declining Week 3 — Analyst recommends reducing frequency and reallocating 1 agent to Medium Propensity.',
+  },
+  {
+    name: 'Low Propensity / Low Balance',
+    accounts: 2100,
+    preScore: 0.18,
+    postScore: 0.15,
+    shift: '-16.7%',
+    shiftDirection: 'down',
+    inputs: {
+      avgBalance: '$900',
+      debtAge: '26 months',
+      debtType: 'Medical (68%), Credit Card (32%)',
+      ficoRange: '450-510',
+      pastPayments: 'No prior payments',
+      creditScore: '470 avg',
+    },
+    reasoning: 'Low balance combined with old debt age and no payment history. Post-engagement score dropped because email-only outreach yielded 12% contact rate with only 3% PTP rate. Cost-per-dollar collected is highest in this cohort. Maintaining low-touch strategy — ROI doesn\'t justify increasing effort.',
+  },
+];
+
 const cohortAllocationData = [
   {
     name: "High propensity / Low balance",
@@ -62,6 +150,8 @@ const cohortAllocationData = [
 ];
 
 export default function Portfolio() {
+  const [propensityView, setPropensityView] = useState('post'); // 'pre' | 'post'
+  const [expandedSegment, setExpandedSegment] = useState(null);
   const [uploadStep, setUploadStep] = useState(null); // null, 'upload', 'uploading', 'processing', 'complete'
   const [selectedFile, setSelectedFile] = useState(null);
   const [processingSteps, setProcessingSteps] = useState({
@@ -176,34 +266,34 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="p-8 bg-gray-50">
+    <div className="p-8 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-gray-900">Portfolio</h1>
-        <p className="text-sm text-gray-600 mt-1">Current allocation, runway, and account upload</p>
+        <p className="text-sm text-gray-500 mt-1">Current allocation, runway, and account upload</p>
       </div>
 
       {/* Portfolio Summary Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="p-5 bg-white border border-gray-200 rounded-lg">
-          <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Total Accounts</div>
-          <div className="text-3xl font-semibold text-gray-900 mb-1">12,000</div>
-          <div className="text-xs text-gray-600">11,257 active, 743 resolved</div>
+        <div className="card p-4">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Total Accounts</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">12,000</div>
+          <div className="text-xs text-gray-500">11,257 active, 743 resolved</div>
         </div>
-        <div className="p-5 bg-white border border-gray-200 rounded-lg">
-          <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Portfolio Value</div>
-          <div className="text-3xl font-semibold text-gray-900 mb-1">$33.6M</div>
-          <div className="text-xs text-gray-600">$31.5M remaining</div>
+        <div className="card p-4">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Portfolio Value</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">$33.6M</div>
+          <div className="text-xs text-gray-500">$31.5M remaining</div>
         </div>
-        <div className="p-5 bg-white border border-gray-200 rounded-lg">
-          <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Avg Balance</div>
-          <div className="text-3xl font-semibold text-gray-900 mb-1">$2,800</div>
-          <div className="text-xs text-gray-600">Across all cohorts</div>
+        <div className="card p-4">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Avg Balance</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">$2,800</div>
+          <div className="text-xs text-gray-500">Across all cohorts</div>
         </div>
-        <div className="p-5 bg-white border border-gray-200 rounded-lg">
-          <div className="text-xs uppercase tracking-wide text-gray-500 mb-2">Days Active</div>
-          <div className="text-3xl font-semibold text-gray-900 mb-1">18</div>
-          <div className="text-xs text-gray-600">Hypercare — Week 3</div>
+        <div className="card p-4">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 mb-2">Days Active</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">18</div>
+          <div className="text-xs text-gray-500">Hypercare — Week 3</div>
         </div>
       </div>
 
@@ -241,6 +331,111 @@ export default function Portfolio() {
             <span className="text-lg font-extrabold text-emerald-700">$127,400</span>
           </div>
           <span className="text-xs text-emerald-600 font-medium">Accounts client could not reach on their own</span>
+        </div>
+      </section>
+
+      {/* Propensity Models */}
+      <section className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-gray-700">psychology</span>
+            <h2 className="text-base font-semibold text-gray-900">Propensity Model</h2>
+          </div>
+          <div className="flex bg-gray-100 rounded-lg p-0.5">
+            <button
+              onClick={() => setPropensityView('pre')}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${propensityView === 'pre' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
+            >Pre-Engagement</button>
+            <button
+              onClick={() => setPropensityView('post')}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${propensityView === 'post' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
+            >Post-Engagement</button>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {propensitySegments.map((seg, idx) => {
+            const score = propensityView === 'pre' ? seg.preScore : seg.postScore;
+            const isExpanded = expandedSegment === idx;
+            return (
+              <div key={idx} className="card overflow-hidden">
+                <button
+                  onClick={() => setExpandedSegment(isExpanded ? null : idx)}
+                  className="w-full p-4 flex items-center gap-4 text-left hover:bg-gray-50/50 transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-sm font-semibold text-gray-900">{seg.name}</h3>
+                      <span className="text-[10px] text-gray-400">{seg.accounts.toLocaleString()} accounts</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {/* Score bar */}
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${score * 100}%`,
+                            background: score >= 0.7 ? '#10b981' : score >= 0.4 ? '#f59e0b' : '#ef4444',
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm font-bold text-gray-900 w-12 text-right">{(score * 100).toFixed(0)}%</span>
+                    </div>
+                  </div>
+                  {propensityView === 'post' && (
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded ${seg.shiftDirection === 'up' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
+                      {seg.shift}
+                    </span>
+                  )}
+                  <span className={`material-symbols-outlined text-gray-400 text-lg transition-transform ${isExpanded ? 'rotate-180' : ''}`}>expand_more</span>
+                </button>
+
+                {isExpanded && (
+                  <div className="px-4 pb-4 border-t border-gray-50 animate-fadeIn">
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+                      {/* Placement File Inputs */}
+                      <div>
+                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Model Inputs</h4>
+                        <div className="space-y-1.5 text-xs">
+                          {Object.entries(seg.inputs).map(([key, val]) => (
+                            <div key={key} className="flex justify-between">
+                              <span className="text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                              <span className="font-medium text-gray-900">{val}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Scores comparison */}
+                      <div>
+                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Score Comparison</h4>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 w-20">Pre</span>
+                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-gray-400 rounded-full" style={{width: `${seg.preScore * 100}%`}} />
+                            </div>
+                            <span className="text-xs font-semibold text-gray-600 w-10 text-right">{(seg.preScore * 100).toFixed(0)}%</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 w-20">Post</span>
+                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-full rounded-full" style={{width: `${seg.postScore * 100}%`, background: seg.postScore >= 0.7 ? '#10b981' : seg.postScore >= 0.4 ? '#f59e0b' : '#ef4444'}} />
+                            </div>
+                            <span className="text-xs font-semibold text-gray-900 w-10 text-right">{(seg.postScore * 100).toFixed(0)}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Reasoning */}
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Segmentation Reasoning</h4>
+                      <p className="text-xs text-gray-600 leading-relaxed">{seg.reasoning}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -328,7 +523,7 @@ export default function Portfolio() {
                     </button>
                   </div>
 
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
                     <p className="text-xs font-semibold text-gray-900 mb-3">What happens next:</p>
                     <ol className="space-y-2 text-xs text-gray-700">
                       <li className="flex items-start gap-2">
@@ -369,7 +564,7 @@ export default function Portfolio() {
 
       {/* Uploading State */}
       {uploadStep === 'uploading' && (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 mb-6">
+        <div className="card p-8 mb-6">
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
@@ -386,7 +581,7 @@ export default function Portfolio() {
       <Section title="Cohort Allocation & Runway" className="mb-6">
           <div className="space-y-4">
             {cohortAllocationData.map((cohort, idx) => (
-            <div key={idx} className="p-4 bg-white border border-gray-200 rounded-lg">
+            <div key={idx} className="card p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold text-gray-900 mb-1">{cohort.name}</h3>

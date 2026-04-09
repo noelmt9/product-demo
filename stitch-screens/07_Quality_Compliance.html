@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Skit AI | Quality &amp; Compliance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Merriweather:ital,wght@1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#00152e",
+                        "secondary-fixed-dim": "#96cbff",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-primary-fixed-variant": "#354863",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-container": "#23a197",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#b4c8e9",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-fixed": "#00201d",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#d4e3ff",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#7e92b1",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#004a76",
+                        "tertiary-fixed-dim": "#69d8cd",
+                        "on-secondary-container": "#004167",
+                        "tertiary-fixed": "#87f5e9",
+                        "inverse-surface": "#213145",
+                        "inverse-primary": "#b4c8e9",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-background": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c4c6ce",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary": "#001816",
+                        "secondary": "#00639b",
+                        "primary-container": "#162a44",
+                        "secondary-container": "#47afff",
+                        "surface-container": "#e5eeff",
+                        "outline": "#74777e",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-fixed": "#cee5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#002f2b",
+                        "on-primary-fixed": "#061c35",
+                        "surface-tint": "#4c5f7c",
+                        "on-secondary-fixed": "#001d33",
+                        "on-surface-variant": "#44474d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ai-gradient {
+            background: linear-gradient(135deg, #3BA7F6 0%, #5FCFC4 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- SideNavBar Shell -->
+<aside class="w-[264px] h-screen fixed left-0 top-0 bg-[#162A44] flex flex-col py-6 z-50">
+<div class="px-6 mb-10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 ai-gradient rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">bubble_chart</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-white tracking-tight">Skit AI</h1>
+<p class="text-[10px] text-[#5FCFC4] font-medium tracking-widest uppercase">Intelligent Layer</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-4 py-2.5 text-slate-300 hover:text-white mx-2 hover:bg-white/5 transition-colors font-['Inter'] font-medium tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined mr-3">insights</span>
+                Insights
+            </a>
+<a class="flex items-center px-4 py-2.5 text-slate-300 hover:text-white mx-2 hover:bg-white/5 transition-colors font-['Inter'] font-medium tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined mr-3">speed</span>
+                Performance
+            </a>
+<a class="flex items-center px-4 py-2.5 text-slate-300 hover:text-white mx-2 hover:bg-white/5 transition-colors font-['Inter'] font-medium tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span>
+                Portfolio
+            </a>
+<a class="flex items-center px-4 py-2.5 text-slate-300 hover:text-white mx-2 hover:bg-white/5 transition-colors font-['Inter'] font-medium tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined mr-3">fact_check</span>
+                Approvals
+            </a>
+<a class="flex items-center px-4 py-2.5 text-slate-300 hover:text-white mx-2 hover:bg-white/5 transition-colors font-['Inter'] font-medium tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined mr-3">forum</span>
+                Conversations
+            </a>
+<a class="flex items-center px-4 py-2.5 bg-white/10 text-[#5FCFC4] rounded-lg mx-2 transition-colors font-['Inter'] font-medium tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined mr-3">rule</span>
+                Quality/Compliance
+            </a>
+<a class="flex items-center px-4 py-2.5 text-slate-300 hover:text-white mx-2 hover:bg-white/5 transition-colors font-['Inter'] font-medium tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="mt-auto px-6">
+<div class="p-4 bg-white/5 rounded-xl">
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">System Status</p>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-[#5FCFC4] shadow-[0_0_8px_#5FCFC4]"></div>
+<span class="text-xs text-slate-200">All Agents Compliant</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="h-16 w-[calc(100%-264px)] fixed right-0 top-0 flex items-center justify-between px-8 bg-slate-100 z-40 shadow-sm">
+<div class="flex items-center w-1/2">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-secondary/20 transition-all" placeholder="Search compliance logs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-slate-500 hover:text-[#3BA7F6] transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-500 hover:text-[#3BA7F6] transition-all duration-200">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden bg-slate-200">
+<img class="w-full h-full object-cover" data-alt="professional headshot of a compliance officer in a modern workspace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2LfL0s79RtSGdcmLqlKkMuakJevKDi8GY7X9Ulltzs3Sj9RuZwWPbmFXcHl0s_xA5GZGnzS1JHR6QIeFgagvJiO8mV26J1mGwMM-roJqS4JzLo8iFppFXXlEoGj1bMdgNogYM8iVKN74ZYztCbab8Cw1n6dpmfqrxVdEOE5Z2H5jl2h_09D0SMhBJ5a5kNn8YgBqXidBHXvL2N_lck5WwU8TC75Mn7r0Istp7ApmHChPX4A0riGtdAD7lbOMAaXbzOKdC4uXeozI"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[264px] pt-16 min-h-screen">
+<div class="p-8 max-w-7xl mx-auto space-y-8">
+<!-- Page Header & Tabs -->
+<div class="flex items-end justify-between">
+<div>
+<h2 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2">Quality &amp; Compliance</h2>
+<div class="flex gap-8 border-b border-outline-variant/10">
+<button class="pb-4 text-sm font-semibold text-secondary border-b-2 border-secondary">Overview</button>
+<button class="pb-4 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">Active Improvements</button>
+<button class="pb-4 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">Risk Inventory</button>
+<button class="pb-4 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">Audit History</button>
+</div>
+</div>
+<button class="ai-gradient text-white px-6 py-2.5 rounded-lg font-semibold text-sm shadow-lg shadow-secondary/10 hover:opacity-90 transition-opacity flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-sm">download</span>
+                    Export Board Report
+                </button>
+</div>
+<!-- Revenue Protection Hero Card -->
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-8 rounded-xl shadow-sm border-t-4 border-[#3BA7F6] relative overflow-hidden">
+<div class="absolute top-0 right-0 p-8 opacity-5 select-none">
+<span class="material-symbols-outlined text-9xl">shield_with_heart</span>
+</div>
+<div class="relative z-10">
+<span class="text-xs font-bold text-[#5FCFC4] tracking-widest uppercase mb-2 block">Revenue Protection Framing</span>
+<h3 class="text-4xl font-extrabold text-on-surface mb-4">43 violations prevented today. <span class="text-secondary">Estimated exposure avoided: $64,500</span></h3>
+<div class="flex gap-12 mt-8">
+<div>
+<p class="text-on-surface-variant text-sm font-medium mb-1">Live Compliance Rate</p>
+<p class="text-2xl font-bold text-on-surface">99.86%</p>
+</div>
+<div class="w-px bg-outline-variant/20"></div>
+<div>
+<p class="text-on-surface-variant text-sm font-medium mb-1">Risk Mitigation ROI</p>
+<p class="text-2xl font-bold text-[#5FCFC4]">14.2x</p>
+</div>
+<div class="w-px bg-outline-variant/20"></div>
+<div>
+<p class="text-on-surface-variant text-sm font-medium mb-1">Agent Drift Index</p>
+<p class="text-2xl font-bold text-on-surface">Minimal (0.02)</p>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 space-y-4">
+<div class="bg-primary-container p-6 rounded-xl text-white">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-tertiary-fixed">auto_awesome</span>
+<span class="text-[10px] bg-white/10 px-2 py-1 rounded text-white/80 uppercase font-bold">New Suggestion</span>
+</div>
+<p class="font-headline font-medium leading-relaxed italic text-slate-100">"Based on 14 recent 'INFO' level deviations, updating the <span class="underline decoration-tertiary-fixed">TCPA Consent Script</span> for California calls could reduce legal exposure by another 12%."</p>
+<p class="mt-4 text-xs font-medium text-slate-400">— Agent Curator Insight</p>
+</div>
+</div>
+</div>
+<!-- Compliance Log Section -->
+<div class="bg-surface-container-low rounded-xl p-6">
+<div class="flex items-center justify-between mb-6 px-2">
+<h4 class="text-lg font-bold text-on-surface">Recent Safety Triggers</h4>
+<div class="flex gap-2">
+<button class="bg-surface-container-lowest px-4 py-1.5 rounded-lg text-xs font-semibold text-on-surface shadow-sm">All Severities</button>
+<button class="bg-surface-container-lowest/50 px-4 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant">Last 24 Hours</button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Critical Flag -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm hover:ring-1 hover:ring-error/20 transition-all">
+<div class="flex items-start justify-between">
+<div class="flex gap-4">
+<div class="mt-1">
+<span class="bg-error text-on-error text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">CRITICAL</span>
+</div>
+<div>
+<h5 class="font-bold text-on-surface">Potential PII Leakage Detection</h5>
+<p class="text-sm text-on-surface-variant mt-1">Agent #0042 attempted to log partial SSN in unencrypted scratchpad.</p>
+<div class="grid grid-cols-3 gap-8 mt-4 pt-4 border-t border-outline-variant/10">
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Root Cause</p>
+<p class="text-sm font-medium mt-1">Prompt injection via user "verify" command</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Immediate Fix</p>
+<p class="text-sm font-medium mt-1">Output interceptor blocked string</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Resolution</p>
+<p class="text-sm font-medium mt-1 text-[#5FCFC4]">Resolved (Auto-patched)</p>
+</div>
+</div>
+</div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">14:22:10 UTC</span>
+</div>
+</div>
+<!-- Warning Flag -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+<div class="flex items-start justify-between">
+<div class="flex gap-4">
+<div class="mt-1">
+<span class="bg-amber-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">WARNING</span>
+</div>
+<div>
+<h5 class="font-bold text-on-surface">Unclear Value Proposition</h5>
+<p class="text-sm text-on-surface-variant mt-1">Agent skipped "Mandatory Benefits Disclosure" after customer interruption.</p>
+<div class="grid grid-cols-3 gap-8 mt-4 pt-4 border-t border-outline-variant/10">
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Root Cause</p>
+<p class="text-sm font-medium mt-1">Over-optimization for call brevity</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Immediate Fix</p>
+<p class="text-sm font-medium mt-1">Callback flagged for human review</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Resolution</p>
+<p class="text-sm font-medium mt-1 text-secondary">Pending Supervisor</p>
+</div>
+</div>
+</div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">13:05:45 UTC</span>
+</div>
+</div>
+<!-- Info Flag -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+<div class="flex items-start justify-between">
+<div class="flex gap-4">
+<div class="mt-1">
+<span class="bg-secondary text-on-secondary text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">INFO</span>
+</div>
+<div>
+<h5 class="font-bold text-on-surface">New Regional Language Pattern</h5>
+<p class="text-sm text-on-surface-variant mt-1">Multiple customers in SE region using "reckon" as positive affirmation.</p>
+<div class="grid grid-cols-3 gap-8 mt-4 pt-4 border-t border-outline-variant/10">
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Root Cause</p>
+<p class="text-sm font-medium mt-1">Localized dialect variations</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Immediate Fix</p>
+<p class="text-sm font-medium mt-1">Added to regional semantic dict</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Resolution</p>
+<p class="text-sm font-medium mt-1 text-[#5FCFC4]">Deployed</p>
+</div>
+</div>
+</div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">12:44:12 UTC</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Client-Ready Narrative Expandable -->
+<div class="bg-surface-container-highest/30 border-l-4 border-primary-container rounded-r-xl overflow-hidden">
+<details class="group">
+<summary class="flex items-center justify-between p-6 cursor-pointer select-none">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary-container">description</span>
+<span class="font-bold text-primary-container">Client-Ready Narrative: Compliance Summary (Today)</span>
+</div>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-16 pb-8">
+<div class="max-w-2xl bg-white p-8 rounded-lg shadow-sm font-body text-on-surface-variant leading-relaxed text-sm">
+<p class="font-bold text-on-surface mb-4">Internal Executive Brief — Q3 Compliance Delta</p>
+<p class="mb-4">Today's operations successfully maintained a 99.86% adherence rate across 12,400+ interactions. Most notably, the "Revenue Protection" layer intercepted 43 potential regulatory deviations before completion, effectively shielding the organization from an estimated $64,500 in statutory liability. </p>
+<p class="mb-4">The agentic infrastructure demonstrated "Kinetic Adaptation" in the Southeast region by updating localized affirmation recognition, preventing 4 false-negative disconnects. All critical flags (1) were auto-remediated within 120ms of detection.</p>
+<p class="italic text-secondary font-medium">Recommendation: Approve the TCPA Consent script update for California to further harden the liability perimeter.</p>
+</div>
+</div>
+</details>
+</div>
+<!-- Bot Adaptation Card (Bento Style) -->
+<div class="bg-surface-container-low p-8 rounded-2xl space-y-6">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined ai-gradient p-1.5 rounded-lg text-white text-sm" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<h4 class="text-xl font-bold text-on-surface">Bot Adaptation &amp; Objection Analysis</h4>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- A/B/C Variant Comparison -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<h5 class="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-4">Prompt Variant Performance</h5>
+<table class="w-full text-left text-sm">
+<thead>
+<tr class="text-[10px] text-slate-400 uppercase font-bold border-b border-outline-variant/10">
+<th class="pb-3 px-2">Variant</th>
+<th class="pb-3">Conversion</th>
+<th class="pb-3">Compliance</th>
+<th class="pb-3 text-right">Revenue/Hr</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr>
+<td class="py-4 px-2 font-bold">Variant A <span class="text-[10px] font-normal text-on-surface-variant ml-2">(Control)</span></td>
+<td class="py-4">12.4%</td>
+<td class="py-4">99.2%</td>
+<td class="py-4 text-right">$4,200</td>
+</tr>
+<tr class="bg-surface-container-low/30">
+<td class="py-4 px-2 font-bold text-secondary">Variant B <span class="text-[10px] font-normal text-on-surface-variant ml-2">(Challenger)</span></td>
+<td class="py-4 text-secondary font-bold">14.8%</td>
+<td class="py-4">99.9%</td>
+<td class="py-4 text-right font-bold">$5,100</td>
+</tr>
+<tr>
+<td class="py-4 px-2 font-bold">Variant C <span class="text-[10px] font-normal text-on-surface-variant ml-2">(Agile)</span></td>
+<td class="py-4">11.1%</td>
+<td class="py-4">98.5%</td>
+<td class="py-4 text-right">$3,850</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Objection Heatmap -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<h5 class="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-4">Objection Heatmap (Drop-off Analysis)</h5>
+<div class="grid grid-cols-4 gap-1">
+<div class="h-10 flex items-center justify-center text-[10px] font-bold text-slate-400">STAGE</div>
+<div class="h-10 flex items-center justify-center text-[10px] font-bold text-slate-400">PRICING</div>
+<div class="h-10 flex items-center justify-center text-[10px] font-bold text-slate-400">TRUST</div>
+<div class="h-10 flex items-center justify-center text-[10px] font-bold text-slate-400">TIMING</div>
+<div class="h-12 flex items-center px-2 text-[10px] font-bold bg-slate-50 border-r border-slate-100">OPENING</div>
+<div class="h-12 bg-[#5FCFC4] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">94%</div>
+<div class="h-12 bg-[#5FCFC4] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">98%</div>
+<div class="h-12 bg-[#5FCFC4] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">91%</div>
+<div class="h-12 flex items-center px-2 text-[10px] font-bold bg-slate-50 border-r border-slate-100">PITCH</div>
+<div class="h-12 bg-[#E45B5B] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">42%</div>
+<div class="h-12 bg-[#5FCFC4] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">88%</div>
+<div class="h-12 bg-[#D9A441] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">65%</div>
+<div class="h-12 flex items-center px-2 text-[10px] font-bold bg-slate-50 border-r border-slate-100">CLOSING</div>
+<div class="h-12 bg-[#5FCFC4] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">92%</div>
+<div class="h-12 bg-[#E45B5B] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">38%</div>
+<div class="h-12 bg-[#5FCFC4] text-white flex items-center justify-center text-[10px] font-bold rounded-sm shadow-inner shadow-black/5">96%</div>
+</div>
+<div class="mt-4 flex gap-4 text-[10px] font-bold">
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#5FCFC4]"></span> Handled Well</div>
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#D9A441]"></span> Caution</div>
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#E45B5B]"></span> High Drop-off</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Information (Floating Sidebar or Modals if needed, but keeping it clean per design system) -->
+<div class="fixed bottom-8 right-8">
+<button class="w-14 h-14 rounded-full ai-gradient shadow-2xl flex items-center justify-center text-white hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_spark</span>
+</button>
+</div>
+</body></html>

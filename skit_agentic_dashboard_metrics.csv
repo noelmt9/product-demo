@@ -1,0 +1,152 @@
+category,sub_category,metric_name,description,unit,example_value,view,persona,source,notes
+Agency Operations,Portfolio Overview,Total Accounts Assigned,Total number of accounts in the current placement,count,12000,Insights / Portfolio,Manager (Satyak),All meetings,Core portfolio metric
+Agency Operations,Portfolio Overview,Total Portfolio Value,Total outstanding balance across all accounts,USD,$33.6M,Insights / Portfolio,Manager (Satyak),CLAUDE.md,Core portfolio metric
+Agency Operations,Portfolio Overview,Average Balance,Average outstanding balance per account,USD,$2800,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Portfolio Overview,Portfolio Age Mix,Distribution of accounts by months since charge-off,months,6–36 months,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Portfolio Overview,Debt Type Breakdown,% split across credit card / personal loan / medical,percentage,"Credit Card 42%, Personal Loan 28%, Medical 30%",Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Portfolio Overview,State Distribution,Account volume by state (top states),percentage,"TX 18%, FL 15%, CA 14%, NY 12%, IL 8%",Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Portfolio Overview,Prior Placement Mix,% primary / secondary / tertiary placements,percentage,"Primary 45%, Secondary 35%, Tertiary 20%",Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Portfolio Overview,Average Months Since Charge-off,Average delinquency age across portfolio,months,14,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Portfolio Overview,Placement Period,Duration for which accounts are placed with the agency,months,varies,Portfolio,Manager (Satyak),Apr 8 transcript,From AmEx analytics framework
+Agency Operations,Portfolio Overview,Monthly Placement Volume,Number of new accounts placed each month,count,varies,Portfolio,Manager (Satyak),Apr 8 transcript,From AmEx analytics framework
+Agency Operations,Enrichment Pipeline,Unreachable Accounts,Accounts with no valid contact info at time of placement,count,1847,Portfolio / Insights,Manager (Satyak),Apr 7 transcript,Part of engagement pipeline
+Agency Operations,Enrichment Pipeline,Enriched Accounts,Accounts recovered via skip tracing / data enrichment,count,1312,Portfolio / Insights,Manager (Satyak),Apr 7 transcript,
+Agency Operations,Enrichment Pipeline,Successfully Contacted Post-Enrichment,Enriched accounts that were successfully contacted,count,487,Portfolio / Insights,Manager (Satyak),Apr 7 transcript,
+Agency Operations,Enrichment Pipeline,Converted Post-Enrichment,Enriched accounts that resulted in payment/PTP,count,89,Portfolio / Insights,Manager (Satyak),Apr 7 transcript,
+Agency Operations,Enrichment Pipeline,Enrichment Conversion Rate,% of enriched accounts that converted,percentage,6.8%,Portfolio,Manager (Satyak),Apr 7 transcript,89/1312
+Agency Operations,Enrichment Pipeline,Phone (Cell) Coverage,% of accounts with cell phone on file,percentage,72%,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Enrichment Pipeline,Phone (Landline) Coverage,% of accounts with landline on file,percentage,41%,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Enrichment Pipeline,Email Coverage,% of accounts with email on file,percentage,58%,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Enrichment Pipeline,SMS-Eligible Coverage,% of accounts with cell + TCPA consent,percentage,68%,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Enrichment Pipeline,Data Issues Count,Accounts flagged for missing/invalid data at intake,count,153,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Performance,Liquidation Rate,Payments collected as % of total portfolio value,percentage,2.7%,Insights / Performance,Manager (Satyak),All meetings,Primary KPI; target 2.5%
+Agency Operations,Performance,6-Month Average Liquidation Rate,Rolling 6-month average of 12-month liquidation rates,percentage,varies,Performance,Manager (Satyak),Apr 8 transcript,From AmEx analytics framework
+Agency Operations,Performance,Target Liquidation Rate,Client-agreed activation benchmark for liquidation,percentage,2.5%,Performance,Manager (Satyak),CLAUDE.md,
+Agency Operations,Performance,Contact Rate,% of accounts reached via any channel,percentage,38%,Insights / Performance,Manager (Satyak),All meetings,Target 40%
+Agency Operations,Performance,RPC Rate,Right Party Contact — confirmed debtor reached,percentage,28%,Insights / Performance,Manager (Satyak),Apr 8 transcript,Renamed from "Contact Rate" in some views; target 30%
+Agency Operations,Performance,RPC to PTP Conversion Rate,% of RPCs that result in a Promise to Pay,percentage,12%,Insights / Performance,Manager (Satyak),Apr 8 transcript,Target 12%
+Agency Operations,Performance,PTP Adherence Rate,% of promises kept by consumers,percentage,68%,Insights / Performance,Manager (Satyak),All meetings,Target 70%
+Agency Operations,Performance,Abandoned Rate,% of inbound calls abandoned before resolution (formerly Drop-off Rate),percentage,18%,Insights / Performance,Manager (Satyak),Apr 8 transcript,Industry standard term; renamed from Drop-off Rate
+Agency Operations,Performance,Resolution Rate,% of total accounts resolved (payments + PTP kept + self-pay),percentage,8.4%,Insights / Performance,Manager (Satyak),Apr 8 transcript,Higher than PTP rate; includes accounts paid without giving PTP
+Agency Operations,Performance,Accounts Resolved,Total number of accounts closed/resolved (cumulative),count,743,Insights,Manager (Satyak),CLAUDE.md,
+Agency Operations,Performance,Total Collected,Total $ amount collected in period,USD,$287400,Insights,Manager (Satyak),CLAUDE.md,
+Agency Operations,Performance,Agency Comparison / Benchmark,Performance vs other agencies on same portfolio type,score/rank,varies,Performance,Manager (Satyak),Apr 8 transcript,Benchmarking methodology for client view
+Agency Operations,Cohort Management,Cohort Account Count,Number of accounts in each propensity/balance cohort,count,varies by cohort,Portfolio,Manager (Satyak),CLAUDE.md,5 cohorts defined
+Agency Operations,Cohort Management,Cohort Total Value,Total portfolio value per cohort,USD,varies by cohort,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Cohort Management,Cohort Avg Balance,Average balance per cohort,USD,varies by cohort,Portfolio,Manager (Satyak),CLAUDE.md,
+Agency Operations,Cohort Management,Cohort Liquidation Rate,Liquidation rate per cohort,percentage,varies,Portfolio / Performance,Manager (Satyak),CLAUDE.md,
+Agency Operations,Cohort Management,Cohort Contact Rate,Contact rate per cohort,percentage,varies,Portfolio / Performance,Manager (Satyak),CLAUDE.md,
+Agency Operations,Cohort Management,Cohort RPC Rate,RPC rate per cohort,percentage,varies,Portfolio / Performance,Manager (Satyak),CLAUDE.md,
+Agency Operations,Cohort Management,Cohort PTP Rate,PTP rate per cohort,percentage,varies,Portfolio / Performance,Manager (Satyak),CLAUDE.md,
+Agency Operations,Cohort Management,Pre-Engagement Score,Propensity score before contact (FICO / credit bureau / loan data),score,varies,Portfolio,Manager (Satyak),Apr 7 transcript,Static model input
+Agency Operations,Cohort Management,Post-Engagement Score,Updated propensity score based on response/contact/payment behavior,score,varies,Portfolio,Manager (Satyak),Apr 7 transcript,Dynamic; updates as engagement happens
+Agency Operations,Cohort Management,Cohort Migration Count,Number of accounts moved between cohorts due to re-scoring,count,340,Portfolio / Insights,Manager (Satyak),CLAUDE.md; Apr 7 transcript,Example: 340 moved Low → Medium
+Agency Operations,Cohort Management,Balance Level,Balance tier per account: low / medium / high,category,low/medium/high,Portfolio,Analyst Agent,Apr 7 transcript,Part of cohort terminology framework
+Agency Operations,Cohort Management,Priority / Propensity Level,Propensity tier: low / medium / high,category,low/medium/high,Portfolio,Analyst Agent,Apr 7 transcript,Part of cohort terminology framework
+Inbound Call Metrics,Inbound Funnel,Total Inbound Calls,Total inbound call volume for period,count,varies,Performance / Quality,Manager (Satyak),Prior session,
+Inbound Call Metrics,Inbound Funnel,Calls Attended,Inbound calls answered by bot or agent,count,varies,Performance / Quality,Manager (Satyak),Prior session,
+Inbound Call Metrics,Inbound Funnel,Abandoned Rate,% of inbound calls dropped before resolution,percentage,18%,Insights,Manager (Satyak),Apr 8 transcript,Industry standard term confirmed
+Inbound Call Metrics,Inbound Funnel,Average Handle Time (AHT),Avg duration of inbound calls handled,minutes,4,Performance / Quality,Manager (Satyak),CLAUDE.md,Payment bot: avg 4 min
+Inbound Call Metrics,Inbound Funnel,Bot Completion Rate,% of inbound bot calls completed without agent transfer,percentage,78%,Performance,Manager (Satyak),CLAUDE.md,
+Inbound Call Metrics,Inbound Funnel,Live Transfer Rate,% of inbound calls escalated to live agent,percentage,varies,Performance,Manager (Satyak),CLAUDE.md,
+Inbound Call Metrics,Inbound Funnel,Payment Inbound Calls,Inbound calls resulting in payment,count,85,Performance,Manager (Satyak),CLAUDE.md,
+Inbound Call Metrics,Resolution,RPC Rate (Inbound),Right Party Contact rate on inbound channel,percentage,varies,Performance,Manager (Satyak),Prior session,
+Inbound Call Metrics,Resolution,PTP Rate (Inbound),% of inbound RPCs resulting in PTP,percentage,varies,Performance,Manager (Satyak),Prior session,
+Inbound Call Metrics,Resolution,Resolution Rate (Inbound),% of inbound calls resulting in payment or arrangement,percentage,varies,Performance,Manager (Satyak),Apr 8 transcript,
+Inbound Call Metrics,Resolution,Dispute / Hardship Routing Count,Number of inbound calls routed to hardship/dispute queue,count,20,Performance,Manager (Satyak),CLAUDE.md,12 disputes + 8 hardship
+Outbound Campaign Metrics,Voice AI,Voice AI Daily Call Volume,Number of voice AI calls placed per day,count,1200,Performance / Campaigns,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,Voice AI,Voice AI Connection Rate,% of voice AI calls connected to a live person,percentage,38%,Performance,Manager (Satyak),CLAUDE.md,456/1200
+Outbound Campaign Metrics,Voice AI,Voice AI RPC Rate,Right Party Contact rate for voice AI channel,percentage,varies,Performance,Manager (Satyak),Prior session,
+Outbound Campaign Metrics,Voice AI,Voice AI PTP Rate,PTP rate from voice AI contacts,percentage,varies,Performance,Manager (Satyak),Prior session,
+Outbound Campaign Metrics,Voice AI,Active Voice AI Bots,Number of distinct bot variants active,count,3,Campaigns,Manager (Satyak),CLAUDE.md,English general / English empathetic / Spanish
+Outbound Campaign Metrics,Human Agents,Agent Daily Call Volume,Total outbound calls per agent per day,count,45,Performance,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,Human Agents,Human Agent Connection Rate,% of human outbound calls connected,percentage,55%,Performance,Manager (Satyak),CLAUDE.md,148/270
+Outbound Campaign Metrics,Human Agents,Human Agent RPC Rate,Right Party Contact rate for human agent channel,percentage,varies,Performance,Manager (Satyak),Prior session,
+Outbound Campaign Metrics,Human Agents,Human Agent PTP Rate,PTP rate from human agent contacts,percentage,varies,Performance,Manager (Satyak),Prior session,
+Outbound Campaign Metrics,Human Agents,Agent Productivity,Accounts worked per agent per day,count,45,Performance,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,Human Agents,Target Revenue per FTE,Monthly revenue collected per full-time agent,USD,$1800,Performance,Manager (Satyak),Apr 8 transcript,From AmEx analytics framework
+Outbound Campaign Metrics,Human Agents,Active Human Agents,Number of active human agents in period,count,6,Campaigns,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,SMS,SMS Daily Send Volume,Number of SMS messages sent per day,count,800,Campaigns,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,SMS,SMS Open Rate,% of SMS messages opened,percentage,41%,Campaigns / Performance,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,SMS,SMS Click-Through Rate,% of SMS messages with link clicks,percentage,6.5%,Campaigns / Performance,Manager (Satyak),CLAUDE.md,52/800
+Outbound Campaign Metrics,SMS,SMS Response Rate,% of SMS messages that received a reply or action,percentage,varies,Campaigns,Manager (Satyak),Prior session,
+Outbound Campaign Metrics,Email,Email Daily Send Volume,Number of emails sent per day,count,600,Campaigns,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,Email,Email Open Rate,% of emails opened,percentage,23%,Campaigns,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,Email,Email Click Rate,% of emails with link clicks,percentage,4%,Campaigns,Manager (Satyak),CLAUDE.md,24/600
+Outbound Campaign Metrics,All Channels,Total Daily Touchpoints,Total consumer contacts across all channels per day,count,2870,Campaigns / Insights,Manager (Satyak),CLAUDE.md,
+Outbound Campaign Metrics,All Channels,Active Campaigns,Total number of campaigns running across channels,count,9,Campaigns / Insights,Manager (Satyak),CLAUDE.md,
+PTP Metrics,Promises,PTP Rate,% of right party contacts that give a Promise to Pay,percentage,12%,Insights / Performance,Manager (Satyak),All meetings,Target 12%
+PTP Metrics,Promises,PTP Adherence Rate,% of promises kept (payment received),percentage,68%,Insights / Performance,Manager (Satyak),All meetings,Target 70%
+PTP Metrics,Promises,Warm PTP,PTP given after direct conversation (voice / human),count/percentage,varies,Performance,Manager (Satyak),Prior session,Higher quality PTP
+PTP Metrics,Promises,Cold PTP,PTP via unilateral channel (SMS/email) without live conversation,count/percentage,varies,Performance,Manager (Satyak),Prior session,Lower quality PTP
+PTP Metrics,Promises,Broken PTP Count,Number of PTPs not honored (missed first installment),count,620,Approvals / Performance,Manager (Satyak),CLAUDE.md,Used for settlement offer targeting
+PTP Metrics,Follow-up,PTP Follow-up SMS Sent,Reminder SMS sent to accounts with active PTP,count,120,Campaigns,Manager (Satyak),CLAUDE.md,
+PTP Metrics,Follow-up,PTP Follow-up Outcome,% of PTP reminders resulting in payment,percentage,varies,Performance,Manager (Satyak),Prior session,
+PTP Metrics,Payments,Settlement Offer Acceptance Rate,% of accounts offered settlement who accept,percentage,varies,Performance,Manager (Satyak),CLAUDE.md,15% discount offer tested
+PTP Metrics,Payments,Payment Plan Adherence,% of installment plans with all payments on time,percentage,varies,Performance,Manager (Satyak),Prior session,
+Quality / Compliance,Compliance,Conversations Audited,Total conversations reviewed by compliance agent,count,2847,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Compliance,Compliance Score,% of conversations with zero compliance flags,percentage,99.86%,Insights / Quality,Manager (Satyak),CLAUDE.md,Target 99.5%
+Quality / Compliance,Compliance,Flags Raised,Number of compliance violations flagged,count,4,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Compliance,Flags Resolved,Number of flags resolved,count,4,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Compliance,Average Flag Resolution Time,Avg hours to resolve a compliance flag,hours,18,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Compliance,Mini-Miranda Adherence Rate,% of calls with proper debt collector disclosure within 30 seconds,percentage,varies,Quality (Call Quality View),Manager (Satyak),Apr 8 PDF (Shitiz),Specifically requested by Shitiz
+Quality / Compliance,Compliance,FDCPA Violation Count,Number of FDCPA violations flagged,count,3,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Compliance,TCPA Violation Count,Number of TCPA violations flagged,count,1,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Call Quality,Call Opening Adherence Rate,% of calls that follow the approved opening script,percentage,varies,Quality (Call Quality View),Manager (Satyak),Apr 8 PDF (Shitiz),Specifically requested by Shitiz
+Quality / Compliance,Call Quality,Call Closing Adherence Rate,% of calls that follow the approved closing script,percentage,varies,Quality (Call Quality View),Manager (Satyak),Apr 8 PDF (Shitiz),Specifically requested by Shitiz
+Quality / Compliance,Call Quality,Human Agent Quality Score (Avg),Average quality score for human agents (out of 100),score,87,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Call Quality,AI Bot Quality Score (Avg),Average quality score for AI bot conversations,score,92,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Call Quality,Calls Scored (Human),Number of human agent calls scored this period,count,142,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Call Quality,Calls Scored (AI Bot),Number of AI bot conversations scored this period,count,480,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Call Quality,Agents Below Quality Threshold,Number of agents scoring below 80/100 threshold,count,3,Quality,Manager (Satyak),CLAUDE.md,
+Quality / Compliance,Call Quality,Training Compliance Rate,% of agents current on required training,percentage,100%,Quality,Manager (Satyak),CLAUDE.md,6/6
+Quality / Compliance,Customer Sentiment,Customer Sentiment Score,Aggregate sentiment analysis of consumer interactions,score,varies,Quality (Sentiment View),Manager (Satyak); External Client,Apr 8 PDF (Shitiz),New view requested by Shitiz
+Quality / Compliance,Customer Sentiment,Positive Sentiment %,% of interactions with positive customer sentiment,percentage,varies,Quality (Sentiment View),Manager (Satyak); External Client,Apr 8 PDF (Shitiz),
+Quality / Compliance,Customer Sentiment,Negative Sentiment %,% of interactions with negative/hostile customer sentiment,percentage,varies,Quality (Sentiment View),Manager (Satyak); External Client,Apr 8 PDF (Shitiz),
+Quality / Compliance,Customer Sentiment,Neutral Sentiment %,% of interactions with neutral customer sentiment,percentage,varies,Quality (Sentiment View),Manager (Satyak); External Client,Apr 8 PDF (Shitiz),
+Agent Performance,Per-Agent Metrics,Agent Quality Score,Individual quality score per human agent (0-100),score,"82–91 range",Quality,Coach Agent,CLAUDE.md,
+Agent Performance,Per-Agent Metrics,Agent Quality Trend,Week-over-week quality score change per agent,direction,up/flat/down,Quality,Coach Agent,CLAUDE.md,
+Agent Performance,Per-Agent Metrics,Agent Accounts Worked,Number of accounts worked per agent per day,count,45,Performance,Manager (Satyak),CLAUDE.md,
+Agent Performance,Per-Agent Metrics,Agent RPC Rate,Right party contact rate per individual agent,percentage,varies,Performance,Manager (Satyak),Prior session,
+Agent Performance,Per-Agent Metrics,Agent PTP Rate,PTP rate per individual agent,percentage,varies,Performance,Manager (Satyak),Prior session,
+Agent Performance,Per-Agent Metrics,Agent PTP Adherence Rate,% of PTPs kept for accounts worked by that agent,percentage,varies,Performance,Manager (Satyak),Prior session,
+Agent Performance,Per-Agent Metrics,Agent Coaching Flag,Whether agent has an active coaching flag,boolean,yes/no,Quality,Coach Agent,CLAUDE.md,
+Agent Performance,Per-Agent Metrics,Top Coaching Need,Primary skill gap identified for agent,text,varies,Quality,Coach Agent,CLAUDE.md,
+Agent Performance,Per-Agent Metrics,Top Strength,Primary strength for agent,text,varies,Quality,Coach Agent,CLAUDE.md,
+Agent Performance,Bot Performance,Bot Abandonment Rate,% of bot conversations where consumer hangs up before resolution,percentage,22%,Performance,Manager (Satyak),CLAUDE.md,inverse of 78% completion
+Agent Performance,Bot Performance,Bot RPC Rate,Right party contact rate for voice bot channel,percentage,varies,Performance,Manager (Satyak),Prior session,
+Agent Performance,Bot Performance,Bot Escalation Rate,% of bot conversations escalated to live agent,percentage,varies,Performance,Manager (Satyak),Prior session,
+Lost Opportunities,Detection,Lost Opportunity Count,Number of accounts where consumer showed intent but bot couldn't handle,count,varies,Insights / Approvals,Manager (Satyak),Apr 1 transcript,Core agent use case from Razorpay analogy
+Lost Opportunities,Detection,High-Intent Abandoned Accounts,Accounts where consumer indicated willingness to pay but dropped off,count,varies,Insights,Manager (Satyak),Apr 1 transcript,Abandoned cart equivalent for collections
+Lost Opportunities,Detection,Installment Request Unresolved,Accounts where consumer asked for installment plan but wasn't offered one,count,14,Insights / Approvals,Manager (Satyak),Prior session,Recoverable opportunity
+Lost Opportunities,Detection,Talk to Spouse Unresolved,Accounts where consumer deferred decision without follow-up,count,8,Insights / Approvals,Manager (Satyak),Prior session,Recoverable opportunity
+Lost Opportunities,Detection,Written Validation Pending,Accounts where consumer requested written validation without response,count,6,Insights / Approvals,Manager (Satyak),Prior session,Recoverable opportunity
+Lost Opportunities,Detection,SMS Abandoned Count,Accounts that engaged with SMS but did not complete payment,count,47,Insights / Approvals,Manager (Satyak),Prior session,Hot opportunity
+Lost Opportunities,Detection,Voice Unresolved Count,Accounts with voice contact but no resolution,count,23,Insights / Approvals,Manager (Satyak),Prior session,Hot opportunity
+Lost Opportunities,At Risk,At-Risk PTP Value,Total $ value of PTPs at risk of being broken (missed 1st installment),USD,$142000,Insights / Approvals,Manager (Satyak),Prior session,
+Lost Opportunities,At Risk,Broken PTP Account Count,Accounts with missed installment on active payment plan,count,89,Performance,Manager (Satyak),CLAUDE.md,
+Unit Economics,Cost & Revenue,Cost Invested per Cohort,Total operational cost allocated per cohort,USD,varies,Performance,Manager (Satyak),Apr 7 transcript (Unit Economics Agent),New agent idea
+Unit Economics,Cost & Revenue,Revenue Collected per Cohort,Total payments collected per cohort,USD,varies,Performance,Manager (Satyak),Apr 7 transcript,
+Unit Economics,Cost & Revenue,Net Margin per Cohort,Revenue minus cost per cohort,USD,varies,Performance,Manager (Satyak),Apr 7 transcript,Green/red based on positive/negative
+Unit Economics,Cost & Revenue,Cost Per Dollar Collected,Operational cost to collect $1 of outstanding debt,USD,varies,Performance,Manager (Satyak),Apr 7 transcript,
+Unit Economics,Cost & Revenue,Cost Per Account,Total cost to work one account end to end,USD,varies,Performance,Manager (Satyak),Prior session,
+Unit Economics,Cost & Revenue,Target Revenue per FTE,Monthly revenue per full-time human agent,USD,$1800,Performance,Manager (Satyak),Apr 8 transcript,From AmEx framework
+Unit Economics,Cost & Revenue,ROI per Agent-Hour,Revenue generated per hour of agent time per cohort,USD,varies,Performance,Manager (Satyak),CLAUDE.md,Fell 22% W2→W3 on low prop/high bal
+Upsell Intelligence,Signals,Upsell Opportunity Score,Score indicating potential for account expansion / upsell to client,score,varies,Insights,Manager (Satyak),Apr 7 transcript (Upsell Agent),New agent idea
+Upsell Intelligence,Signals,High Liquidation Cohort Benchmark Delta,How much above industry benchmark a cohort is performing,percentage,varies,Performance,Manager (Satyak),Prior session,Triggers upsell case draft
+Upsell Intelligence,Signals,Accounts Eligible for Additional Products,Accounts that paid and may be eligible for credit rebuild or new products,count,varies,Insights,Manager (Satyak),Prior session,
+Client / External View,Portfolio Health,Fee Rate,Agency fee rate applied to the portfolio,percentage,varies,External Client View,External Client,Apr 8 transcript,From AmEx analytics framework
+Client / External View,Portfolio Health,Placement Period,Duration of current placement contract,months,varies,External Client View,External Client,Apr 8 transcript,
+Client / External View,Portfolio Health,Recovery Rate vs Benchmark,Client's recovery rate vs industry benchmark for similar portfolios,percentage,varies,External Client View,External Client,Apr 8 transcript,Agency comparison methodology
+Client / External View,Portfolio Health,Bottom 20 Segment Performance,Performance of bottom 20% accounts by scoring algorithm,percentage,varies,External Client View,External Client,Apr 8 transcript,From AmEx bottom 20 charge/lending framework
+Client / External View,Portfolio Health,Tertiary Account Performance,Performance of accounts 18+ months delinquent,percentage,varies,External Client View,External Client,Apr 8 transcript,Tertiary = 18+ months
+Client / External View,Analytics,Total Collected (Client View),Total $ collected on behalf of client in period,USD,varies,External Client View,External Client,Apr 8 PDF (Shitiz),Separate external-facing view
+Client / External View,Analytics,Liquidation Rate (Client View),Client-facing liquidation rate vs target,percentage,varies,External Client View,External Client,Apr 8 PDF (Shitiz),
+Client / External View,Analytics,Compliance Score (Client View),Compliance performance summary for client examiners,percentage,99.86%,External Client View,External Client,CLAUDE.md,
+Client / External View,Analytics,Quality Score (Client View),Summary quality score for client-facing reporting,score,varies,External Client View,External Client,Apr 8 PDF (Shitiz),
+Client / External View,Analytics,Agent Activity Summary,Summary of all agent actions in period for client transparency,text,varies,External Client View,External Client,Apr 7 transcript,
+Approvals,Human-in-the-Loop,Pending Approvals Count,Number of decisions awaiting human approval,count,5,Approvals,Manager (Satyak),CLAUDE.md,
+Approvals,Human-in-the-Loop,Strategy Change Approvals,Pending approvals for campaign/strategy changes,count,varies,Approvals,Manager (Satyak),CLAUDE.md,
+Approvals,Human-in-the-Loop,Settlement Offer Approvals,Pending settlement offers requiring manager sign-off,count,varies,Approvals,Manager (Satyak),CLAUDE.md,>20% discount requires approval
+Approvals,Human-in-the-Loop,Compliance Exception Approvals,Pending compliance exceptions requiring review,count,varies,Approvals,Manager (Satyak),CLAUDE.md,
+Approvals,Human-in-the-Loop,Approval Turnaround Time,Avg time to act on a pending approval,hours,varies,Approvals,Manager (Satyak),Prior session,

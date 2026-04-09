@@ -23,8 +23,8 @@ export const AgentHeader = ({ color, name, role, description }) => (
 );
 
 export const Section = ({ title, children, className = "" }) => (
-  <div className={`bg-white border border-gray-200 rounded-lg p-6 ${className}`}>
-    <h2 className="text-base font-semibold text-gray-900 mb-4">{title}</h2>
+  <div className={`card p-5 ${className}`}>
+    <h2 className="text-sm font-semibold text-gray-800 mb-4">{title}</h2>
     {children}
   </div>
 );
@@ -32,11 +32,11 @@ export const Section = ({ title, children, className = "" }) => (
 export const DataTable = ({ headers, rows, alignments = [] }) => (
   <table className="w-full text-sm">
     <thead>
-      <tr className="border-b border-gray-200 bg-gray-50">
+      <tr className="border-b border-gray-100">
         {headers.map((header, idx) => (
           <th
             key={idx}
-            className={`py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-600 ${
+            className={`py-2 px-3 text-[10px] font-bold uppercase tracking-wider text-gray-400 ${
               alignments[idx] === 'right' ? 'text-right' : 'text-left'
             }`}
           >
@@ -47,12 +47,12 @@ export const DataTable = ({ headers, rows, alignments = [] }) => (
     </thead>
     <tbody>
       {rows.map((row, idx) => (
-        <tr key={idx} className="border-b border-gray-100 last:border-0">
+        <tr key={idx} className="border-b border-gray-50 last:border-0">
           {row.map((cell, cellIdx) => (
             <td
               key={cellIdx}
-              className={`py-2 px-3 ${
-                cellIdx === 0 ? 'font-medium text-gray-900' : 'text-gray-700'
+              className={`py-2 px-3 text-xs ${
+                cellIdx === 0 ? 'font-medium text-gray-900' : 'text-gray-600'
               } ${alignments[cellIdx] === 'right' ? 'text-right text-numeric' : ''}`}
             >
               {cell}

@@ -430,8 +430,49 @@ export const collectorData = {
     "Inbound handling (payment bot, live transfers for disputes/hardship, email/website intake)",
     "Real-time delivery tracking (attempts, connections, sends, opens, clicks, replies)",
     "Delivery failure handling (bounced emails, invalid numbers, opt-outs, DNC)",
-    "Human agent coordination (1st party collections via Mulberry — experienced collectors, accent neutralization)"
+    "Human agent coordination (1st party collections via Mulberry — experienced collectors, accent neutralization)",
+    "PTP adherence monitoring and automated follow-up orchestration"
   ],
+  inboundMetrics: {
+    totalIBCalls: 85,
+    avgCallDuration: '4 min',
+    completionRate: 78,
+    disputes: 12,
+    hardship: 8,
+    paymentPortalVisits: 18,
+    inboundEmails: 34,
+    ibConversionRate: 42,
+  },
+  rpcMetrics: {
+    overall: 28,
+    target: 30,
+    byChannel: {
+      voiceAI: 38,
+      humanAgent: 55,
+      sms: 'N/A',
+    },
+    byCohort: {
+      'High Prop/High Bal': 38,
+      'High Prop/Low Bal': 32,
+      'Medium Prop': 26,
+      'Low Prop/High Bal': 22,
+      'Low Prop/Low Bal': 8,
+    }
+  },
+  ptpMetrics: {
+    activePTPs: 620,
+    ptpRate: 12,
+    adherenceRate: 68,
+    adherenceTarget: 70,
+    keptThisWeek: 422,
+    brokenThisWeek: 198,
+    adherenceActions: [
+      { action: 'Sent PTP reminder SMS 24h before due date', accounts: 620, outcome: '34 confirmed payment', status: 'completed' },
+      { action: 'Voice AI follow-up call on Day 1 of missed PTP', accounts: 198, outcome: '47 re-committed to new date', status: 'completed' },
+      { action: 'Escalated repeat PTP-breakers to human agent queue', accounts: 89, outcome: '12 settled, 8 on hardship plan', status: 'in_progress' },
+      { action: 'Settlement SMS to accounts with 2+ broken PTPs', accounts: 62, outcome: 'Monitoring — 8% conversion projected', status: 'pending' },
+    ]
+  },
   activeCampaigns: [
     { name: "Voice AI - English General", channel: "Voice", cohort: "Med Prop + High Prop/High Bal", volume: "800 calls", status: "Running" },
     { name: "Voice AI - English Empathetic", channel: "Voice", cohort: "Medical debt subset", volume: "200 calls", status: "Running" },

@@ -6,13 +6,15 @@ const agentColors = {
   Coach: '#06b6d4', Collector: '#f59e0b', 'Upsell Opportunity': '#10b981', 'Data Enrichment': '#6366f1'
 };
 
-const presetQuestions = [
+const allSuggestions = [
   { q: "What drove the liquidation rate increase this week?", agents: ['Analyst', 'Collector'] },
   { q: "Show me accounts most likely to settle", agents: ['Analyst', 'Manager'] },
   { q: "Where are we losing money?", agents: ['Analyst', 'Upsell Opportunity'] },
   { q: "Summarize compliance issues this month", agents: ['Compliance', 'Coach'] },
   { q: "How are enriched accounts performing?", agents: ['Data Enrichment', 'Analyst'] },
   { q: "Draft this week's client report", agents: ['Analyst', 'Compliance', 'Coach'] },
+  { q: "Which cohorts have the highest abandoned rate?", agents: ['Collector', 'Analyst'] },
+  { q: "What's the RPC → PTP conversion by channel?", agents: ['Collector', 'Analyst'] },
 ];
 
 const mockAnswer = {
@@ -33,10 +35,20 @@ const overnightTimeline = [
   { time: '06:15 AM', agent: 'Analyst', color: '#3b82f6', summary: 'Identified $42K leakage in automated installment flows.' },
 ];
 
-const briefItems = [
-  { text: 'High-prop segment burning through runway — manager proposes expanding strategy', action: 'Approve', actionStyle: 'gradient' },
-  { text: '620 broken-promise accounts — follow-up SMS staged', action: 'Review', actionStyle: 'outline' },
-  { text: '14 consumers asked about installments but bot had no path — ~$4,200 missed', action: 'See accounts', actionStyle: 'outline' },
+// FYI items — read to get up to speed
+const fyiItems = [
+  { text: 'RPC rate crossed 28% this week — up from 25% last week. High Prop/High Bal cohort driving the lift at 38%.', icon: 'trending_up' },
+  { text: 'Inbound volume up 12% — 85 IB calls today. IVR completion at 78%, above 75% target.', icon: 'call_received' },
+  { text: 'Coach deployed objection handling fix — abandoned rate dropped from 22% to 18% on "I already paid" scenarios.', icon: 'school' },
+  { text: '340 accounts re-scored from Low → Medium propensity based on SMS + email engagement signals.', icon: 'swap_vert' },
+];
+
+// Actionable items — require decisions (manager persona)
+const actionItems = [
+  { text: 'Attempt limits at 5/account — compliance allows 7. Analyst recommends requesting client approval to increase to 6 for Medium Propensity cohort. Projected +$35K/week.', action: 'Request Approval', actionStyle: 'gradient', nav: 'approvals' },
+  { text: '89 repeat PTP-breakers need escalation strategy. Collector proposes settlement SMS at 15% discount for accounts with 2+ broken promises.', action: 'Review Plan', actionStyle: 'gradient', nav: 'approvals' },
+  { text: '14 consumers asked about installments but bot had no path — ~$4,200/week missed. Manager has drafted a new IVR flow.', action: 'Approve Flow', actionStyle: 'outline', nav: 'approvals' },
+  { text: 'Spanish-language SMS showing 8% higher response in TX/FL. Manager recommends expanding to all Spanish-preference accounts across cohorts.', action: 'Review', actionStyle: 'outline', nav: 'approvals' },
 ];
 
 const claudeAnswers = {
@@ -57,14 +69,29 @@ const gptAnswers = {
   5: "Week 3 Client Report — Apex Recovery Partners\n\n**Executive Summary**\nWeek 3 performance has crossed the 2.5% liquidation target, with current rate at 2.7%. Portfolio momentum is strong heading into Week 4.\n\n**Metrics vs Targets**\n| Metric | W3 Actual | Target | Status |\n|--------|-----------|--------|--------|\n| Liquidation Rate | 2.7% | 2.5% | ✅ Above |\n| Contact Rate | 38% | 40% | ⚠️ Near |\n| RPC Rate | 28% | 30% | ⚠️ Near |\n| Compliance | 99.86% | 99.5% | ✅ Above |\n\n**Recommendation for Client**\nConsider expanding settlement authority to 20% for Medium Propensity cohort. Model shows this could add $35–55K in Week 4 collections.",
 };
 
+function pickTwo(arr) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return [shuffled[0], shuffled[1]];
+}
+
 export default function CommandCenter({ onAgentClick, onCoachActivityClick, onNavigate }) {
   const [chatQuestion, setChatQuestion] = React.useState(null);
   const [showAnswer, setShowAnswer] = React.useState(false);
   const [animStep, setAnimStep] = React.useState(0);
   const [expandedSection, setExpandedSection] = React.useState(null);
+  const [suggestions, setSuggestions] = React.useState(() => pickTwo(allSuggestions));
 
-  const handleQuestionClick = (idx) => {
-    setChatQuestion(idx);
+  // Rotate suggestions every 30s
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setSuggestions(pickTwo(allSuggestions));
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleQuestionClick = (q) => {
+    const idx = allSuggestions.findIndex(s => s.q === q);
+    setChatQuestion(idx >= 0 ? idx : 0);
     setShowAnswer(false);
     setAnimStep(0);
     mockAnswer.steps.forEach((_, i) => {
@@ -81,44 +108,44 @@ export default function CommandCenter({ onAgentClick, onCoachActivityClick, onNa
 
   // --- CHAT VIEW ---
   if (chatQuestion !== null) {
-    const question = presetQuestions[chatQuestion].q;
+    const question = allSuggestions[chatQuestion]?.q || allSuggestions[0].q;
     const claudeAnswer = claudeAnswers[chatQuestion] || claudeAnswers[0];
     const gptAnswer = gptAnswers[chatQuestion] || gptAnswers[0];
 
     return (
-      <div className="min-h-screen bg-[#f8f9ff]">
+      <div className="min-h-screen" style={{background: '#0f1117'}}>
         {/* Chat Header */}
-        <div className="sticky top-0 z-10 bg-white border-b border-gray-100 shadow-sm px-8 py-4 flex items-center gap-4">
+        <div className="sticky top-0 z-10 backdrop-blur-md px-8 py-4 flex items-center gap-4" style={{background: 'rgba(15,17,23,0.85)', borderBottom: '1px solid #1e2535'}}>
           <button
             onClick={handleBackFromChat}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-100 transition-colors"
           >
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             Back to Insights
           </button>
-          <div className="h-5 w-px bg-gray-200" />
-          <p className="text-sm font-medium text-gray-700 truncate flex-1">"{question}"</p>
+          <div className="h-5 w-px bg-slate-700" />
+          <p className="text-sm font-medium text-slate-300 truncate flex-1">"{question}"</p>
         </div>
 
         <div className="p-8 max-w-6xl mx-auto">
           {/* Question bubble */}
           <div className="flex justify-end mb-8">
-            <div className="max-w-xl px-5 py-3 rounded-2xl rounded-tr-sm text-white text-sm leading-relaxed shadow-md" style={{background: 'linear-gradient(135deg, #162A44, #1e3a5f)'}}>
+            <div className="max-w-xl px-5 py-3 rounded-2xl rounded-tr-sm text-white text-sm leading-relaxed shadow-md" style={{background: 'linear-gradient(135deg, #1e3a5f, #1a2f4a)'}}>
               {question}
             </div>
           </div>
 
           {/* Agent processing steps */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-6">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Agents working on this...</p>
+          <div className="card p-4 mb-6">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Agents working on this...</p>
             <div className="space-y-2">
               {mockAnswer.steps.map((step, idx) => (
                 <div key={idx} className={`flex items-center gap-3 transition-all duration-500 ${idx < animStep ? 'opacity-100' : 'opacity-30'}`}>
                   <span className="w-2 h-2 rounded-full flex-shrink-0" style={{backgroundColor: agentColors[step.agent]}} />
                   <span className="text-xs font-semibold" style={{color: agentColors[step.agent]}}>{step.agent}</span>
-                  <span className="text-xs text-gray-500 flex-1">{step.action}</span>
-                  {idx < animStep && <span className="material-symbols-outlined text-green-500 text-sm">check_circle</span>}
-                  {idx >= animStep && <span className="w-3 h-3 rounded-full border-2 border-gray-300 border-t-blue-400 animate-spin" style={{animationDuration: '1s'}} />}
+                  <span className="text-xs text-slate-400 flex-1">{step.action}</span>
+                  {idx < animStep && <span className="material-symbols-outlined text-emerald-400 text-sm">check_circle</span>}
+                  {idx >= animStep && <span className="w-3 h-3 rounded-full border-2 border-slate-600 border-t-blue-400 animate-spin" style={{animationDuration: '1s'}} />}
                 </div>
               ))}
             </div>
@@ -128,32 +155,32 @@ export default function CommandCenter({ onAgentClick, onCoachActivityClick, onNa
           {showAnswer && (
             <div className="grid grid-cols-2 gap-6 animate-fadeIn">
               {/* Claude */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3" style={{background: 'linear-gradient(135deg, #f5f3ff, #ede9fe)'}}>
+              <div className="card overflow-hidden">
+                <div className="px-5 py-4 flex items-center gap-3" style={{background: 'linear-gradient(135deg, #1e1a35, #261d42)', borderBottom: '1px solid #2a2245'}}>
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{background: 'linear-gradient(135deg, #7c3aed, #a78bfa)'}}>C</div>
                   <div>
-                    <p className="text-sm font-bold text-gray-900">Claude</p>
-                    <p className="text-[10px] text-gray-500">Anthropic · claude-opus-4-6</p>
+                    <p className="text-sm font-bold text-slate-100">Claude</p>
+                    <p className="text-[10px] text-slate-400">Anthropic · claude-opus-4-6</p>
                   </div>
-                  <span className="ml-auto text-[10px] font-semibold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full">Skit Context</span>
+                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{background: 'rgba(139,92,246,0.15)', color: '#a78bfa'}}>Skit Context</span>
                 </div>
                 <div className="p-5">
-                  <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line" dangerouslySetInnerHTML={{__html: claudeAnswer.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}} />
+                  <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-line" dangerouslySetInnerHTML={{__html: claudeAnswer.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-100">$1</strong>')}} />
                 </div>
               </div>
 
               {/* GPT */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3" style={{background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)'}}>
+              <div className="card overflow-hidden">
+                <div className="px-5 py-4 flex items-center gap-3" style={{background: 'linear-gradient(135deg, #0f2e1e, #132b1e)', borderBottom: '1px solid #1a3a28'}}>
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold" style={{background: 'linear-gradient(135deg, #059669, #34d399)'}}>G</div>
                   <div>
-                    <p className="text-sm font-bold text-gray-900">GPT-4o</p>
-                    <p className="text-[10px] text-gray-500">OpenAI · gpt-4o-2024-11</p>
+                    <p className="text-sm font-bold text-slate-100">GPT-4o</p>
+                    <p className="text-[10px] text-slate-400">OpenAI · gpt-4o-2024-11</p>
                   </div>
-                  <span className="ml-auto text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Skit Context</span>
+                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{background: 'rgba(16,185,129,0.15)', color: '#34d399'}}>Skit Context</span>
                 </div>
                 <div className="p-5">
-                  <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-line" dangerouslySetInnerHTML={{__html: gptAnswer.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}} />
+                  <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-line" dangerouslySetInnerHTML={{__html: gptAnswer.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-100">$1</strong>')}} />
                 </div>
               </div>
             </div>
@@ -162,14 +189,14 @@ export default function CommandCenter({ onAgentClick, onCoachActivityClick, onNa
           {/* Ask a follow-up */}
           {showAnswer && (
             <div className="mt-8 animate-fadeIn">
-              <div className="relative bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3 px-5 py-3">
-                <span className="material-symbols-outlined text-gray-300 text-lg">chat</span>
+              <div className="relative card flex items-center gap-3 px-5 py-3">
+                <span className="material-symbols-outlined text-slate-600 text-lg">chat</span>
                 <input
                   type="text"
                   placeholder="Ask a follow-up question..."
-                  className="flex-1 text-sm bg-transparent border-none outline-none text-gray-700 placeholder-gray-400"
+                  className="flex-1 text-sm bg-transparent border-none outline-none text-slate-200 placeholder-slate-600"
                 />
-                <button className="w-8 h-8 rounded-xl flex items-center justify-center text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}>
+                <button className="w-8 h-8 rounded-xl flex items-center justify-center text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)'}}>
                   <span className="material-symbols-outlined text-base">arrow_upward</span>
                 </button>
               </div>
@@ -183,255 +210,137 @@ export default function CommandCenter({ onAgentClick, onCoachActivityClick, onNa
   // --- MAIN INSIGHTS VIEW ---
   return (
     <div className="p-8 max-w-5xl mx-auto">
-      {/* AI Search — Hero with animated background */}
-      <div className="relative text-center mb-8 pt-8 pb-6 rounded-3xl overflow-hidden">
-        {/* Animated orbs */}
+      {/* AI Search — Hero */}
+      <div className="relative text-center mb-6 pt-8 pb-6 rounded-3xl overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="orb-1 absolute w-72 h-72 rounded-full -top-16 -left-16" style={{background: 'radial-gradient(circle, rgba(59,167,246,0.18) 0%, transparent 70%)', filter: 'blur(20px)'}} />
-          <div className="orb-2 absolute w-96 h-96 rounded-full -top-24 right-0" style={{background: 'radial-gradient(circle, rgba(95,207,196,0.15) 0%, transparent 70%)', filter: 'blur(28px)'}} />
-          <div className="orb-3 absolute w-64 h-64 rounded-full bottom-0 left-1/3" style={{background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)', filter: 'blur(24px)'}} />
+          <div className="orb-1 absolute w-72 h-72 rounded-full -top-16 -left-16" style={{background: 'radial-gradient(circle, rgba(59,167,246,0.12) 0%, transparent 70%)', filter: 'blur(20px)'}} />
+          <div className="orb-2 absolute w-96 h-96 rounded-full -top-24 right-0" style={{background: 'radial-gradient(circle, rgba(95,207,196,0.10) 0%, transparent 70%)', filter: 'blur(28px)'}} />
+          <div className="orb-3 absolute w-64 h-64 rounded-full bottom-0 left-1/3" style={{background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)', filter: 'blur(24px)'}} />
         </div>
         <div className="relative z-10">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4" style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4" style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)'}}>
             <span className="material-symbols-outlined text-white text-2xl" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">How can I help you today?</h1>
-          <p className="text-sm text-gray-500">Powered by 7 agents working across your portfolio</p>
+          <h1 className="text-2xl font-bold text-slate-100 mb-1">How can I help you today?</h1>
+          <p className="text-sm text-slate-500">Powered by 7 agents working across your portfolio</p>
         </div>
       </div>
 
-      {/* Search Input — compact single line */}
-      <div className="mb-6">
-        <div className="relative bg-white rounded-2xl shadow-lg border border-gray-100 flex items-center gap-3 px-5 py-3.5">
-          <span className="material-symbols-outlined text-gray-300 text-xl">search</span>
+      {/* Search + 2 rotating suggestions */}
+      <div className="mb-4">
+        <div className="card flex items-center gap-3 px-5 py-3.5">
+          <span className="material-symbols-outlined text-slate-600 text-xl">search</span>
           <input
             type="text"
             placeholder="Ask about collection performance, cohort trends, or strategy yields..."
-            className="flex-1 text-sm bg-transparent border-none outline-none text-gray-900 placeholder-gray-400"
+            className="flex-1 text-sm bg-transparent border-none outline-none text-slate-200 placeholder-slate-600"
           />
-          <button className="w-9 h-9 rounded-xl flex items-center justify-center text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}>
+          <button className="w-9 h-9 rounded-xl flex items-center justify-center text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)'}}>
             <span className="material-symbols-outlined text-lg">arrow_upward</span>
           </button>
         </div>
-        <p className="text-center text-[11px] text-gray-400 mt-2">Skit AI is powered by agentic intelligence and may refine strategies based on historical data.</p>
       </div>
-
-      {/* Preset Questions */}
-      <div className="flex flex-wrap justify-center gap-2 mb-8">
-        {presetQuestions.map((pq, idx) => (
+      <div className="flex justify-center gap-2 mb-8">
+        {suggestions.map((s) => (
           <button
-            key={idx}
-            onClick={() => handleQuestionClick(idx)}
-            className="px-4 py-2 rounded-full text-sm font-medium transition-all border bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:shadow-sm hover:text-blue-700"
+            key={s.q}
+            onClick={() => handleQuestionClick(s.q)}
+            className="px-4 py-2 rounded-full text-sm font-medium transition-all max-w-xs truncate text-slate-400 hover:text-slate-200"
+            style={{background: '#0d1e2e', border: '1px solid #1c2f45'}}
           >
-            {pq.q}
+            {s.q}
           </button>
         ))}
       </div>
 
-      {/* KPI Cards — Compact */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        {[
-          { label: 'Total Collected', value: '$4.28M', change: '+8%', icon: 'payments' },
-          { label: 'Liquidation Rate', value: '24.8%', change: '+3%', icon: 'trending_up' },
-          { label: 'Contact Rate', value: '42.1%', change: '+1.8%', icon: 'call' },
-          { label: 'RPC Rate', value: '18.2%', change: '+0.5%', icon: 'record_voice_over' },
-        ].map((card, i) => (
-          <div key={i} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer" onClick={() => onNavigate('performance')}>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{card.label}</p>
-              <span className="material-symbols-outlined text-gray-300 text-lg">{card.icon}</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-gray-900">{card.value}</span>
-              <span className="text-xs font-semibold text-emerald-600">{card.change}</span>
-            </div>
+      {/* Today's Brief */}
+      <div className="card p-5 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-1 h-8 rounded-full" style={{background: 'linear-gradient(180deg, #3BA7F6, #5FCFC4)'}} />
+          <div>
+            <h2 className="text-sm font-semibold text-slate-100">Today's Brief</h2>
+            <p className="text-xs text-slate-500">Inbound & collection performance summary — {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
           </div>
-        ))}
+        </div>
+        <div className="space-y-2 text-sm text-slate-400 leading-relaxed">
+          <p>RPC rate at <strong className="text-slate-200">28%</strong> (+3% WoW) — High Prop/High Bal cohort leading at 38%. Inbound volume up 12% with <strong className="text-slate-200">85 IB calls</strong> and 78% IVR completion. Abandoned rate is down to <strong className="text-slate-200">18%</strong> from 22% after Coach's objection fix.</p>
+          <p>RPC → PTP conversion holding at <strong className="text-slate-200">12%</strong> with 620 active promises. PTP adherence at 68% (target 70%). Resolution rate at <strong className="text-slate-200">8.4%</strong> (1,008 accounts — includes 265 who paid without giving PTP).</p>
+          <p className="text-xs text-slate-600 pt-1">Analyst re-scored 340 accounts from Low → Medium propensity. Enrichment pipeline added 78 new phone numbers overnight.</p>
+        </div>
       </div>
 
-      {/* Today's Brief — Expandable */}
-      <div className="mb-8">
-        <button
-          onClick={() => setExpandedSection(expandedSection === 'brief' ? null : 'brief')}
-          className="w-full flex items-center justify-between bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-10 rounded-full" style={{background: 'linear-gradient(180deg, #3BA7F6, #5FCFC4)'}} />
-            <div className="text-left">
-              <h2 className="text-base font-bold text-gray-900">Today's Brief</h2>
-              <p className="text-sm text-gray-500">Portfolio at 2.7% liquidation. 3 items need attention.</p>
-            </div>
+      {/* ─── FYI vs ACTIONABLE split ─── */}
+      <div className="grid grid-cols-2 gap-6 mb-6">
+
+        {/* FYI — Insights & News */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="material-symbols-outlined text-slate-500 text-base">info</span>
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Insights & News</h2>
           </div>
-          <span className={`material-symbols-outlined text-gray-400 transition-transform ${expandedSection === 'brief' ? 'rotate-180' : ''}`}>expand_more</span>
-        </button>
-        {expandedSection === 'brief' && (
-          <div className="bg-white rounded-b-xl border border-t-0 border-gray-100 shadow-sm p-5 space-y-3 -mt-1">
-            {briefItems.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold" style={{background: '#162A44'}}>{idx + 1}</span>
-                  <p className="text-sm text-gray-800">{item.text}</p>
-                </div>
+          <div className="space-y-3">
+            {fyiItems.map((item, idx) => (
+              <div key={idx} className="card p-4 flex items-start gap-3">
+                <span className="material-symbols-outlined text-slate-600 text-lg mt-0.5">{item.icon}</span>
+                <p className="text-sm text-slate-400 leading-relaxed">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Actionable — Recommended Actions */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="material-symbols-outlined text-slate-500 text-base">bolt</span>
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Recommended Actions</h2>
+          </div>
+          <div className="space-y-3">
+            {actionItems.map((item, idx) => (
+              <div key={idx} className="card p-4">
+                <p className="text-sm text-slate-400 leading-relaxed mb-3">{item.text}</p>
                 <button
-                  onClick={() => onNavigate('approvals')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold flex-shrink-0 ml-4 transition-all ${
+                  onClick={() => onNavigate(item.nav)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                     item.actionStyle === 'gradient'
                       ? 'text-white shadow-sm'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'text-slate-300 hover:text-white'
                   }`}
-                  style={item.actionStyle === 'gradient' ? {background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'} : {}}
+                  style={item.actionStyle === 'gradient'
+                    ? {background: 'linear-gradient(135deg, #2196af, #61ab5e)'}
+                    : {background: '#0d1e2e', border: '1px solid #1c2f45'}}
                 >{item.action}</button>
               </div>
             ))}
-            <div className="pt-3 border-t border-gray-100 space-y-2">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="material-symbols-outlined text-sm" style={{color: '#6366f1'}}>zoom_in</span>
-                <span className="text-gray-600">Enrichment: 340 accounts recovered, 6 converted ($18,400)</span>
-                <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">+$18.4K</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-sm" style={{color: '#10b981'}}>rocket_launch</span>
-                  <span className="text-gray-600">Auto-finance &lt;$3K at 4.1%, 1.6x above benchmark</span>
-                </div>
-                <button className="text-xs font-bold hover:underline" style={{color: '#3BA7F6'}}>Draft upsell case</button>
-              </div>
-            </div>
           </div>
-        )}
-      </div>
-
-      {/* Leakage Analysis — Expandable */}
-      <div className="mb-8">
-        <button
-          onClick={() => setExpandedSection(expandedSection === 'leakage' ? null : 'leakage')}
-          className="w-full flex items-center justify-between bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-red-400">leak_remove</span>
-            <div className="text-left">
-              <h2 className="text-base font-bold text-gray-900">Leakage Analysis</h2>
-              <p className="text-sm text-gray-500">$172K identified across 3 categories</p>
-            </div>
-          </div>
-          <span className={`material-symbols-outlined text-gray-400 transition-transform ${expandedSection === 'leakage' ? 'rotate-180' : ''}`}>expand_more</span>
-        </button>
-        {expandedSection === 'leakage' && (
-          <div className="bg-white rounded-b-xl border border-t-0 border-gray-100 shadow-sm p-5 -mt-1">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-xs font-bold text-amber-700 uppercase tracking-widest">Hot</h4>
-                  <span className="material-symbols-outlined text-amber-500 text-lg">local_fire_department</span>
-                </div>
-                <div className="text-xs text-gray-600 space-y-1 mb-3">
-                  <div className="flex justify-between"><span>SMS abandons</span><span className="font-bold text-gray-900">47</span></div>
-                  <div className="flex justify-between"><span>Voice AI unresolved</span><span className="font-bold text-gray-900">23</span></div>
-                </div>
-                <div className="text-lg font-extrabold text-amber-600">$18K</div>
-              </div>
-              <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-xs font-bold text-blue-600 uppercase tracking-widest">Recoverable</h4>
-                  <span className="material-symbols-outlined text-blue-500 text-lg">refresh</span>
-                </div>
-                <div className="text-xs text-gray-600 space-y-1 mb-3">
-                  <div className="flex justify-between"><span>Installment asks</span><span className="font-bold text-gray-900">14</span></div>
-                  <div className="flex justify-between"><span>Callbacks needed</span><span className="font-bold text-gray-900">8</span></div>
-                </div>
-                <div className="text-lg font-extrabold text-blue-600">$12K</div>
-              </div>
-              <div className="p-4 rounded-xl bg-red-50 border border-red-100">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-xs font-bold text-red-600 uppercase tracking-widest">At Risk</h4>
-                  <span className="material-symbols-outlined text-red-500 text-lg">warning</span>
-                </div>
-                <div className="text-xs text-gray-600 space-y-1 mb-3">
-                  <div className="flex justify-between"><span>Missed plans</span><span className="font-bold text-gray-900">89</span></div>
-                  <div className="flex justify-between"><span>Impending drop-off</span><span className="font-bold text-red-500 italic">urgent</span></div>
-                </div>
-                <div className="text-lg font-extrabold text-red-600">$142K</div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Agent Highlights */}
-      <div className="mb-8">
-        <h2 className="text-base font-bold text-gray-900 mb-4">Agent Highlights</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {agents.slice(0, 4).map((agent) => (
-            <button
-              key={agent.name}
-              onClick={() => onAgentClick(agent.name)}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left group"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{backgroundColor: `${agentColors[agent.name]}15`}}>
-                  <span className="w-3 h-3 rounded-full" style={{backgroundColor: agentColors[agent.name]}} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{agent.name}</h3>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">{agent.role}</p>
-                </div>
-              </div>
-              <p className="text-xs text-gray-600 mb-2">{agent.lastAction}</p>
-              <p className="text-[10px] font-bold text-gray-400 uppercase">{agent.keyMetric}</p>
-            </button>
-          ))}
-        </div>
-        {/* New agents row */}
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          {agents.filter(a => a.name === 'Upsell Opportunity' || a.name === 'Data Enrichment').map((agent) => (
-            <button
-              key={agent.name}
-              onClick={() => onAgentClick(agent.name)}
-              className="rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left text-white"
-              style={{background: 'linear-gradient(135deg, #162A44, #1e3a5f)'}}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{backgroundColor: `${agentColors[agent.name]}30`}}>
-                  <span className="w-3 h-3 rounded-full" style={{backgroundColor: agentColors[agent.name]}} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold">{agent.name}</h3>
-                  <p className="text-[10px] uppercase tracking-wider" style={{color: '#5FCFC4'}}>{agent.role}</p>
-                </div>
-              </div>
-              <p className="text-xs text-slate-300">{agent.lastAction}</p>
-            </button>
-          ))}
         </div>
       </div>
 
-      {/* Agent Activity Timeline — Expandable */}
-      <div className="mb-8">
+      {/* Overnight Activity — Expandable */}
+      <div className="mb-6">
         <button
           onClick={() => setExpandedSection(expandedSection === 'timeline' ? null : 'timeline')}
-          className="w-full flex items-center justify-between bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all"
+          className="w-full flex items-center justify-between card p-4 transition-all"
         >
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-gray-400">schedule</span>
+            <span className="material-symbols-outlined text-slate-500 text-lg">schedule</span>
             <div className="text-left">
-              <h2 className="text-base font-bold text-gray-900">Overnight Activity</h2>
-              <p className="text-sm text-gray-500">{overnightTimeline.length} agent actions while you were away</p>
+              <h2 className="text-sm font-semibold text-slate-200">Overnight Activity</h2>
+              <p className="text-xs text-slate-500">{overnightTimeline.length} agent actions while you were away</p>
             </div>
           </div>
-          <span className={`material-symbols-outlined text-gray-400 transition-transform ${expandedSection === 'timeline' ? 'rotate-180' : ''}`}>expand_more</span>
+          <span className={`material-symbols-outlined text-slate-500 transition-transform text-lg ${expandedSection === 'timeline' ? 'rotate-180' : ''}`}>expand_more</span>
         </button>
         {expandedSection === 'timeline' && (
-          <div className="bg-white rounded-b-xl border border-t-0 border-gray-100 shadow-sm p-5 -mt-1">
-            <div className="relative pl-6 border-l-2 border-gray-200 space-y-6">
+          <div className="rounded-b-2xl p-4 -mt-2 animate-fadeIn" style={{background: '#0d1e2e', border: '1px solid #1c2f45', borderTop: 'none'}}>
+            <div className="relative pl-5 space-y-5" style={{borderLeft: '2px solid #1e2535'}}>
               {overnightTimeline.map((entry, idx) => (
                 <div key={idx} className="relative">
-                  <div className="absolute -left-[21px] top-0 w-2.5 h-2.5 rounded-full border-2 border-white" style={{backgroundColor: entry.color}} />
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-gray-400">{entry.time}</span>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded" style={{backgroundColor: `${entry.color}10`, color: entry.color}}>{entry.agent}</span>
+                  <div className="absolute -left-[17px] top-0.5 w-2 h-2 rounded-full" style={{backgroundColor: entry.color}} />
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] font-semibold text-slate-600">{entry.time}</span>
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{backgroundColor: `${entry.color}18`, color: entry.color}}>{entry.agent}</span>
                   </div>
-                  <p className="text-sm text-gray-700">{entry.summary}</p>
+                  <p className="text-sm text-slate-400">{entry.summary}</p>
                 </div>
               ))}
             </div>

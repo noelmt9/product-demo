@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Skit AI | Insights</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Merriweather:ital,wght@1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .ai-gradient {
+            background: linear-gradient(135deg, #3BA7F6 0%, #5FCFC4 100%);
+        }
+        .ai-gradient-text {
+            background: linear-gradient(135deg, #3BA7F6 0%, #5FCFC4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#00152e",
+                      "secondary-fixed-dim": "#96cbff",
+                      "on-tertiary-fixed-variant": "#00504a",
+                      "on-primary-fixed-variant": "#354863",
+                      "on-surface": "#0b1c30",
+                      "on-tertiary-container": "#23a197",
+                      "error-container": "#ffdad6",
+                      "primary-fixed-dim": "#b4c8e9",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#cbdbf5",
+                      "on-tertiary-fixed": "#00201d",
+                      "background": "#f8f9ff",
+                      "primary-fixed": "#d4e3ff",
+                      "on-secondary": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "error": "#ba1a1a",
+                      "on-primary-container": "#7e92b1",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed-variant": "#004a76",
+                      "tertiary-fixed-dim": "#69d8cd",
+                      "on-secondary-container": "#004167",
+                      "tertiary-fixed": "#87f5e9",
+                      "inverse-surface": "#213145",
+                      "inverse-primary": "#b4c8e9",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-background": "#0b1c30",
+                      "on-primary": "#ffffff",
+                      "outline-variant": "#c4c6ce",
+                      "surface-variant": "#d3e4fe",
+                      "surface-container-high": "#dce9ff",
+                      "tertiary": "#001816",
+                      "secondary": "#00639b",
+                      "primary-container": "#162a44",
+                      "secondary-container": "#47afff",
+                      "surface-container": "#e5eeff",
+                      "outline": "#74777e",
+                      "surface-bright": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "secondary-fixed": "#cee5ff",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#002f2b",
+                      "on-primary-fixed": "#061c35",
+                      "surface-tint": "#4c5f7c",
+                      "on-secondary-fixed": "#001d33",
+                      "on-surface-variant": "#44474d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Inter"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- SideNavBar Component -->
+<aside class="w-[264px] h-screen fixed left-0 top-0 bg-[#162A44] flex flex-col py-6 z-50">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg ai-gradient flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">network_intelligence</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-white tracking-tight leading-tight">Skit AI</h1>
+<p class="text-[10px] text-[#5FCFC4] font-medium tracking-widest uppercase">Intelligent Layer</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-2">
+<!-- Active State Navigation -->
+<a class="flex items-center gap-3 py-3 px-4 bg-white/10 text-[#5FCFC4] rounded-lg transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span>Insights</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="speed">speed</span>
+<span>Performance</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Portfolio</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span>Approvals</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span>Conversations</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+<span>Quality/Compliance</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<a class="flex items-center gap-3 py-3 px-4 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[264px] min-h-screen">
+<!-- TopNavBar Component -->
+<header class="h-16 w-[calc(100%-264px)] fixed right-0 top-0 bg-slate-50 dark:bg-slate-900 flex items-center justify-between px-8 z-40 shadow-sm">
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full w-96">
+<span class="material-symbols-outlined text-slate-400 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full" placeholder="Search insights, metrics, or agents..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-slate-500 hover:text-[#3BA7F6] transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-500 hover:text-[#3BA7F6] transition-all">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+<div class="text-right">
+<p class="text-xs font-bold">Alex Rivera</p>
+<p class="text-[10px] text-slate-500">Portfolio Director</p>
+</div>
+<img alt="User Profile" class="w-8 h-8 rounded-full border-2 border-surface-container-high" data-alt="professional portrait of a male executive in a neutral studio setting, soft lighting, clean corporate aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9OQmMGytE3NUbE-nXaxGR5gxNMmb99s2DSEik39sUbrMIOvmfHpGgwn0bYp7CbL8BBNreS2M_u0fj1P4ExsENRJbP4YT-8Pd5J9578Q45E6q8OW_pczJjVvIC_MOorWfbv7u6sLCNel54xCHw4yKSkpQc7JviKV_cFwMOXkbkMHZNBnz9miMx3da0TpkJwjxxJRne62kIPi3KQWqRlyzGha-Wpldjm_iUZ5bfEAZPFwKaEAG2--OL3JK-nsForfwtlcwTl2u2gHg"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="pt-24 pb-12 px-8 max-w-7xl mx-auto space-y-8">
+<!-- Metric Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-none border-l-4 border-primary-container">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Total Collected</p>
+<h3 class="text-2xl font-extrabold text-on-surface tracking-tight">$287,400</h3>
+<div class="mt-2 flex items-center text-xs font-medium text-[#5FCFC4]">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>12.4% vs prev. month</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-none border-l-4 border-primary-container">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Liquidation Rate</p>
+<h3 class="text-2xl font-extrabold text-on-surface tracking-tight">2.7%</h3>
+<div class="mt-2 flex items-center text-xs font-medium text-[#5FCFC4]">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span>0.2% above target</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-none border-l-4 border-primary-container">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Accounts Resolved</p>
+<h3 class="text-2xl font-extrabold text-on-surface tracking-tight">743</h3>
+<div class="mt-2 flex items-center text-xs font-medium text-amber-600">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>82 pending review</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-none border-l-4 border-primary-container">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Compliance</p>
+<h3 class="text-2xl font-extrabold text-on-surface tracking-tight">99.86%</h3>
+<div class="mt-2 flex items-center text-xs font-medium text-[#5FCFC4]">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span>Within Safe Zone</span>
+</div>
+</div>
+</div>
+<!-- Today's Briefing Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden border-l-4 border-none relative">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 ai-gradient"></div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h2 class="text-xl font-bold mb-2 tracking-tight">Today's Brief</h2>
+<p class="text-primary font-medium">Portfolio at 2.7% liquidation ($287K collected). Above 2.5% target.</p>
+</div>
+<span class="text-xs font-medium text-on-surface-variant bg-surface-container px-3 py-1.5 rounded-full">Updated 14m ago</span>
+</div>
+<div class="space-y-6">
+<div class="flex items-start gap-4 p-4 rounded-lg bg-surface-container-low">
+<span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-container text-white text-xs flex items-center justify-center font-bold">1</span>
+<div class="flex-1">
+<p class="text-sm font-medium mb-3">High-prop segment burning through runway, manager proposes expanding strategy</p>
+<button class="px-4 py-1.5 rounded-full ai-gradient text-white text-xs font-bold hover:opacity-90 transition-opacity">Approve</button>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 rounded-lg bg-surface-container-low">
+<span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-container text-white text-xs flex items-center justify-center font-bold">2</span>
+<div class="flex-1">
+<p class="text-sm font-medium mb-3">620 broken-promise accounts, follow-up SMS staged</p>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface text-xs font-bold hover:bg-slate-200 transition-colors">Review</button>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 rounded-lg bg-surface-container-low">
+<span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-container text-white text-xs flex items-center justify-center font-bold">3</span>
+<div class="flex-1 flex items-center justify-between">
+<div>
+<p class="text-sm font-medium mb-1">14 consumers asked about installments but bot had no path</p>
+<p class="text-xs text-error font-semibold italic Merriweather">~$4,200 missed revenue estimate</p>
+</div>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface text-xs font-bold hover:bg-slate-200 transition-colors">See accounts</button>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/10 flex flex-col gap-3">
+<div class="flex items-center gap-2 text-xs font-medium">
+<span class="material-symbols-outlined text-[#3BA7F6] text-sm">zoom_enhance</span>
+<span>Enrichment update: 4.2k phone numbers validated</span>
+<span class="bg-surface-container-high px-2 py-0.5 rounded text-[10px] font-bold">+$1.4K VALUE</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2 text-xs font-medium">
+<span class="material-symbols-outlined text-[#5FCFC4] text-sm">rocket_launch</span>
+<span>Upsell signal: Opportunity detected in Q4 legacy debt pool</span>
+</div>
+<button class="text-[#3BA7F6] text-xs font-bold hover:underline">Draft upsell case</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Search Bar Centered -->
+<div class="relative group">
+<div class="absolute inset-0 bg-[#3BA7F6]/5 blur-xl group-focus-within:bg-[#3BA7F6]/10 transition-all rounded-full"></div>
+<div class="relative flex items-center bg-surface-container-lowest border-none px-6 py-4 rounded-2xl shadow-sm">
+<span class="material-symbols-outlined ai-gradient-text mr-4 text-2xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-lg placeholder-slate-400" placeholder="Ask anything about your portfolio..." type="text"/>
+<div class="flex gap-2">
+<kbd class="bg-surface-container px-2 py-1 rounded text-[10px] font-bold text-slate-500">⌘</kbd>
+<kbd class="bg-surface-container px-2 py-1 rounded text-[10px] font-bold text-slate-500">K</kbd>
+</div>
+</div>
+</div>
+<!-- Lost Opportunities Bento Section -->
+<section>
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary-container">leak_remove</span>
+<h2 class="text-lg font-bold tracking-tight">Leakage Analysis</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Hot Opportunities -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border-t-2 border-amber-500/50">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-xs font-bold text-amber-700 uppercase tracking-widest">Hot Opportunities</h4>
+<span class="material-symbols-outlined text-amber-500">local_fire_department</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">SMS abandons</span>
+<span class="font-bold">47</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Voice AI unresolved</span>
+<span class="font-bold">23</span>
+</div>
+<div class="pt-3 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface">Est. Value</span>
+<span class="text-lg font-extrabold text-amber-600">$18K</span>
+</div>
+</div>
+</div>
+<!-- Recoverable -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border-t-2 border-[#3BA7F6]/50">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-xs font-bold text-[#3BA7F6] uppercase tracking-widest">Recoverable</h4>
+<span class="material-symbols-outlined text-[#3BA7F6]">refresh</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Installment asks</span>
+<span class="font-bold">14</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Callbacks needed</span>
+<span class="font-bold">8</span>
+</div>
+<div class="pt-3 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface">Est. Value</span>
+<span class="text-lg font-extrabold text-[#3BA7F6]">$12K</span>
+</div>
+</div>
+</div>
+<!-- About to be Lost -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border-t-2 border-error/50">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-xs font-bold text-error uppercase tracking-widest">At Risk</h4>
+<span class="material-symbols-outlined text-error">warning</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Missed plans</span>
+<span class="font-bold">89</span>
+</div>
+<div class="flex justify-between text-sm italic text-error Merriweather">
+<span>Impending drop-off</span>
+</div>
+<div class="pt-3 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface">Value at Risk</span>
+<span class="text-lg font-extrabold text-error">$142K</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Agent Activity Timeline -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-lg font-bold tracking-tight">Agent Activity Timeline</h2>
+<button class="text-xs font-bold text-[#3BA7F6]">View All Logs</button>
+</div>
+<div class="relative pl-8 border-l-2 border-surface-container space-y-10">
+<!-- Item 1 -->
+<div class="relative">
+<div class="absolute -left-[41px] top-0 w-4 h-4 rounded-full border-2 border-white bg-primary-container shadow-sm"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
+<span class="text-xs font-bold text-on-surface-variant">08:15 AM</span>
+<span class="text-xs font-bold bg-[#5FCFC4]/10 text-[#23a197] px-2 py-0.5 rounded">Compliance Agent</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg">
+<p class="text-sm">Scanned 412 new voice call recordings. 0 critical violations detected. 2 low-risk script deviations flagged for Coaching.</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="relative">
+<div class="absolute -left-[41px] top-0 w-4 h-4 rounded-full border-2 border-white bg-[#3BA7F6] shadow-sm"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
+<span class="text-xs font-bold text-on-surface-variant">07:00 AM</span>
+<span class="text-xs font-bold bg-[#3BA7F6]/10 text-secondary px-2 py-0.5 rounded">Strategy Manager</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg">
+<p class="text-sm">Optimized outbound frequency for 'Early-Arrears' segment based on overnight response peaks.</p>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="relative">
+<div class="absolute -left-[41px] top-0 w-4 h-4 rounded-full border-2 border-white bg-error shadow-sm"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
+<span class="text-xs font-bold text-on-surface-variant">06:15 AM</span>
+<span class="text-xs font-bold bg-error-container text-error px-2 py-0.5 rounded">Recovery Analyst</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg">
+<p class="text-sm">Identified $42k revenue leakage in automated installment flows. Alert triggered to Strategy.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Team Sidebar -->
+<div class="space-y-6">
+<h2 class="text-lg font-bold tracking-tight">Agent Team</h2>
+<div class="space-y-3">
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-none flex items-center gap-4 hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-500">monitoring</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h5 class="text-sm font-bold">Analyst</h5>
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Active</span>
+</div>
+<p class="text-xs text-on-surface-variant">Scan complete at 06:15 AM</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-none flex items-center gap-4 hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-500">account_tree</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h5 class="text-sm font-bold">Manager</h5>
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Active</span>
+</div>
+<p class="text-xs text-on-surface-variant">Optimized strategy 07:00 AM</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-none flex items-center gap-4 hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-500">policy</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h5 class="text-sm font-bold">Compliance</h5>
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Active</span>
+</div>
+<p class="text-xs text-on-surface-variant">Monitoring live calls</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-none flex items-center gap-4 hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-500">school</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h5 class="text-sm font-bold">Coach</h5>
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Standby</span>
+</div>
+<p class="text-xs text-on-surface-variant">Awaiting deviation logs</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-none flex items-center gap-4 hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-500">support_agent</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h5 class="text-sm font-bold">Collector</h5>
+<span class="text-[10px] text-[#5FCFC4] font-bold uppercase tracking-tighter">Processing</span>
+</div>
+<p class="text-xs text-on-surface-variant">Active outbound campaign</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

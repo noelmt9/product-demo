@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Skit AI | Conversations &amp; Journey Replay</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Merriweather:ital,wght@1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#00152e",
+                        "secondary-fixed-dim": "#96cbff",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-primary-fixed-variant": "#354863",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-container": "#23a197",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#b4c8e9",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-fixed": "#00201d",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#d4e3ff",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#7e92b1",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#004a76",
+                        "tertiary-fixed-dim": "#69d8cd",
+                        "on-secondary-container": "#004167",
+                        "tertiary-fixed": "#87f5e9",
+                        "inverse-surface": "#213145",
+                        "inverse-primary": "#b4c8e9",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-background": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c4c6ce",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-high": "#dce9ff",
+                        "tertiary": "#001816",
+                        "secondary": "#00639b",
+                        "primary-container": "#162a44",
+                        "secondary-container": "#47afff",
+                        "surface-container": "#e5eeff",
+                        "outline": "#74777e",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-fixed": "#cee5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#002f2b",
+                        "on-primary-fixed": "#061c35",
+                        "surface-tint": "#4c5f7c",
+                        "on-secondary-fixed": "#001d33",
+                        "on-surface-variant": "#44474d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ai-gradient-bg {
+            background: linear-gradient(135deg, #3BA7F6 0%, #5FCFC4 100%);
+        }
+        .ai-gradient-text {
+            background: linear-gradient(135deg, #3BA7F6 0%, #5FCFC4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sidebar-active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #5FCFC4;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="w-[264px] h-screen fixed left-0 top-0 bg-[#162A44] flex flex-col py-6 z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg ai-gradient-bg flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">hub</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-white tracking-tight">Skit AI</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-secondary-fixed-dim/70 font-semibold">Intelligent Layer</p>
+</div>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/5 transition-colors rounded-lg font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">insights</span>
+                Insights
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/5 transition-colors rounded-lg font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">speed</span>
+                Performance
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/5 transition-colors rounded-lg font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">analytics</span>
+                Portfolio
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/5 transition-colors rounded-lg font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">fact_check</span>
+                Approvals
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 sidebar-active rounded-lg mx-2 font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">forum</span>
+                Conversations
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/5 transition-colors rounded-lg font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">rule</span>
+                Quality/Compliance
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-white/5 transition-colors rounded-lg font-medium text-sm" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="px-6 pt-6 mt-auto border-t border-white/5">
+<div class="flex items-center gap-3 p-2 rounded-xl bg-white/5">
+<img alt="Skit Logo" class="w-10 h-10 rounded-lg object-cover" data-alt="corporate profile headshot of a professional man in a tailored suit with a confident and approachable expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9AkKNm107-cOfcEGhkZd7vI-KSWEFlCpYOprPaKp3BH9G9wfq0-K4BEXu4GSVGjTdoYzVcHtFrXsxYhAcx58TIjf90OStCUSPui3IPgPwMzGWwNDxUtmRJPCn1BOT-aXil4DqTTFDzQlPkIRcTEajoy_J9PvJ5cxZIjT-TVgoZ8KsqDGEMzZr1JtA4JFyyLjFHCstCz9Yg1jnR5Qsm7MDFxSLyeCzt5ajBr2wlcGgiNAnwLmExuAgBVp0HjbCxvyxqomQDRHsun8"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold text-white truncate">Marcus Chen</p>
+<p class="text-[10px] text-slate-400 truncate">Systems Lead</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-[264px] flex-1 min-h-screen flex flex-col relative">
+<!-- TopNavBar -->
+<header class="h-16 w-full sticky top-0 bg-slate-50 flex items-center justify-between px-8 z-40 shadow-sm">
+<div class="flex items-center bg-slate-100 px-4 py-2 rounded-full w-96">
+<span class="material-symbols-outlined text-slate-400 mr-2 text-lg">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full p-0" placeholder="Search conversations by CID, Name, or Intent..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-slate-500 hover:text-[#3BA7F6] transition-all">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-slate-500 hover:text-[#3BA7F6] transition-all">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-px bg-slate-200"></div>
+<div class="flex items-center gap-2">
+<span class="text-sm font-semibold text-[#162A44]">Live Insights</span>
+<span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-8 max-w-7xl w-full mx-auto">
+<!-- Page Header -->
+<div class="mb-8 flex items-end justify-between">
+<div>
+<h2 class="text-3xl font-extrabold tracking-tight text-[#162A44] mb-1">Conversations</h2>
+<p class="text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">history</span>
+                        Real-time audit and journey replay for omnichannel agents.
+                    </p>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-container-highest px-4 py-2 rounded-lg text-sm font-semibold text-on-surface hover:bg-surface-container-high transition-colors">
+                        Export Logs
+                    </button>
+<button class="ai-gradient-bg px-6 py-2 rounded-lg text-sm font-bold text-white shadow-lg shadow-primary/10">
+                        View Aggregated Stats
+                    </button>
+</div>
+</div>
+<!-- Dashboard Briefing (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-[2px] ai-gradient-bg"></div>
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">Total Resolved</p>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-bold tracking-tighter">14,282</span>
+<span class="text-emerald-600 text-xs font-bold flex items-center">+12.4% <span class="material-symbols-outlined text-xs">arrow_upward</span></span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-[2px] ai-gradient-bg"></div>
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">Avg. Sentiment</p>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-bold tracking-tighter">Positive</span>
+<span class="text-blue-500 text-xs font-bold px-2 py-0.5 bg-blue-50 rounded-full">Score: 88</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-[2px] bg-amber-400"></div>
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">Escalations</p>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-bold tracking-tighter">2.4%</span>
+<span class="text-slate-400 text-xs font-medium">Industry Avg: 6.8%</span>
+</div>
+</div>
+</div>
+<!-- Conversation Log Table -->
+<div class="bg-surface-container-low rounded-2xl overflow-hidden mb-12">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Customer</th>
+<th class="px-6 py-4">Last Channel</th>
+<th class="px-6 py-4">Intent</th>
+<th class="px-6 py-4">Outcome</th>
+<th class="px-6 py-4 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Expanded Row: The Kinetic Architect Focus -->
+<tr class="bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+<span class="text-xs font-bold text-on-surface">Resolved</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-[#162A44]">Jonathan Vance</span>
+<span class="text-xs text-on-surface-variant">CID: 9821-44</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-[#eff4ff] text-[#3BA7F6] uppercase tracking-wide">
+<span class="material-symbols-outlined text-xs mr-1">record_voice_over</span> Voice AI
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm font-medium">Settlement Negotiation</td>
+<td class="px-6 py-4">
+<span class="text-sm text-emerald-600 font-bold">$5,100 Settled (PTP)</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#3BA7F6] font-bold text-xs uppercase tracking-widest">Collapse</button>
+</td>
+</tr>
+<!-- Journey Replay Canvas -->
+<tr class="bg-surface">
+<td class="px-12 py-10" colspan="6">
+<div class="flex flex-col md:flex-row gap-12">
+<!-- Vertical Journey Timeline -->
+<div class="flex-1">
+<h4 class="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-10">Journey Replay</h4>
+<div class="relative pl-10 space-y-12">
+<!-- Timeline Line -->
+<div class="absolute left-[19px] top-4 bottom-4 w-0.5 bg-outline-variant/30"></div>
+<!-- Node 1 -->
+<div class="relative">
+<div class="absolute -left-10 w-10 h-10 rounded-full bg-[#eff4ff] border-4 border-surface flex items-center justify-center z-10 shadow-sm">
+<span class="material-symbols-outlined text-[#3BA7F6] text-lg">call</span>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="text-xs font-black text-[#162A44]">Day 1</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-[#3BA7F6] font-bold uppercase tracking-tight">Voice AI</span>
+</div>
+<p class="text-sm font-medium text-on-surface">No answer</p>
+<p class="text-xs text-on-surface-variant mt-1 italic Merriweather font-light">"Call terminated at 15s. Machine detection confirmed."</p>
+</div>
+</div>
+<!-- Node 2 -->
+<div class="relative">
+<div class="absolute -left-10 w-10 h-10 rounded-full bg-[#e6fffc] border-4 border-surface flex items-center justify-center z-10 shadow-sm">
+<span class="material-symbols-outlined text-[#5FCFC4] text-lg">sms</span>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="text-xs font-black text-[#162A44]">Day 3</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-[#e6fffc] text-[#5FCFC4] font-bold uppercase tracking-tight">SMS</span>
+</div>
+<p class="text-sm font-medium text-on-surface">Opened, no click</p>
+<div class="mt-2 flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded inline-flex border border-outline-variant/10">
+<span class="material-symbols-outlined text-[10px] text-amber-500" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<span class="text-[10px] text-on-surface font-semibold">Annotation: SMS chosen: high digital engagement score.</span>
+</div>
+</div>
+</div>
+<!-- Node 3 -->
+<div class="relative">
+<div class="absolute -left-10 w-10 h-10 rounded-full bg-[#eff4ff] border-4 border-surface flex items-center justify-center z-10 shadow-sm">
+<span class="material-symbols-outlined text-[#3BA7F6] text-lg">call</span>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="text-xs font-black text-[#162A44]">Day 5</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-[#3BA7F6] font-bold uppercase tracking-tight">Voice AI</span>
+<div class="flex gap-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span class="text-[10px] font-bold text-emerald-600 uppercase">Positive Sentiment</span>
+</div>
+</div>
+<p class="text-sm font-medium text-on-surface">Connected → "Can't pay that much" → Settlement offered → PTP set</p>
+<p class="text-xs text-on-surface-variant mt-2 italic Merriweather leading-relaxed">"Consumer expressed financial hardship. Agent matched with Tier-2 settlement logic. 35% reduction applied."</p>
+</div>
+</div>
+<!-- Node 4 -->
+<div class="relative">
+<div class="absolute -left-10 w-10 h-10 rounded-full ai-gradient-bg border-4 border-surface flex items-center justify-center z-10 shadow-lg">
+<span class="material-symbols-outlined text-white text-lg">check_circle</span>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="text-xs font-black text-[#162A44]">Day 10</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container text-[#162A44] font-bold uppercase tracking-tight">Payment Bot</span>
+</div>
+<p class="text-sm font-bold text-emerald-600">$5,100 settled ✓</p>
+<p class="text-xs text-on-surface-variant mt-1">PTP SMS Clicked → Automated portal transaction successful.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Meta Insights Sidebar -->
+<div class="w-80 space-y-6">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-[#3BA7F6]">
+<h5 class="text-xs font-bold uppercase tracking-widest text-[#162A44] mb-4">Agent Insights</h5>
+<div class="space-y-4">
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Primary Intent</p>
+<p class="text-sm font-semibold text-on-surface">Debt Validation &amp; Hardship</p>
+</div>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Success Driver</p>
+<p class="text-sm text-on-surface">Dynamic pivot to SMS after first Voice AI attempt significantly increased open rates by <span class="text-emerald-600 font-bold">22%</span>.</p>
+</div>
+<div class="pt-4 border-t border-outline-variant/20">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-2">Transcribed Voice Snippet</p>
+<p class="text-xs italic Merriweather text-on-primary-container leading-relaxed">
+                                                            "I'm worried about my credit score, but my monthly expenses are just too high right now..."
+                                                        </p>
+</div>
+</div>
+</div>
+<div class="bg-[#162A44] p-6 rounded-xl text-white">
+<div class="flex items-center justify-between mb-4">
+<h5 class="text-xs font-bold uppercase tracking-widest text-slate-400">Scorecard</h5>
+<span class="text-lg font-bold ai-gradient-text">9.4</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-[11px]">
+<span>Compliance</span>
+<div class="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="w-full h-full bg-[#5FCFC4]"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-[11px]">
+<span>Resolution Speed</span>
+<div class="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="w-[85%] h-full bg-[#3BA7F6]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- More Rows -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-amber-400"></div>
+<span class="text-xs font-bold text-on-surface">In Progress</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-[#162A44]">Sarah McLellan</span>
+<span class="text-xs text-on-surface-variant">CID: 4402-19</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-[#fff7e6] text-amber-600 uppercase tracking-wide">
+<span class="material-symbols-outlined text-xs mr-1">mail</span> Email
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm font-medium">Payment Plan Inquiry</td>
+<td class="px-6 py-4">
+<span class="text-sm text-on-surface-variant">Awaiting response</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 font-bold text-xs uppercase tracking-widest hover:text-[#3BA7F6]">Expand</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-blue-500"></div>
+<span class="text-xs font-bold text-on-surface">Escalated</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-[#162A44]">Michael Rossi</span>
+<span class="text-xs text-on-surface-variant">CID: 1104-52</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-[#e8eaf6] text-[#162A44] uppercase tracking-wide">
+<span class="material-symbols-outlined text-xs mr-1">person</span> Human
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm font-medium">Dispute Filing</td>
+<td class="px-6 py-4">
+<span class="text-sm text-error font-bold">Transfer to Legal</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 font-bold text-xs uppercase tracking-widest hover:text-[#3BA7F6]">Expand</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Footer -->
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline-variant/10 flex items-center justify-between">
+<span class="text-xs text-on-surface-variant font-medium">Showing 1-15 of 1,204 conversations</span>
+<div class="flex gap-2">
+<button class="p-1 rounded hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="p-1 rounded hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+</div>
+<!-- Contextual Knowledge Moment -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<div class="bg-primary-container p-8 rounded-2xl relative overflow-hidden text-white">
+<div class="relative z-10">
+<h3 class="text-xl font-extrabold mb-2">Agent Performance Optimization</h3>
+<p class="text-slate-300 text-sm mb-6 max-w-md">Our intelligence layer detected that switching to Teal channel (SMS) during Day 2-4 increases resolution rates by 14.8% for accounts with high digital propensity scores.</p>
+<button class="bg-white text-[#162A44] px-6 py-2 rounded-lg text-sm font-bold hover:bg-slate-100 transition-colors">Apply to Workflow</button>
+</div>
+<span class="material-symbols-outlined absolute -bottom-8 -right-8 text-[160px] text-white/5 pointer-events-none" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-2xl flex flex-col justify-center border border-outline-variant/10">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-full ai-gradient-bg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<div>
+<h4 class="font-bold text-[#162A44]">Automated Quality Review</h4>
+<p class="text-xs text-on-surface-variant">Powered by Skit AI compliance model</p>
+</div>
+</div>
+<p class="text-sm leading-relaxed text-on-surface-variant italic Merriweather">
+                        "Overall conversation quality remains above 90% threshold. Recommended action: Increase Voice AI empathy parameters for accounts identified in 'Financial Hardship' intent clusters to further reduce escalation rates."
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Hidden on this transactional/log screen as per suppression rules) -->
+</body></html>
