@@ -148,8 +148,6 @@ const ApprovalCard = ({ a, onAgentClick }) => {
   const meta = AGENT_META[a.agent] || AGENT_META.Analyst;
   return (
     <div className={`bg-white rounded-xl border overflow-hidden ${a.criticality === 'critical' ? 'border-red-200' : a.criticality === 'high' ? 'border-amber-200' : 'border-gray-200'}`}>
-      {/* Top accent bar */}
-      <div className="h-1 w-full" style={{ backgroundColor: meta.color }} />
       <div className="p-5">
         {/* Header row */}
         <div className="flex items-start justify-between gap-3 mb-3">
