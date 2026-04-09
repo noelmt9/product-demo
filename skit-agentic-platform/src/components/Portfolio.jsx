@@ -198,9 +198,9 @@ export default function Portfolio() {
   return (
     <div className="min-h-full bg-gray-50">
 
-      {/* ── TOP: Search + Upload ─────────────────────────────────────────────── */}
+      {/* ── TOP: Title + Upload CTA ───────────────────────────────────────────── */}
       <div className="bg-white border-b border-gray-200 px-8 py-5">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Portfolio</h1>
             <p className="text-sm text-gray-500 mt-0.5">Placement file view · Read-only · Apex Recovery Partners</p>
@@ -216,28 +216,27 @@ export default function Portfolio() {
             Upload New Placement
           </button>
         </div>
-
-        {/* Current placement file banner */}
-        <div className="flex items-center gap-4 px-4 py-3 rounded-lg" style={{ backgroundColor: '#f0faf8', border: '1px solid #d4eae5' }}>
-          <svg className="w-8 h-8 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-gray-900">{placementMeta.fileName}</div>
-            <div className="text-xs text-gray-500 mt-0.5">Uploaded {placementMeta.uploadedAt} · {placementMeta.uploadedBy}</div>
-          </div>
-          <div className="flex items-center gap-5 text-xs text-gray-600">
-            <div><span className="text-gray-400">Total rows</span><br /><span className="font-bold text-gray-900">{placementMeta.totalRows.toLocaleString()}</span></div>
-            <div><span className="text-gray-400">Clean</span><br /><span className="font-bold text-green-700">{placementMeta.cleanRows.toLocaleString()}</span></div>
-            <div><span className="text-gray-400">Flagged</span><br /><span className="font-bold text-amber-600">{placementMeta.flaggedRows}</span></div>
-            <div><span className="text-gray-400">Total balance</span><br /><span className="font-bold text-gray-900">${(placementMeta.totalBalance / 1000000).toFixed(1)}M</span></div>
-            <div><span className="text-gray-400">Avg balance</span><br /><span className="font-bold text-gray-900">${placementMeta.avgBalance.toLocaleString()}</span></div>
-            <div><span className="text-gray-400">Avg CO age</span><br /><span className="font-bold text-gray-900">{placementMeta.avgChargeoffAge} mo</span></div>
-          </div>
-        </div>
       </div>
 
       <div className="px-8 py-6 space-y-6">
+
+        {/* ── PLACEMENT SUMMARY CARDS ──────────────────────────────────────── */}
+        <div className="grid grid-cols-6 gap-4">
+          {[
+            { label: 'Total Accounts', value: placementMeta.totalRows.toLocaleString(), sub: `From ${placementMeta.uploadedAt.split('·')[0].trim()}`, color: null },
+            { label: 'Clean Accounts', value: placementMeta.cleanRows.toLocaleString(), sub: `${((placementMeta.cleanRows/placementMeta.totalRows)*100).toFixed(1)}% of total`, color: '#61ab5e' },
+            { label: 'Flagged', value: placementMeta.flaggedRows.toString(), sub: 'Missing contact / duplicate', color: '#f59e0b' },
+            { label: 'Total Balance', value: `$${(placementMeta.totalBalance/1000000).toFixed(1)}M`, sub: 'Face value at placement', color: null },
+            { label: 'Avg Balance', value: `$${placementMeta.avgBalance.toLocaleString()}`, sub: 'Across all accounts', color: null },
+            { label: 'Avg CO Age', value: `${placementMeta.avgChargeoffAge} mo`, sub: 'Since charge-off date', color: null },
+          ].map((card, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{card.label}</div>
+              <div className="text-2xl font-extrabold" style={{ color: card.color || '#111827' }}>{card.value}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{card.sub}</div>
+            </div>
+          ))}
+        </div>
 
         {/* ── ORIGINAL CREDITOR BREAKDOWN — horizontal bar view ────────────── */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -251,7 +250,7 @@ export default function Portfolio() {
                 {/* Legend */}
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm inline-block" style={{ backgroundColor: '#2196af' }} /><span className="text-xs text-gray-500">Accounts</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm inline-block" style={{ backgroundColor: '#f59e0b' }} /><span className="text-xs text-gray-500">Collected</span></div>
+                  <div className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm inline-block" style={{ backgroundColor: '#61ab5e' }} /><span className="text-xs text-gray-500">Collected</span></div>
                 </div>
                 {/* Search */}
                 <div className="relative">
@@ -317,10 +316,10 @@ export default function Portfolio() {
                       </div>
                       {/* Collected bar */}
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#fef3cd' }}>
+                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#e8f5e2' }}>
                           <div
                             className="h-5 rounded flex items-center px-2"
-                            style={{ width: `${colPct}%`, backgroundColor: '#f59e0b', minWidth: '52px' }}
+                            style={{ width: `${colPct}%`, backgroundColor: '#61ab5e', minWidth: '52px' }}
                           >
                             <span className="text-[10px] font-semibold text-white whitespace-nowrap">${c.collected.toLocaleString()}</span>
                           </div>
