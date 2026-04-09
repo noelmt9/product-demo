@@ -89,7 +89,10 @@ function App() {
               <path d="M122.59,138.74c-5.2,0-8.55,16.05-16.28,16.05-8.53,0-12.01-16.05-17.62-16.05-7.88,0-15.41,19.51-23.28,19.51-9.88,0-18.4-30.44-33.59-30.44,15.19,0,23.71-30.44,33.59-30.44,7.87,0,15.4,19.51,23.28,19.51,5.61,0,9.09-16.05,17.62-16.05,7.73,0,11.08,16.05,16.28,16.05,15.2,0,18.52-71.19,33.97-71.19,17.61,0,13.83,82.12,53.68,82.12-39.85,0-36.07,82.12-53.68,82.12-15.45,0-18.77-71.19-33.97-71.19" fill="white"/>
             </svg>
             {!sidebarCollapsed && (
-              <span className="text-[22px] font-bold text-white tracking-tight leading-none truncate">skit.ai</span>
+              <div className="flex flex-col leading-none truncate">
+                <span className="text-[22px] font-bold text-white tracking-tight">skit.ai</span>
+                <span className="text-[10px] text-blue-200/50 font-medium mt-1">Apex Recovery Partners</span>
+              </div>
             )}
           </div>
           <button
