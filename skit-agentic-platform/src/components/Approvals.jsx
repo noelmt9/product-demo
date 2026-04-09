@@ -362,84 +362,49 @@ function AgentTab({ agent, onAgentClick }) {
 
 // ── TAB: Approved ─────────────────────────────────────────────────────────────
 
-function ApprovedTab({ approvedHistory, rejectedHistory, approvedTotal }) {
-  const all = [...approvedHistory, ...rejectedHistory].sort((a, b) => {
-    // Sort by day number descending
-    const dayA = parseInt(a.date.replace('Day ', ''));
-    const dayB = parseInt(b.date.replace('Day ', ''));
-    return dayB - dayA;
-  });
-
+function ApprovedTab({ approvedHistory, approvedTotal }) {
   return (
-    <div className="px-8 py-6 space-y-6">
-      {/* Summary row */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Approved</div>
-          <div className="text-3xl font-extrabold text-gray-900">{approvedHistory.length}</div>
-          <div className="mt-2">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>
-              ${(approvedTotal/1000).toFixed(0)}K unlocked
-            </span>
-          </div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Rejected</div>
-          <div className="text-3xl font-extrabold text-gray-900">{rejectedHistory.length}</div>
-          <div className="mt-2">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
-              Opportunity not captured
-            </span>
-          </div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Approval Rate</div>
-          <div className="text-3xl font-extrabold text-gray-900">{Math.round((approvedHistory.length / (approvedHistory.length + rejectedHistory.length)) * 100)}%</div>
-          <div className="mt-3 h-1.5 rounded-full bg-gray-100 overflow-hidden">
-            <div className="h-1.5 rounded-full" style={{ backgroundColor: '#2196af', width: `${(approvedHistory.length / (approvedHistory.length + rejectedHistory.length)) * 100}%` }} />
-          </div>
-          <div className="text-xs text-gray-400 mt-1">{approvedHistory.length + rejectedHistory.length} total decisions</div>
-        </div>
+    <div className="px-8 py-6 space-y-3">
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">{approvedHistory.length} Approved Decisions</h2>
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>
+          ${(approvedTotal/1000).toFixed(0)}K total unlocked
+        </span>
       </div>
-
-      {/* Decision log */}
-      <div>
-        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Decision Log</h2>
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                {['Day', 'Agent', 'Decision', 'Outcome', '$ Impact'].map(h => (
-                  <th key={h} className={`py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wide ${h === 'Decision' ? 'text-left' : 'text-center'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {all.map((row, i) => {
-                const meta = AGENT_META[row.agent] || AGENT_META.Analyst;
-                return (
-                  <tr key={i} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                    <td className="py-3 px-5 text-center text-xs text-gray-400 font-medium tabular-nums">{row.date}</td>
-                    <td className="py-3 px-5 text-center">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: meta.color }}>
-                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: meta.color }} />
-                        {row.agent}
-                      </span>
-                    </td>
-                    <td className="py-3 px-5 text-xs text-gray-700">{row.decision}</td>
-                    <td className="py-3 px-5 text-center">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${row.outcome === 'Approved' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
-                        {row.outcome}
-                      </span>
-                    </td>
-                    <td className="py-3 px-5 text-center text-xs font-semibold text-gray-700 tabular-nums">{row.dollarLabel}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {approvedHistory.map((row, i) => {
+        const meta = AGENT_META[row.agent] || AGENT_META.Analyst;
+        return (
+          <div key={i} className="bg-white border border-gray-200 rounded-xl p-5">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex items-start gap-2 flex-1 min-w-0">
+                <span className="inline-block w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: meta.color }} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-xs font-bold" style={{ color: meta.color }}>{row.agent}</span>
+                    <span className="text-[10px] text-gray-400">{row.date}</span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200">Approved</span>
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900 leading-snug">{row.decision}</p>
+                </div>
+              </div>
+              {row.dollarImpact > 0 && (
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>
+                  {row.dollarLabel}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+              <CriticalityBadge level={row.criticality} />
+              {row.dollarImpact === 0 && (
+                <span className="text-xs text-gray-400">{row.dollarLabel}</span>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
     </div>
   );
 }
@@ -546,7 +511,7 @@ export default function Approvals({ onAgentClick }) {
 
       {/* ── TAB CONTENT ──────────────────────────────────────────────────────── */}
       {activeTab === 'pending'  && <OverallTab onAgentClick={onAgentClick} />}
-      {activeTab === 'approved' && <ApprovedTab approvedHistory={approvedHistory} rejectedHistory={rejectedHistory} approvedTotal={approvedTotal} />}
+      {activeTab === 'approved' && <ApprovedTab approvedHistory={approvedHistory} approvedTotal={approvedTotal} />}
 
     </div>
   );
