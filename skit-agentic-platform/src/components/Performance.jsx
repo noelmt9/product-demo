@@ -14,6 +14,16 @@ const generateDailyData = () => {
 };
 const dailyData = generateDailyData();
 
+// Funnel trend data — each step has 18 days of values
+const funnelTrendData = {
+  Accounts:    dailyData.map((_, i) => ({ day: i+1, value: 12000 })),
+  Contacted:   dailyData.map((d) => ({ day: d.day, value: Math.round(12000 * (d.contact / 100)) })),
+  RPC:         dailyData.map((d) => ({ day: d.day, value: Math.round(12000 * (d.rpc / 100)) })),
+  PTP:         dailyData.map((d, i) => ({ day: d.day, value: Math.round(180 + i * 12.4) })),
+  "Kept PTP":  dailyData.map((d, i) => ({ day: d.day, value: Math.round(110 + i * 9.1) })),
+  Resolved:    dailyData.map((d, i) => ({ day: d.day, value: Math.round(40 + i * 39) })),
+};
+
 const cohortTrendData = {
   "High propensity / Low balance":    [3.3, 3.8, 4.1],
   "High propensity / High balance":   [2.7, 3.2, 3.8],
@@ -28,27 +38,6 @@ const cohortMetrics = [
   { name: "Medium prop / All bal",  liquidation: 2.2, contact: 36, rpc: 26, ptp: 11, collections: 57600,  change: "+18%", cost: 18400, margin: 39200, costPerDollar: 0.32 },
   { name: "Low prop / Low bal",     liquidation: 0.4, contact: 12, rpc: 8,  ptp: 3,  collections: 8400,   change: "+12%", cost: 9200,  margin: -800,  costPerDollar: 1.10, negativeMargin: true },
   { name: "Low prop / High bal",    liquidation: 1.9, contact: 28, rpc: 22, ptp: 8,  collections: 77400,  change: "+8%",  cost: 22100, margin: 55300, costPerDollar: 0.29 },
-];
-
-const agencyBenchmark = [
-  { agency: "Agency A", liquidation: 1.9 },
-  { agency: "Agency B", liquidation: 2.1 },
-  { agency: "Agency C", liquidation: 2.4 },
-  { agency: "Skit.ai",  liquidation: 2.7, isSkit: true },
-];
-
-const moreBenchmarkMetrics = [
-  { label: "Contact Rate",           skit: "38%",    agencyA: "29%",   agencyB: "33%",   agencyC: "36%"   },
-  { label: "RPC Rate",               skit: "28%",    agencyA: "19%",   agencyB: "22%",   agencyC: "25%"   },
-  { label: "PTP Adherence",          skit: "68%",    agencyA: "54%",   agencyB: "59%",   agencyC: "63%"   },
-  { label: "Compliance Score",       skit: "99.86%", agencyA: "98.1%", agencyB: "98.7%", agencyC: "99.2%" },
-  { label: "Cost per $1 Collected",  skit: "$0.24",  agencyA: "$0.41", agencyB: "$0.37", agencyC: "$0.29" },
-];
-
-const analystRecs = [
-  { message: "High Prop / High Bal settlement + voice strategy is working. Recommend expanding to Medium Propensity cohort — similar balance profile, currently under-penetrated on settlement offers.", agents: ["Analyst"] },
-  { message: "Medium Propensity contact rate plateauing at 36%. Adding morning SMS nudge before voice attempt could improve pickup. Manager has a proposed change in Approvals.", agents: ["Analyst", "Manager"] },
-  { message: "Week 3 liquidation crossed activation target (2.7% vs 2.5%). Recommend scheduling Activation Review with client.", agents: ["Analyst"] },
 ];
 
 const sentimentData = {
@@ -72,7 +61,7 @@ const sentimentData = {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-const Sparkline = ({ data, dataKey, color = "#10b981" }) => (
+const Sparkline = ({ data, dataKey, color = "#61ab5e" }) => (
   <ResponsiveContainer width="100%" height={36}>
     <LineChart data={data}>
       <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={false} />
@@ -80,7 +69,7 @@ const Sparkline = ({ data, dataKey, color = "#10b981" }) => (
   </ResponsiveContainer>
 );
 
-const MiniBar = ({ data, color = "#3b82f6" }) => {
+const MiniBar = ({ data, color = "#2196af" }) => {
   const d = data.map((v, i) => ({ w: i + 1, v }));
   return (
     <ResponsiveContainer width="100%" height={64}>
@@ -94,23 +83,32 @@ const MiniBar = ({ data, color = "#3b82f6" }) => {
 const sentColor = s => s === "positive" ? "text-green-600" : s === "negative" ? "text-red-500" : "text-gray-500";
 const sentDot   = s => s === "positive" ? "bg-green-500"  : s === "negative" ? "bg-red-500"   : "bg-gray-400";
 
-// Funnel step component
-const FunnelStep = ({ label, value, sub, pct, color, isLast }) => (
+// Funnel step component — light theme, clickable
+const FunnelStep = ({ label, value, sub, pct, isLast, isExpanded, onClick }) => (
   <div className="flex items-center flex-1 min-w-0">
     <div className="flex flex-col items-center flex-1 min-w-0">
-      <div className={`w-full rounded-lg px-3 py-3 text-center border-2 ${color}`}>
-        <div className="text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">{label}</div>
-        <div className="text-2xl font-extrabold text-white">{value}</div>
-        {sub && <div className="text-[11px] text-white/60 mt-0.5">{sub}</div>}
-      </div>
+      <button
+        onClick={onClick}
+        className="w-full rounded-lg px-3 py-3 text-center border transition-all"
+        style={{
+          background: isExpanded ? '#f0faf8' : '#ffffff',
+          borderColor: isExpanded ? '#2196af' : '#d4eae5',
+          boxShadow: isExpanded ? '0 0 0 2px rgba(33,150,175,0.15)' : 'none',
+          cursor: 'pointer',
+        }}
+      >
+        <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">{label}</div>
+        <div className="text-2xl font-extrabold text-gray-900">{value}</div>
+        {sub && <div className="text-[11px] text-gray-400 mt-0.5">{sub}</div>}
+      </button>
       {pct && (
-        <div className="mt-1.5 text-xs font-semibold text-white/50">{pct}</div>
+        <div className="mt-1.5 text-xs font-semibold text-gray-400">{pct}</div>
       )}
     </div>
     {!isLast && (
       <div className="flex flex-col items-center px-1 flex-shrink-0 mt-[-14px]">
         <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
-          <path d="M0 8 H18 M12 2 L20 8 L12 14" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M0 8 H18 M12 2 L20 8 L12 14" stroke="#2196af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.35"/>
         </svg>
       </div>
     )}
@@ -120,70 +118,82 @@ const FunnelStep = ({ label, value, sub, pct, color, isLast }) => (
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function Performance({ onNavigate }) {
-  const [expandedRec, setExpandedRec] = React.useState(null);
-  const [showMoreBenchmark, setShowMoreBenchmark] = React.useState(false);
+  const [expandedFunnel, setExpandedFunnel] = React.useState(null);
+  const [expandedCohort, setExpandedCohort] = React.useState(null);
+
+  const funnelSteps = [
+    { label: "Accounts",  value: "12,000", sub: "Total placement",    pct: null,               key: "Accounts" },
+    { label: "Contacted", value: "4,560",  sub: "38% contact rate",   pct: "38% of placement",  key: "Contacted" },
+    { label: "RPC",       value: "3,360",  sub: "Right party contact", pct: "28% of placement",  key: "RPC" },
+    { label: "PTP",       value: "403",    sub: "Promise to pay",     pct: "12% of RPC",        key: "PTP" },
+    { label: "Kept PTP",  value: "274",    sub: "68% adherence",      pct: "68% of PTP",        key: "Kept PTP" },
+    { label: "Resolved",  value: "743",    sub: "Cumulative",         pct: "6.2% of placement", key: "Resolved" },
+  ];
 
   return (
-    <div className="bg-gray-50 min-h-full">
+    <div className="min-h-full">
 
-      {/* ── HERO STRIP ─────────────────────────────────────────────────────── */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f2744 100%)' }} className="px-8 pt-8 pb-6">
+      {/* ── HEADER AREA ─────────────────────────────────────────────────────── */}
+      <div className="px-8 pt-8 pb-6">
 
         {/* Title row */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-bold text-white">Performance</h1>
-            <p className="text-sm text-slate-400 mt-0.5">Apex Recovery Partners · Hypercare Week 3 · Day 18</p>
+            <h1 className="text-xl font-bold text-gray-900">Performance</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Apex Recovery Partners · Hypercare Week 3 · Day 18</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
+              style={{ background: 'linear-gradient(135deg, rgba(33,150,175,0.12), rgba(97,171,94,0.12))', color: '#2196af', border: '1px solid rgba(33,150,175,0.3)' }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#61ab5e' }} />
               Above activation target
             </span>
           </div>
         </div>
 
-        {/* 3 headline numbers */}
+        {/* 3 headline number cards */}
         <div className="grid grid-cols-3 gap-5 mb-2">
           {/* Total Collected */}
-          <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Total Collected</div>
-            <div className="text-4xl font-extrabold text-white mb-1">$287,400</div>
-            <div className="text-xs text-slate-400 mb-3">Day 1 – Day 18 cumulative</div>
-            <Sparkline data={dailyData} dataKey="cumulativeCollections" color="#34d399" />
-            <div className="mt-2 flex items-center gap-2 text-xs text-emerald-400 font-medium">
-              <span>↑ $25,200 yesterday</span>
-              <span className="text-slate-600">·</span>
-              <span className="text-slate-400">Avg $15,967/day</span>
+          <div className="card p-5">
+            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Total Collected</div>
+            <div className="text-4xl font-extrabold text-gray-900 mb-1">$287,400</div>
+            <div className="text-xs text-gray-400 mb-3">Day 1 – Day 18 cumulative</div>
+            <Sparkline data={dailyData} dataKey="cumulativeCollections" color="#61ab5e" />
+            <div className="mt-2 flex items-center gap-2 text-xs font-medium">
+              <span style={{ color: '#61ab5e' }}>↑ $25,200 yesterday</span>
+              <span className="text-gray-300">·</span>
+              <span className="text-gray-400">Avg $15,967/day</span>
             </div>
           </div>
 
           {/* Liquidation Rate */}
-          <div className="rounded-xl p-5" style={{ background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)' }}>
-            <div className="text-xs font-semibold uppercase tracking-wider text-blue-300 mb-1">Liquidation Rate</div>
+          <div className="card p-5" style={{ borderColor: '#2196af40' }}>
+            <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#2196af' }}>Liquidation Rate</div>
             <div className="flex items-end gap-3 mb-1">
-              <div className="text-4xl font-extrabold text-white">2.7%</div>
-              <div className="mb-1.5 text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">↑ +0.2% vs target</div>
+              <div className="text-4xl font-extrabold text-gray-900">2.7%</div>
+              <div className="mb-1.5 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>↑ +0.2% vs target</div>
             </div>
-            <div className="text-xs text-slate-400 mb-3">Target: 2.5% · 6-mo avg: 2.1%</div>
-            <Sparkline data={dailyData} dataKey="liquidation" color="#60a5fa" />
+            <div className="text-xs text-gray-400 mb-3">Target: 2.5% · 6-mo avg: 2.1%</div>
+            <Sparkline data={dailyData} dataKey="liquidation" color="#2196af" />
             <div className="mt-2 flex items-center gap-2 text-xs font-medium">
-              <span className="text-blue-300">Week 1: 1.8%</span>
-              <span className="text-slate-600">→</span>
-              <span className="text-blue-300">Week 2: 2.3%</span>
-              <span className="text-slate-600">→</span>
-              <span className="text-emerald-400 font-bold">Week 3: 2.7%</span>
+              <span style={{ color: '#2196af' }}>Week 1: 1.8%</span>
+              <span className="text-gray-300">→</span>
+              <span style={{ color: '#2196af' }}>Week 2: 2.3%</span>
+              <span className="text-gray-300">→</span>
+              <span className="font-bold" style={{ color: '#61ab5e' }}>Week 3: 2.7%</span>
             </div>
           </div>
 
           {/* Agency Ranking */}
-          <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Agency Ranking</div>
+          <div className="card p-5">
+            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Agency Ranking</div>
             <div className="flex items-end gap-3 mb-3">
-              <div className="text-4xl font-extrabold text-white">#1</div>
-              <div className="mb-1.5 text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">of 4 agencies</div>
+              <div className="text-4xl font-extrabold text-gray-900">#1</div>
+              <div className="mb-1.5 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>of 4 agencies</div>
             </div>
-            <div className="text-xs text-slate-400 mb-4">Liquidation rate · same portfolio type · Hypercare Wk 3</div>
+            <div className="text-xs text-gray-400 mb-4">Liquidation rate · same portfolio type · Hypercare Wk 3</div>
             <div className="space-y-2">
               {[
                 { label: "Skit.ai",  val: 2.7, isSkit: true },
@@ -192,43 +202,79 @@ export default function Performance({ onNavigate }) {
                 { label: "Agency A", val: 1.9 },
               ].map((a, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <div className={`text-[11px] w-16 flex-shrink-0 ${a.isSkit ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>{a.label}</div>
-                  <div className="flex-1 bg-slate-700 rounded-full h-1.5">
+                  <div className={`text-[11px] w-16 flex-shrink-0 ${a.isSkit ? 'font-bold' : 'text-gray-400'}`} style={a.isSkit ? { color: '#2196af' } : {}}>
+                    {a.label}
+                  </div>
+                  <div className="flex-1 rounded-full h-1.5" style={{ backgroundColor: '#d4eae5' }}>
                     <div
-                      className={`h-1.5 rounded-full ${a.isSkit ? 'bg-emerald-400' : 'bg-slate-500'}`}
-                      style={{ width: `${(a.val / 3) * 100}%` }}
+                      className="h-1.5 rounded-full"
+                      style={{ width: `${(a.val / 3) * 100}%`, backgroundColor: a.isSkit ? '#2196af' : '#9ca3af' }}
                     />
                   </div>
-                  <div className={`text-[11px] w-8 text-right flex-shrink-0 tabular-nums ${a.isSkit ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>{a.val}%</div>
+                  <div className={`text-[11px] w-8 text-right flex-shrink-0 tabular-nums ${a.isSkit ? 'font-bold' : 'text-gray-400'}`} style={a.isSkit ? { color: '#2196af' } : {}}>
+                    {a.val}%
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="mt-3 text-xs text-emerald-400 font-medium">12.5% above next best agency</div>
+            <div className="mt-3 text-xs font-medium" style={{ color: '#2196af' }}>12.5% above next best agency</div>
           </div>
         </div>
       </div>
 
       <div className="px-8 py-6 space-y-6">
 
-        {/* ── CONVERSION FUNNEL ──────────────────────────────────────────────── */}
-        <div className="rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
+        {/* ── COLLECTIONS FUNNEL ──────────────────────────────────────────────── */}
+        <div className="card overflow-hidden">
           <div className="px-6 pt-5 pb-2">
             <div className="flex items-center justify-between mb-1">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Collections Funnel</h2>
-              <span className="text-xs text-slate-500">Week 3 · All channels</span>
+              <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Collections Funnel</h2>
+              <span className="text-xs text-gray-400">Week 3 · All channels</span>
             </div>
-            <p className="text-xs text-slate-500 mb-5">End-to-end conversion from placement to resolution</p>
+            <p className="text-xs text-gray-400 mb-5">End-to-end conversion from placement to resolution — click any step for trend</p>
             <div className="flex items-start gap-1">
-              <FunnelStep label="Accounts" value="12,000" sub="Total placement" color="border-slate-600 bg-slate-700/50" />
-              <FunnelStep label="Contacted" value="4,560" sub="38% contact rate" pct="38% of placement" color="border-blue-700 bg-blue-900/50" />
-              <FunnelStep label="RPC" value="3,360" sub="Right party contact" pct="28% of placement" color="border-indigo-600 bg-indigo-900/50" />
-              <FunnelStep label="PTP" value="403" sub="Promise to pay" pct="12% of RPC" color="border-violet-600 bg-violet-900/50" />
-              <FunnelStep label="Kept PTP" value="274" sub="68% adherence" pct="68% of PTP" color="border-teal-600 bg-teal-900/50" />
-              <FunnelStep label="Resolved" value="743" sub="Cumulative" pct="6.2% of placement" color="border-emerald-600 bg-emerald-900/60" isLast />
+              {funnelSteps.map((step, i) => (
+                <FunnelStep
+                  key={step.key}
+                  label={step.label}
+                  value={step.value}
+                  sub={step.sub}
+                  pct={step.pct}
+                  isLast={i === funnelSteps.length - 1}
+                  isExpanded={expandedFunnel === step.key}
+                  onClick={() => setExpandedFunnel(expandedFunnel === step.key ? null : step.key)}
+                />
+              ))}
             </div>
+
+            {/* Expanded trend chart for selected funnel step */}
+            {expandedFunnel && (
+              <div className="mt-4 pt-4" style={{ borderTop: '1px solid #d4eae5' }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-semibold text-gray-900">{expandedFunnel}</span>
+                  <span className="text-xs text-gray-400">— 18-day trend</span>
+                </div>
+                <ResponsiveContainer width="100%" height={120}>
+                  <AreaChart data={funnelTrendData[expandedFunnel]} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
+                    <defs>
+                      <linearGradient id="funnelGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="#2196af" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#2196af" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="day" tick={{ fontSize: 10 }} stroke="#9ca3af" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="value" stroke="#2196af" fill="url(#funnelGrad)" strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
-          {/* Drop-off callouts */}
-          <div className="grid grid-cols-5 gap-px mt-4 border-t border-slate-700/60">
+
+          {/* Drop-off callouts — light theme */}
+          <div className="grid grid-cols-5 gap-px mt-4" style={{ borderTop: '1px solid #d4eae5' }}>
             {[
               { label: "Unreached", value: "7,440", note: "Skip trace / re-attempt in progress" },
               { label: "No RPC", value: "1,200", note: "Connected but not right party" },
@@ -236,96 +282,14 @@ export default function Performance({ onNavigate }) {
               { label: "Broken PTP", value: "129", note: "620 total broken this placement" },
               { label: "In progress", value: "469", note: "Active payment plans running" },
             ].map((d, i) => (
-              <div key={i} className="px-4 py-3 bg-slate-800/40">
-                <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Drop-off: {d.label}</div>
-                <div className="text-sm font-bold text-red-400">{d.value}</div>
-                <div className="text-[10px] text-slate-600 mt-0.5">{d.note}</div>
+              <div key={i} className="px-4 py-3" style={{ backgroundColor: '#f8fcfb' }}>
+                <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Drop-off: {d.label}</div>
+                <div className="text-sm font-bold text-red-500">{d.value}</div>
+                <div className="text-[10px] text-gray-400 mt-0.5">{d.note}</div>
               </div>
             ))}
           </div>
         </div>
-
-        {/* ── ANALYST RECOMMENDATIONS ────────────────────────────────────────── */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-2 h-2 rounded-full bg-blue-500" />
-            <span className="text-xs font-semibold uppercase tracking-wide text-gray-600">Analyst Recommendations</span>
-            <span className="text-xs text-gray-400">• {analystRecs.length} active</span>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {analystRecs.map((rec, idx) => (
-              <button
-                key={idx}
-                onClick={() => setExpandedRec(expandedRec === idx ? null : idx)}
-                className="p-3 bg-white border border-gray-200 rounded-lg text-left hover:border-blue-300 hover:shadow-sm transition-all"
-              >
-                <div className="flex items-start gap-2">
-                  <div className="flex gap-1 mt-1 flex-shrink-0">
-                    {rec.agents.map((a, ai) => (
-                      <span key={ai} className={`w-1.5 h-1.5 rounded-full ${a === 'Analyst' ? 'bg-blue-500' : 'bg-purple-500'}`} />
-                    ))}
-                  </div>
-                  <p className={`text-xs text-gray-900 ${expandedRec === idx ? '' : 'line-clamp-2'}`}>{rec.message}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── AGENCY BENCHMARK ───────────────────────────────────────────────── */}
-        <Section title="Agency Benchmark — Liquidation Rate">
-          <div className="flex items-end gap-4 mb-4" style={{ height: 130 }}>
-            {agencyBenchmark.map((a, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center justify-end h-full gap-1">
-                <div className={`text-xs font-bold mb-1 ${a.isSkit ? 'text-blue-600' : 'text-gray-400'}`}>{a.liquidation}%</div>
-                <div
-                  className="w-full rounded-t transition-all"
-                  style={{ height: `${(a.liquidation / 3) * 100}px`, backgroundColor: a.isSkit ? '#3b82f6' : '#cbd5e1' }}
-                />
-                <div className={`text-xs mt-1 ${a.isSkit ? 'text-blue-600 font-bold' : 'text-gray-400'}`}>{a.agency}</div>
-              </div>
-            ))}
-            <div className="flex flex-col justify-center pb-6 pl-6 border-l border-gray-200 text-xs text-gray-400 space-y-1 flex-shrink-0">
-              <div>Same portfolio type</div>
-              <div>Post charge-off, mixed debt</div>
-              <div>Hypercare Week 3</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 border border-blue-200 rounded text-xs font-semibold text-blue-700">
-              Skit.ai ranks #1 — 12.5% above next best agency
-            </span>
-            <button onClick={() => setShowMoreBenchmark(!showMoreBenchmark)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-              {showMoreBenchmark ? 'Hide comparisons ↑' : 'View more comparisons →'}
-            </button>
-          </div>
-          {showMoreBenchmark && (
-            <div className="mt-3 border border-gray-200 rounded-lg overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="text-left py-2 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Metric</th>
-                    {["Agency A","Agency B","Agency C"].map(a => (
-                      <th key={a} className="text-center py-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">{a}</th>
-                    ))}
-                    <th className="text-center py-2 px-3 text-xs font-semibold text-blue-600 uppercase tracking-wide">Skit.ai</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {moreBenchmarkMetrics.map((row, i) => (
-                    <tr key={i} className="border-b border-gray-100 last:border-0">
-                      <td className="py-2 px-3 text-gray-700 font-medium">{row.label}</td>
-                      <td className="py-2 px-3 text-center text-gray-400">{row.agencyA}</td>
-                      <td className="py-2 px-3 text-center text-gray-400">{row.agencyB}</td>
-                      <td className="py-2 px-3 text-center text-gray-400">{row.agencyC}</td>
-                      <td className="py-2 px-3 text-center font-bold text-blue-600">{row.skit}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Section>
 
         {/* ── COLLECTIONS OVER TIME ──────────────────────────────────────────── */}
         <Section title="Collections Over Time">
@@ -333,8 +297,8 @@ export default function Performance({ onNavigate }) {
             <AreaChart data={dailyData}>
               <defs>
                 <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  <stop offset="5%"  stopColor="#2196af" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#2196af" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -342,11 +306,11 @@ export default function Performance({ onNavigate }) {
               <YAxis yAxisId="left"  label={{ value: 'Daily ($)',      angle: -90, position: 'insideLeft' }}  stroke="#9ca3af" />
               <YAxis yAxisId="right" orientation="right" label={{ value: 'Cumulative ($)', angle: 90, position: 'insideRight' }} stroke="#9ca3af" />
               <Tooltip />
-              <Area  yAxisId="left"  type="monotone" dataKey="dailyCollections"      stroke="#3b82f6" fill="url(#grad)" />
-              <Line  yAxisId="right" type="monotone" dataKey="cumulativeCollections" stroke="#10b981" strokeWidth={2} dot={false} />
-              <ReferenceLine yAxisId="left" x={3}  stroke="#6366f1" strokeDasharray="3 3" label={{ value: "Day 3: SMS-first",    position: "top", fill: "#6366f1", fontSize: 11 }} />
-              <ReferenceLine yAxisId="left" x={12} stroke="#6366f1" strokeDasharray="3 3" label={{ value: "Day 12: Voice 5×/wk", position: "top", fill: "#6366f1", fontSize: 11 }} />
-              <ReferenceLine yAxisId="left" x={17} stroke="#6366f1" strokeDasharray="3 3" label={{ value: "Day 17: Settlements",  position: "top", fill: "#6366f1", fontSize: 11 }} />
+              <Area  yAxisId="left"  type="monotone" dataKey="dailyCollections"      stroke="#2196af" fill="url(#grad)" />
+              <Line  yAxisId="right" type="monotone" dataKey="cumulativeCollections" stroke="#61ab5e" strokeWidth={2} dot={false} />
+              <ReferenceLine yAxisId="left" x={3}  stroke="#2196af" strokeDasharray="3 3" label={{ value: "Day 3: SMS-first",    position: "top", fill: "#2196af", fontSize: 11 }} />
+              <ReferenceLine yAxisId="left" x={12} stroke="#2196af" strokeDasharray="3 3" label={{ value: "Day 12: Voice 5x/wk", position: "top", fill: "#2196af", fontSize: 11 }} />
+              <ReferenceLine yAxisId="left" x={17} stroke="#2196af" strokeDasharray="3 3" label={{ value: "Day 17: Settlements",  position: "top", fill: "#2196af", fontSize: 11 }} />
             </AreaChart>
           </ResponsiveContainer>
         </Section>
@@ -354,38 +318,38 @@ export default function Performance({ onNavigate }) {
         {/* ── PTP PIPELINE ───────────────────────────────────────────────────── */}
         <Section title="PTP Pipeline & Delivery">
           <div className="grid grid-cols-4 gap-4">
-            <div className="p-4 bg-white border border-gray-200 rounded-lg">
+            <div className="card p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Warm PTP</div>
               <div className="text-2xl font-bold text-gray-900">312</div>
               <div className="text-xs text-gray-400 mt-1">Via voice / human direct contact</div>
-              <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">
+              <div className="mt-2 pt-2 text-xs text-gray-500" style={{ borderTop: '1px solid #d4eae5' }}>
                 Cold PTP <span className="font-semibold text-gray-700 ml-1">308</span> <span className="text-gray-400">via SMS/email</span>
               </div>
             </div>
-            <div className="p-4 bg-white border border-gray-200 rounded-lg">
+            <div className="card p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">PTP Adherence</div>
               <div className="text-2xl font-bold text-amber-600">68%</div>
               <div className="text-xs text-gray-400 mt-1">vs 70% target</div>
-              <div className="mt-2 pt-2 border-t border-gray-100">
-                <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div className="mt-2 pt-2" style={{ borderTop: '1px solid #d4eae5' }}>
+                <div className="w-full rounded-full h-1.5" style={{ backgroundColor: '#d4eae5' }}>
                   <div className="h-1.5 rounded-full bg-amber-400" style={{ width: '68%' }} />
                 </div>
                 <div className="text-xs text-gray-400 mt-1">274 kept · 129 broken this week</div>
               </div>
             </div>
-            <div className="p-4 bg-white border border-red-100 rounded-lg">
+            <div className="card p-4" style={{ borderColor: 'rgba(239,68,68,0.2)' }}>
               <div className="text-xs font-semibold uppercase tracking-wide text-red-500 mb-2">At-Risk PTP Value</div>
               <div className="text-2xl font-bold text-red-600">$142,000</div>
               <div className="text-xs text-gray-400 mt-1">PTPs at risk of being broken</div>
-              <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">
+              <div className="mt-2 pt-2 text-xs text-gray-500" style={{ borderTop: '1px solid #d4eae5' }}>
                 89 accounts · missed 1st installment
               </div>
             </div>
-            <div className="p-4 bg-white border border-gray-200 rounded-lg">
+            <div className="card p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Bot Abandonment</div>
               <div className="text-2xl font-bold text-amber-600">22%</div>
               <div className="text-xs text-gray-400 mt-1">Hung up before resolution</div>
-              <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">
+              <div className="mt-2 pt-2 text-xs text-gray-500" style={{ borderTop: '1px solid #d4eae5' }}>
                 Bot transfer rate <span className="font-semibold text-gray-700 ml-1">18%</span> <span className="text-gray-400">to live agent</span>
               </div>
             </div>
@@ -396,39 +360,59 @@ export default function Performance({ onNavigate }) {
         <Section title="Cohort Performance">
           <div className="grid grid-cols-5 gap-3">
             {cohortMetrics.map((c, i) => (
-              <div key={i} className={`p-3 bg-white rounded-lg ${c.highlight ? 'border-2 border-green-500 shadow-md shadow-green-100' : 'border border-gray-200'}`}>
+              <button
+                key={i}
+                onClick={() => setExpandedCohort(expandedCohort === i ? null : i)}
+                className="text-left card p-3 transition-all"
+                style={
+                  c.highlight
+                    ? { borderColor: '#61ab5e', borderWidth: '2px', boxShadow: '0 4px 12px rgba(97,171,94,0.15)' }
+                    : expandedCohort === i
+                    ? { borderColor: '#2196af', boxShadow: '0 0 0 2px rgba(33,150,175,0.12)' }
+                    : {}
+                }
+              >
                 <div className="flex items-start justify-between mb-2">
                   <div className="text-xs font-semibold text-gray-900 leading-tight flex-1 pr-1">{c.name}</div>
-                  <span className="text-xs font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded flex-shrink-0">{c.change}</span>
+                  <span className="text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ backgroundColor: 'rgba(97,171,94,0.1)', color: '#61ab5e' }}>{c.change}</span>
                 </div>
-                <MiniBar data={cohortTrendData[Object.keys(cohortTrendData).find(k => k.toLowerCase().includes(c.name.split('/')[0].trim().toLowerCase()))]} color={c.highlight ? '#10b981' : '#3b82f6'} />
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-2 pt-2 border-t border-gray-100 text-xs">
+                <MiniBar data={cohortTrendData[Object.keys(cohortTrendData).find(k => k.toLowerCase().includes(c.name.split('/')[0].trim().toLowerCase()))]} color={c.highlight ? '#61ab5e' : '#2196af'} />
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-2 pt-2 text-xs" style={{ borderTop: '1px solid #d4eae5' }}>
                   <div><span className="text-gray-400">Liq</span> <span className="font-semibold text-gray-900">{c.liquidation}%</span></div>
                   <div><span className="text-gray-400">RPC</span> <span className="font-semibold text-gray-900">{c.rpc}%</span></div>
                   <div><span className="text-gray-400">Cont</span> <span className="font-semibold text-gray-900">{c.contact}%</span></div>
                   <div><span className="text-gray-400">PTP</span> <span className="font-semibold text-gray-900">{c.ptp}%</span></div>
                 </div>
-                <div className={`mt-2 pt-2 border-t text-xs ${c.negativeMargin ? 'border-red-100' : 'border-gray-100'}`}>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Collected</span>
-                    <span className="font-semibold text-gray-900">${(c.collections/1000).toFixed(0)}k</span>
+
+                {/* Expanded detail — margin/cost info */}
+                {expandedCohort === i && (
+                  <div className={`mt-2 pt-2 text-xs ${c.negativeMargin ? '' : ''}`} style={{ borderTop: '1px solid #d4eae5' }}>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Collected</span>
+                      <span className="font-semibold text-gray-900">${(c.collections/1000).toFixed(0)}k</span>
+                    </div>
+                    <div className="flex justify-between mt-0.5">
+                      <span className="text-gray-400">Cost</span>
+                      <span className="font-semibold text-gray-600">${(c.cost/1000).toFixed(1)}k</span>
+                    </div>
+                    <div className="flex justify-between mt-0.5">
+                      <span className="text-gray-400">Margin</span>
+                      <span className={`font-semibold ${c.negativeMargin ? 'text-red-600' : 'text-green-600'}`}>{c.negativeMargin ? '' : '+'}{(c.margin/1000).toFixed(1)}k</span>
+                    </div>
+                    <div className="flex justify-between mt-0.5">
+                      <span className="text-gray-400">$/dollar</span>
+                      <span className={`font-semibold ${c.negativeMargin ? 'text-red-600' : 'text-gray-700'}`}>${c.costPerDollar.toFixed(2)}</span>
+                    </div>
+                    {c.negativeMargin && (
+                      <div className="mt-1.5 text-[10px] text-red-600 font-medium">Negative margin</div>
+                    )}
                   </div>
-                  <div className="flex justify-between mt-0.5">
-                    <span className="text-gray-400">Margin</span>
-                    <span className={`font-semibold ${c.negativeMargin ? 'text-red-600' : 'text-green-600'}`}>{c.negativeMargin ? '' : '+'}{(c.margin/1000).toFixed(1)}k</span>
-                  </div>
-                  <div className="flex justify-between mt-0.5">
-                    <span className="text-gray-400">$/dollar</span>
-                    <span className={`font-semibold ${c.negativeMargin ? 'text-red-600' : 'text-gray-700'}`}>${c.costPerDollar.toFixed(2)}</span>
-                  </div>
-                </div>
-                {c.negativeMargin && (
-                  <div className="mt-1.5 text-[10px] text-red-600 font-medium">⚠ Negative margin</div>
                 )}
+
                 {c.highlight && (
-                  <button onClick={() => onNavigate && onNavigate('conversations')} className="mt-2 text-xs text-blue-600 font-medium">View conversations →</button>
+                  <button onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate('conversations'); }} className="mt-2 text-xs font-medium" style={{ color: '#2196af' }}>View conversations →</button>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         </Section>
@@ -437,22 +421,22 @@ export default function Performance({ onNavigate }) {
         <Section title="Customer Sentiment">
           {/* Score cards */}
           <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="p-4 bg-white border border-gray-200 rounded-lg text-center">
+            <div className="card p-4 text-center">
               <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Sentiment Score</div>
               <div className="text-3xl font-bold text-gray-900">{sentimentData.overall}<span className="text-base text-gray-400">/100</span></div>
               <div className="text-xs text-gray-400 mt-1">All channels</div>
             </div>
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+            <div className="card p-4 text-center" style={{ backgroundColor: 'rgba(97,171,94,0.06)', borderColor: 'rgba(97,171,94,0.25)' }}>
               <div className="text-xs font-semibold uppercase tracking-wide text-green-700 mb-2">Positive</div>
               <div className="text-3xl font-bold text-green-700">{sentimentData.positive}%</div>
               <div className="text-xs text-green-500 mt-1">of interactions</div>
             </div>
-            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
+            <div className="card p-4 text-center" style={{ backgroundColor: 'rgba(156,163,175,0.06)', borderColor: 'rgba(156,163,175,0.25)' }}>
               <div className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">Neutral</div>
               <div className="text-3xl font-bold text-gray-700">{sentimentData.neutral}%</div>
               <div className="text-xs text-gray-400 mt-1">of interactions</div>
             </div>
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+            <div className="card p-4 text-center" style={{ backgroundColor: 'rgba(239,68,68,0.04)', borderColor: 'rgba(239,68,68,0.2)' }}>
               <div className="text-xs font-semibold uppercase tracking-wide text-red-700 mb-2">Negative</div>
               <div className="text-3xl font-bold text-red-600">{sentimentData.negative}%</div>
               <div className="text-xs text-red-400 mt-1">of interactions</div>
@@ -470,7 +454,7 @@ export default function Performance({ onNavigate }) {
                     <div className="bg-green-400 flex items-center justify-center" style={{ width: `${ch.positive}%` }}>
                       {ch.positive > 12 && <span className="text-[10px] text-white font-semibold">{ch.positive}%</span>}
                     </div>
-                    <div className="bg-gray-200 flex items-center justify-center" style={{ width: `${ch.neutral}%` }}>
+                    <div className="flex items-center justify-center" style={{ width: `${ch.neutral}%`, backgroundColor: '#d4eae5' }}>
                       {ch.neutral > 12 && <span className="text-[10px] text-gray-500 font-semibold">{ch.neutral}%</span>}
                     </div>
                     <div className="bg-red-400 flex items-center justify-center" style={{ width: `${ch.negative}%` }}>
@@ -481,7 +465,7 @@ export default function Performance({ onNavigate }) {
               ))}
               <div className="flex items-center gap-5 mt-2">
                 <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-green-400" /><span className="text-xs text-gray-500">Positive</span></div>
-                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-gray-200" /><span className="text-xs text-gray-500">Neutral</span></div>
+                <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#d4eae5' }} /><span className="text-xs text-gray-500">Neutral</span></div>
                 <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-red-400" /><span className="text-xs text-gray-500">Negative</span></div>
               </div>
             </div>
@@ -490,10 +474,10 @@ export default function Performance({ onNavigate }) {
           {/* Calling reason table */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-3">Calling Reason Breakdown</p>
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
+                  <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
                     {["Reason","Count","Share","Sentiment","Resolution"].map(h => (
                       <th key={h} className={`py-2 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Reason' || h === 'Resolution' ? 'text-left' : 'text-center'}`}>{h}</th>
                     ))}
@@ -501,13 +485,13 @@ export default function Performance({ onNavigate }) {
                 </thead>
                 <tbody>
                   {sentimentData.callingReasons.map((row, i) => (
-                    <tr key={i} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                    <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
                       <td className="py-2.5 px-3 font-medium text-gray-900">{row.reason}</td>
                       <td className="py-2.5 px-3 text-center text-gray-700 tabular-nums">{row.count}</td>
                       <td className="py-2.5 px-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <div className="w-14 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-400 rounded-full" style={{ width: `${row.pct * 2.7}%` }} />
+                          <div className="w-14 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#d4eae5' }}>
+                            <div className="h-full rounded-full" style={{ width: `${row.pct * 2.7}%`, backgroundColor: '#2196af' }} />
                           </div>
                           <span className="text-xs text-gray-600 tabular-nums w-7">{row.pct}%</span>
                         </div>
@@ -534,20 +518,20 @@ export default function Performance({ onNavigate }) {
             <h2 className="text-base font-semibold text-gray-900">Intelligence: Upsell Signals</h2>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white border-2 border-teal-200 rounded-lg p-5">
+            <div className="card p-5" style={{ borderColor: '#2196af40', borderWidth: '2px' }}>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded text-white" style={{ background: 'linear-gradient(135deg,#3BA7F6,#5FCFC4)' }}>Outperforming</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded text-white" style={{ background: 'linear-gradient(135deg, #2196af, #61ab5e)' }}>Outperforming</span>
                 <span className="text-sm font-bold text-gray-900">Auto-Finance &lt;$3K Portfolio</span>
               </div>
-              <p className="text-sm text-gray-600 mb-3">Outperforming at 4.1%, 1.6× above the aggregate benchmark. Client has 22,000 similar accounts in-house.</p>
+              <p className="text-sm text-gray-600 mb-3">Outperforming at 4.1%, 1.6x above the aggregate benchmark. Client has 22,000 similar accounts in-house.</p>
               <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-                <span>Confidence: <strong className="text-teal-600">High</strong></span>
+                <span>Confidence: <strong style={{ color: '#2196af' }}>High</strong></span>
                 <span>|</span>
                 <span>Projected: <strong>$205K over 60 days</strong></span>
               </div>
-              <button className="px-4 py-2 rounded-lg text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg,#3BA7F6,#5FCFC4)' }}>Draft Upsell Case</button>
+              <button className="px-4 py-2 rounded-lg text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #2196af, #61ab5e)' }}>Draft Upsell Case</button>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-5">
+            <div className="card p-5">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-700">Negative Trend</span>
                 <span className="text-sm font-bold text-gray-900">Fintech Tier 2: Latency Drop</span>
@@ -558,7 +542,7 @@ export default function Performance({ onNavigate }) {
                 <span>|</span>
                 <span>Est. impact: <strong>-$34K/month</strong></span>
               </div>
-              <button className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-xs font-bold hover:bg-gray-200 transition-colors">Review Economic Draft</button>
+              <button className="px-4 py-2 rounded-lg text-gray-700 text-xs font-bold transition-colors" style={{ backgroundColor: '#f0faf8', border: '1px solid #d4eae5' }}>Review Economic Draft</button>
             </div>
           </div>
         </section>
