@@ -149,46 +149,100 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
       {activeTab === 'overview' && (
         <div>
 
-      {/* Summary Metrics */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
-        {/* Compliance Summary */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Compliance Summary</h2>
-          <div className="space-y-4">
+      {/* Summary Metrics — Compliance */}
+      <div className="grid grid-cols-4 gap-4 mb-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Conversations Audited</p>
+          <p className="text-2xl font-semibold text-gray-900 tabular-nums">{complianceData.weekSummary.audited.toLocaleString()}</p>
+          <p className="text-xs text-gray-400 mt-1">This week</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Compliance Score</p>
+          <p className="text-2xl font-semibold text-green-600 tabular-nums">{complianceData.weekSummary.complianceScore}%</p>
+          <p className="text-xs text-gray-400 mt-1">Target: 99.5%</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Flags Resolved</p>
+          <p className="text-2xl font-semibold text-green-600 tabular-nums">{complianceData.weekSummary.flagsResolved}/{complianceData.weekSummary.flagsRaised}</p>
+          <p className="text-xs text-gray-400 mt-1">Avg: {complianceData.weekSummary.avgResolutionTime}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Violation Breakdown</p>
+          <div className="flex items-center gap-3 mt-1">
             <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Conversations Audited</p>
-              <p className="text-2xl font-semibold text-gray-900 text-numeric">{complianceData.weekSummary.audited.toLocaleString()}</p>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded bg-orange-50 border border-orange-200 text-orange-700">FDCPA <span className="font-bold">3</span></span>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Compliance Score</p>
-              <p className="text-2xl font-semibold text-green-600 text-numeric">{complianceData.weekSummary.complianceScore}%</p>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded bg-red-50 border border-red-200 text-red-700">TCPA <span className="font-bold">1</span></span>
             </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Flags Resolved</p>
-              <p className="text-2xl font-semibold text-green-600 text-numeric">{complianceData.weekSummary.flagsResolved}/{complianceData.weekSummary.flagsRaised}</p>
-              <p className="text-xs text-gray-500 mt-1">Avg: {complianceData.weekSummary.avgResolutionTime}</p>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">All resolved</p>
+        </div>
+      </div>
+
+      {/* Adherence Rates */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Mini-Miranda Adherence</p>
+          <p className="text-2xl font-semibold text-gray-900 tabular-nums">96.8%</p>
+          <p className="text-xs text-gray-400 mt-1">Disclosure within 30 sec</p>
+          <div className="mt-2 pt-2 border-t border-gray-100">
+            <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '96.8%' }} />
             </div>
           </div>
         </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Call Opening Adherence</p>
+          <p className="text-2xl font-semibold text-gray-900 tabular-nums">98.2%</p>
+          <p className="text-xs text-gray-400 mt-1">Approved opening script</p>
+          <div className="mt-2 pt-2 border-t border-gray-100">
+            <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '98.2%' }} />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Call Closing Adherence</p>
+          <p className="text-2xl font-semibold text-gray-900 tabular-nums">97.4%</p>
+          <p className="text-xs text-gray-400 mt-1">Approved closing script</p>
+          <div className="mt-2 pt-2 border-t border-gray-100">
+            <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '97.4%' }} />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Training Compliance</p>
+          <p className="text-2xl font-semibold text-green-600 tabular-nums">100%</p>
+          <p className="text-xs text-gray-400 mt-1">Agents current on Q1 refresher</p>
+          <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">6 / 6 agents certified</div>
+        </div>
+      </div>
 
-        {/* Quality Summary */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Quality Summary</h2>
-          <div className="space-y-4">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Calls Scored</p>
-              <p className="text-2xl font-semibold text-gray-900 text-numeric">{coachData.weekSummary.humanCallsScored + coachData.weekSummary.aiConversationsScored}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Human Avg</p>
-                <p className="text-2xl font-semibold text-cyan-600 text-numeric">{coachData.weekSummary.humanAvgQuality}/100</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">AI Avg</p>
-                <p className="text-2xl font-semibold text-cyan-600 text-numeric">{coachData.weekSummary.aiAvgQuality}/100</p>
-              </div>
-            </div>
+      {/* Quality Summary */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Calls Scored (Total)</p>
+          <p className="text-2xl font-semibold text-gray-900 tabular-nums">{coachData.weekSummary.humanCallsScored + coachData.weekSummary.aiConversationsScored}</p>
+          <p className="text-xs text-gray-400 mt-1">Human + AI this week</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Human Avg Quality</p>
+          <p className="text-2xl font-semibold text-cyan-600 tabular-nums">{coachData.weekSummary.humanAvgQuality}/100</p>
+          <p className="text-xs text-gray-400 mt-1">{coachData.weekSummary.humanCallsScored} calls scored</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">AI Bot Avg Quality</p>
+          <p className="text-2xl font-semibold text-cyan-600 tabular-nums">{coachData.weekSummary.aiAvgQuality}/100</p>
+          <p className="text-xs text-gray-400 mt-1">{coachData.weekSummary.aiConversationsScored} conversations scored</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Bot Abandonment Rate</p>
+          <p className="text-2xl font-semibold text-amber-600 tabular-nums">22%</p>
+          <p className="text-xs text-gray-400 mt-1">Hung up before resolution</p>
+          <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">
+            Agents below threshold <span className="font-semibold text-red-500 ml-1">3</span>
           </div>
         </div>
       </div>

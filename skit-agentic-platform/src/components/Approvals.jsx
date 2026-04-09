@@ -68,6 +68,37 @@ const pendingApprovals = [
   }
 ];
 
+const lostOpportunities = [
+  {
+    category: "Installment Request Unresolved",
+    count: 14,
+    description: "Consumer asked for installment plan but wasn't offered one",
+    color: "amber",
+    action: "Queue for human agent callback with plan offer"
+  },
+  {
+    category: "Talk to Spouse Unresolved",
+    count: 8,
+    description: "Consumer deferred decision without a follow-up scheduled",
+    color: "amber",
+    action: "Schedule callback in 48h with SMS reminder"
+  },
+  {
+    category: "Written Validation Pending",
+    count: 6,
+    description: "Consumer requested written validation — no response sent yet",
+    color: "red",
+    action: "Compliance to send validation letter within 5 days (FDCPA)"
+  },
+  {
+    category: "Voice Unresolved",
+    count: 23,
+    description: "Voice contact made, no resolution or disposition captured",
+    color: "amber",
+    action: "Analyst flagged for re-attempt next cycle"
+  }
+];
+
 export default function Approvals({ onAgentClick }) {
   return (
     <div className="p-8 bg-gray-50">
@@ -75,6 +106,34 @@ export default function Approvals({ onAgentClick }) {
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-gray-900">Approvals Workflow</h1>
         <p className="text-sm text-gray-600 mt-1">Human-in-the-loop review and sign-off</p>
+      </div>
+
+      {/* At-Risk PTP + Turnaround Stats */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="bg-white border border-red-200 rounded-lg p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-red-600 mb-2">At-Risk PTP Value</p>
+          <p className="text-2xl font-bold text-red-600">$142,000</p>
+          <p className="text-xs text-gray-500 mt-1">PTPs at risk of being broken</p>
+          <p className="text-xs text-gray-400 mt-1">Missed 1st installment</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Broken PTP Accounts</p>
+          <p className="text-2xl font-bold text-amber-600">89</p>
+          <p className="text-xs text-gray-500 mt-1">Missed installment on active plan</p>
+          <p className="text-xs text-gray-400 mt-1">620 total broken PTPs this placement</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Pending Approvals</p>
+          <p className="text-2xl font-bold text-amber-600">{pendingApprovals.filter(a => a.status === 'pending').length}</p>
+          <p className="text-xs text-gray-500 mt-1">Awaiting human sign-off</p>
+          <p className="text-xs text-gray-400 mt-1">Total $ at stake: $295K</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Avg Approval Turnaround</p>
+          <p className="text-2xl font-bold text-gray-900">3.2 hrs</p>
+          <p className="text-xs text-gray-500 mt-1">Avg time to act on approval</p>
+          <p className="text-xs text-green-500 mt-1">↓ 1.4 hrs faster than last week</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-6">
@@ -136,7 +195,7 @@ export default function Approvals({ onAgentClick }) {
           ))}
         </div>
 
-        {/* Upsell Sidebar */}
+        {/* Sidebar */}
         <div className="space-y-4">
           <div className="rounded-xl p-5 text-white" style={{background: 'linear-gradient(135deg, #162A44, #1e3a5f)'}}>
             <div className="flex items-center gap-2 mb-3">
@@ -154,6 +213,34 @@ export default function Approvals({ onAgentClick }) {
               <div className="flex justify-between text-sm"><span className="text-gray-500">Pending</span><span className="font-bold text-amber-600">{pendingApprovals.filter(a => a.status === 'pending').length}</span></div>
               <div className="flex justify-between text-sm"><span className="text-gray-500">Auto-approved</span><span className="font-bold text-green-600">{pendingApprovals.filter(a => a.status === 'auto-approved').length}</span></div>
               <div className="flex justify-between text-sm"><span className="text-gray-500">Total $ at stake</span><span className="font-bold">$295K</span></div>
+            </div>
+          </div>
+
+          {/* Lost Opportunities */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Lost Opportunities</h4>
+            <p className="text-xs text-gray-400 mb-4">Accounts with intent signals that went unresolved</p>
+            <div className="space-y-3">
+              {lostOpportunities.map((opp, idx) => (
+                <div key={idx} className="border border-gray-100 rounded-lg p-3">
+                  <div className="flex items-start justify-between mb-1">
+                    <span className="text-xs font-semibold text-gray-800 leading-tight flex-1 pr-2">{opp.category}</span>
+                    <span className={`text-sm font-bold flex-shrink-0 ${opp.color === 'red' ? 'text-red-600' : 'text-amber-600'}`}>
+                      {opp.count}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-2">{opp.description}</p>
+                  <div className={`text-[10px] font-medium px-2 py-1 rounded ${
+                    opp.color === 'red' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'
+                  }`}>
+                    → {opp.action}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
+              <span>Total unresolved</span>
+              <span className="font-bold text-gray-800">{lostOpportunities.reduce((s, o) => s + o.count, 0)} accounts</span>
             </div>
           </div>
         </div>
