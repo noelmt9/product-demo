@@ -405,9 +405,6 @@ function ApprovedTab({ approvedHistory, approvedTotal }) {
     </div>
   );
 }
-    </div>
-  );
-}
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
