@@ -26,6 +26,8 @@ function App() {
   const [activeScreen, setActiveScreen] = useState('insights');
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [selectedClient, setSelectedClient] = useState('Apex Recovery Partners');
+  const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
   const [qualityTab, setQualityTab] = useState('overview');
   const mainContentRef = useRef(null);
 
@@ -43,7 +45,7 @@ function App() {
   const renderScreen = () => {
     switch (activeScreen) {
       case 'insights':
-        return <CommandCenter onAgentClick={setSelectedAgent} onCoachActivityClick={handleCoachActivityClick} onNavigate={handleNavigate} />;
+        return <CommandCenter onNavigate={handleNavigate} />;
       case 'approvals':
         return <Approvals onAgentClick={setSelectedAgent} />;
       case 'portfolio':
@@ -61,7 +63,7 @@ function App() {
       case 'quality':
         return <Quality initialTab={qualityTab} onTabChange={setQualityTab} />;
       default:
-        return <CommandCenter onAgentClick={setSelectedAgent} onCoachActivityClick={handleCoachActivityClick} onNavigate={handleNavigate} />;
+        return <CommandCenter onNavigate={handleNavigate} />;
     }
   };
 
@@ -91,7 +93,15 @@ function App() {
             {!sidebarCollapsed && (
               <div className="flex flex-col leading-none truncate">
                 <span className="text-[22px] font-bold text-white tracking-tight">skit.ai</span>
-                <span className="text-[10px] text-blue-200/50 font-medium mt-1">Apex Recovery Partners</span>
+                <div className="mt-1">
+                  <button
+                    onClick={() => setClientDropdownOpen(!clientDropdownOpen)}
+                    className="flex items-center gap-1 text-[12px] text-blue-200/50 font-medium hover:text-blue-200/80 transition-colors max-w-full"
+                  >
+                    <span className="truncate">{selectedClient}</span>
+                    <span className={`material-symbols-outlined flex-shrink-0 transition-transform ${clientDropdownOpen ? 'rotate-180' : ''}`} style={{fontSize: 12}}>expand_more</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -102,6 +112,25 @@ function App() {
             <span className="material-symbols-outlined text-lg">{sidebarCollapsed ? 'chevron_right' : 'chevron_left'}</span>
           </button>
         </div>
+
+        {/* Client dropdown */}
+        {clientDropdownOpen && !sidebarCollapsed && (
+          <>
+            <div className="fixed inset-0 z-[60]" onClick={() => setClientDropdownOpen(false)} />
+            <div className="absolute left-5 top-[72px] w-52 rounded-xl shadow-lg z-[70] py-1" style={{background: '#1e3654', border: '1px solid #2a4a6b'}}>
+              {['Apex Recovery Partners', 'Summit Financial Solutions', 'Clearview Collections', 'Heritage Debt Group'].map(client => (
+                <button
+                  key={client}
+                  onClick={() => { setSelectedClient(client); setClientDropdownOpen(false); }}
+                  className={`w-full text-left px-3 py-2.5 text-[12px] transition-colors ${selectedClient === client ? 'text-white font-semibold' : 'text-blue-200/60 hover:text-white hover:bg-white/5'}`}
+                  style={selectedClient === client ? {background: 'rgba(33,150,175,0.25)'} : {}}
+                >
+                  {client}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Nav */}
         <nav className={`flex-1 ${sidebarCollapsed ? 'px-2' : 'px-3'} space-y-1 overflow-y-auto`}>

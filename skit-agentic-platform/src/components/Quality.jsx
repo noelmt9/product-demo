@@ -82,7 +82,7 @@ const scoreboard = [
 
 export default function Quality({ initialTab = 'overview', onTabChange }) {
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [expandedSection, setExpandedSection] = useState(null); // 'saved' | 'lost' | 'quality' | null
+  const [expandedSection, setExpandedSection] = useState('saved'); // 'saved' | 'lost' | 'quality'
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -130,7 +130,7 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
               style={expandedSection === 'saved' ? { borderColor: '#2196af', boxShadow: '0 0 0 2px rgba(33,150,175,0.15)' } : {}}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">$Saved</span>
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Saved</span>
                 <span className={`material-symbols-outlined text-sm text-gray-400 transition-transform ${expandedSection === 'saved' ? 'rotate-180' : ''}`}>expand_more</span>
               </div>
               <div className="text-2xl font-bold text-emerald-600 mb-1">$64,500</div>
@@ -144,7 +144,7 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
               style={expandedSection === 'lost' ? { borderColor: '#ef4444', boxShadow: '0 0 0 2px rgba(239,68,68,0.12)' } : {}}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">$Lost</span>
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Lost</span>
                 <span className={`material-symbols-outlined text-sm text-gray-400 transition-transform ${expandedSection === 'lost' ? 'rotate-180' : ''}`}>expand_more</span>
               </div>
               <div className="text-2xl font-bold text-red-600 mb-1">$12,300</div>
