@@ -71,9 +71,9 @@ function App() {
   const mainML = sidebarCollapsed ? 'ml-[72px]' : 'ml-64';
 
   return (
-    <div className="flex h-screen" style={{background: '#0e1824'}}>
+    <div className="flex h-screen" style={{background: '#e8f4f1'}}>
       {/* Sidebar */}
-      <div className={`${sideW} fixed left-0 top-0 h-screen flex flex-col z-50 transition-all duration-300`} style={{background: '#0a1420', borderRight: '1px solid #1c2f45'}}>
+      <div className={`${sideW} fixed left-0 top-0 h-screen flex flex-col z-50 transition-all duration-300`} style={{background: '#162a44', borderRight: '1px solid #1e3654'}}>
         {/* Logo + Collapse */}
         <div className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'px-5'} py-6`}>
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -96,7 +96,7 @@ function App() {
           </div>
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className={`text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0 ${sidebarCollapsed ? '' : 'ml-2'}`}
+            className={`text-blue-200/50 hover:text-white transition-colors flex-shrink-0 ${sidebarCollapsed ? '' : 'ml-2'}`}
           >
             <span className="material-symbols-outlined text-lg">{sidebarCollapsed ? 'chevron_right' : 'chevron_left'}</span>
           </button>
@@ -112,9 +112,9 @@ function App() {
               className={`w-full text-left flex items-center ${sidebarCollapsed ? 'justify-center' : ''} gap-3 py-2.5 px-3 rounded-xl transition-all text-sm font-medium ${
                 activeScreen === item.id
                   ? 'text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                  : 'text-blue-200/60 hover:text-white hover:bg-white/10'
               }`}
-          style={activeScreen === item.id ? {background: 'rgba(33,150,175,0.18)', color: '#5fcfc4'} : {}}
+          style={activeScreen === item.id ? {background: 'rgba(33,150,175,0.30)', color: '#ffffff'} : {}}
             >
               <span className="material-symbols-outlined text-lg">{item.icon}</span>
               {!sidebarCollapsed && <span>{item.label}</span>}
@@ -125,7 +125,7 @@ function App() {
         {/* Bottom */}
         <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-5 pt-3`}>
           {!sidebarCollapsed && (
-            <button className="w-full text-left flex items-center gap-3 py-2.5 px-3 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all text-sm font-medium">
+            <button className="w-full text-left flex items-center gap-3 py-2.5 px-3 rounded-xl text-blue-200/60 hover:text-white hover:bg-white/10 transition-all text-sm font-medium">
               <span className="material-symbols-outlined text-lg">settings</span>
               <span>Settings</span>
             </button>
@@ -136,8 +136,8 @@ function App() {
             </div>
             {!sidebarCollapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-slate-200 truncate">Alex Rivera</p>
-                <p className="text-[10px] text-slate-500 truncate">Operations Lead</p>
+                <p className="text-xs font-semibold text-white truncate">Alex Rivera</p>
+                <p className="text-[10px] text-blue-200/50 truncate">Operations Lead</p>
               </div>
             )}
           </div>
@@ -145,23 +145,25 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <div ref={mainContentRef} className={`flex-1 ${mainML} overflow-y-auto relative transition-all duration-300`} style={{background: '#0e1824'}}>
+      <div ref={mainContentRef} className={`flex-1 ${mainML} overflow-y-auto relative transition-all duration-300`} style={{background: '#e8f4f1'}}>
         {renderScreen()}
 
         {selectedAgent && (
           <AgentPanel agent={selectedAgent} onClose={() => setSelectedAgent(null)} />
         )}
 
-        {/* Chat FAB */}
-        <button
-          onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 text-white rounded-2xl hover:scale-105 transition-all flex items-center justify-center z-30 group"
-          style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)', boxShadow: '0 8px 24px rgba(33,150,175,0.35)'}}
-        >
-          <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </button>
+        {/* Chat FAB — hidden on Insights since it has its own search */}
+        {activeScreen !== 'insights' && (
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="fixed bottom-6 right-6 w-14 h-14 text-white rounded-2xl hover:scale-105 transition-all flex items-center justify-center z-30 group"
+            style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)', boxShadow: '0 8px 24px rgba(33,150,175,0.35)'}}
+          >
+            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </button>
+        )}
 
         <ChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       </div>

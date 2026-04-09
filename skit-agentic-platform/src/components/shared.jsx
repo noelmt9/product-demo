@@ -12,13 +12,13 @@ export const StatusDot = ({ status }) => {
 export const AgentHeader = ({ color, name, role, description }) => (
   <div className="mb-6 pb-6 border-b border-gray-200">
     <div className="flex items-center gap-3 mb-2">
-      <span className={`inline-block w-2 h-2 rounded-full bg-${color}-500`} style={{ backgroundColor: color }} />
+      <span className={`inline-block w-2 h-2 rounded-full`} style={{ backgroundColor: color }} />
       <div>
         <h1 className="text-xl font-semibold text-gray-900">{name}</h1>
-        <p className="text-sm text-gray-600">{role}</p>
+        <p className="text-sm text-gray-500">{role}</p>
       </div>
     </div>
-    <p className="text-sm text-gray-700 mt-4 leading-relaxed">{description}</p>
+    <p className="text-sm text-gray-600 mt-4 leading-relaxed">{description}</p>
   </div>
 );
 
@@ -32,7 +32,7 @@ export const Section = ({ title, children, className = "" }) => (
 export const DataTable = ({ headers, rows, alignments = [] }) => (
   <table className="w-full text-sm">
     <thead>
-      <tr className="border-b border-gray-100">
+      <tr style={{borderBottom: '1px solid #d4eae5'}}>
         {headers.map((header, idx) => (
           <th
             key={idx}
@@ -47,12 +47,12 @@ export const DataTable = ({ headers, rows, alignments = [] }) => (
     </thead>
     <tbody>
       {rows.map((row, idx) => (
-        <tr key={idx} className="border-b border-gray-50 last:border-0">
+        <tr key={idx} style={{borderBottom: '1px solid #ecf6f3'}}>
           {row.map((cell, cellIdx) => (
             <td
               key={cellIdx}
               className={`py-2 px-3 text-xs ${
-                cellIdx === 0 ? 'font-medium text-gray-900' : 'text-gray-600'
+                cellIdx === 0 ? 'font-medium text-gray-800' : 'text-gray-600'
               } ${alignments[cellIdx] === 'right' ? 'text-right text-numeric' : ''}`}
             >
               {cell}

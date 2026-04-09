@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { agents } from '../data';
 
+const overnightTimeline = [
+  { time: '08:15 AM', agent: 'Compliance', color: '#06b6d4', summary: 'Scanned 412 recordings. 0 critical violations. 2 low-risk deviations flagged.' },
+  { time: '07:00 AM', agent: 'Manager', color: '#8b5cf6', summary: 'Optimized outbound frequency for Early-Arrears segment.' },
+  { time: '06:30 AM', agent: 'Data Enrichment', color: '#6366f1', summary: 'Skip trace batch complete. 78 new phone numbers appended.' },
+  { time: '06:15 AM', agent: 'Analyst', color: '#3b82f6', summary: 'Identified $42K leakage in automated installment flows.' },
+];
+
 const agentColors = {
   Analyst: '#3b82f6', Manager: '#8b5cf6', Compliance: '#ef4444',
   Coach: '#06b6d4', Collector: '#f59e0b', 'Upsell Opportunity': '#10b981', 'Data Enrichment': '#6366f1'
@@ -415,10 +422,28 @@ export default function Agents({ onAgentClick }) {
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Overnight Activity — always visible when no agent selected, collapsible otherwise */}
       {!selected && (
-        <div className="text-center py-6 text-gray-400">
-          <p className="text-sm">Select an agent to view their work and metrics</p>
+        <div className="mt-2">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="material-symbols-outlined text-gray-400 text-base">schedule</span>
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Overnight Activity</h2>
+            <span className="text-[10px] text-gray-400 ml-1">· {overnightTimeline.length} agent actions while you were away</span>
+          </div>
+          <div className="card p-5">
+            <div className="relative pl-5 space-y-5" style={{borderLeft: '2px solid #d4eae5'}}>
+              {overnightTimeline.map((entry, idx) => (
+                <div key={idx} className="relative">
+                  <div className="absolute -left-[17px] top-0.5 w-2 h-2 rounded-full" style={{backgroundColor: entry.color}} />
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-[10px] font-semibold text-gray-400">{entry.time}</span>
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{backgroundColor: `${entry.color}15`, color: entry.color}}>{entry.agent}</span>
+                  </div>
+                  <p className="text-sm text-gray-600">{entry.summary}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
