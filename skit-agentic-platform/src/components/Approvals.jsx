@@ -225,22 +225,28 @@ function OverallTab({ onAgentClick }) {
           <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Approvals vs Rejections (Historical)</div>
           <div className="flex gap-8">
             <div>
-              <div className="text-3xl font-extrabold" style={{ color: '#61ab5e' }}>{stats.approved}</div>
-              <div className="text-xs text-gray-500 mt-0.5">Approved</div>
+              <div className="text-3xl font-extrabold text-gray-900">{stats.approved}</div>
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>Approved</span>
+              </div>
             </div>
             <div className="w-px bg-gray-100" />
             <div>
-              <div className="text-3xl font-extrabold text-red-500">{stats.rejected}</div>
-              <div className="text-xs text-gray-500 mt-0.5">Rejected</div>
+              <div className="text-3xl font-extrabold text-gray-900">{stats.rejected}</div>
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>Rejected</span>
+              </div>
             </div>
             <div className="w-px bg-gray-100" />
             <div>
-              <div className="text-3xl font-extrabold" style={{ color: '#2196af' }}>${(stats.approvedDollar/1000).toFixed(0)}K</div>
-              <div className="text-xs text-gray-500 mt-0.5">$ Unlocked</div>
+              <div className="text-3xl font-extrabold text-gray-900">${(stats.approvedDollar/1000).toFixed(0)}K</div>
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(33,150,175,0.08)', color: '#2196af', border: '1px solid rgba(33,150,175,0.2)' }}>$ Unlocked</span>
+              </div>
             </div>
           </div>
           <div className="mt-4 h-2 rounded-full bg-gray-100 overflow-hidden">
-            <div className="h-2 rounded-full" style={{ backgroundColor: '#61ab5e', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
+            <div className="h-2 rounded-full" style={{ backgroundColor: '#2196af', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
           </div>
           <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate across {stats.approved + stats.rejected} decisions</div>
         </div>
@@ -264,8 +270,8 @@ function OverallTab({ onAgentClick }) {
                       {count > 0 && <span className="text-[10px] font-bold text-white">{count}</span>}
                     </div>
                   </div>
-                  <div className="w-24 text-right text-xs text-gray-500 flex-shrink-0 tabular-nums">
-                    {stake > 0 ? <span className="font-semibold text-gray-700">${(stake/1000).toFixed(0)}K gain</span> : <span className="text-gray-300">—</span>}
+                  <div className="w-28 text-right text-xs flex-shrink-0 tabular-nums">
+                    {stake > 0 ? <span className="font-semibold text-gray-600">${(stake/1000).toFixed(0)}K potential</span> : <span className="text-gray-300">—</span>}
                   </div>
                 </div>
               );
@@ -337,24 +343,30 @@ function AgentTab({ agent, onAgentClick }) {
           <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Historical Decisions</div>
           <div className="flex gap-8">
             <div>
-              <div className="text-3xl font-extrabold" style={{ color: '#61ab5e' }}>{stats.approved}</div>
-              <div className="text-xs text-gray-500 mt-0.5">Approved</div>
+              <div className="text-3xl font-extrabold text-gray-900">{stats.approved}</div>
+              <div className="mt-1">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>Approved</span>
+              </div>
             </div>
             <div className="w-px bg-gray-100" />
             <div>
-              <div className="text-3xl font-extrabold text-red-500">{stats.rejected}</div>
-              <div className="text-xs text-gray-500 mt-0.5">Rejected</div>
+              <div className="text-3xl font-extrabold text-gray-900">{stats.rejected}</div>
+              <div className="mt-1">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>Rejected</span>
+              </div>
             </div>
             <div className="w-px bg-gray-100" />
             <div>
-              <div className="text-3xl font-extrabold" style={{ color: '#2196af' }}>{stats.approvedDollar > 0 ? `$${(stats.approvedDollar/1000).toFixed(0)}K` : '—'}</div>
-              <div className="text-xs text-gray-500 mt-0.5">$ Unlocked</div>
+              <div className="text-3xl font-extrabold text-gray-900">{stats.approvedDollar > 0 ? `$${(stats.approvedDollar/1000).toFixed(0)}K` : '—'}</div>
+              <div className="mt-1">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(33,150,175,0.08)', color: '#2196af', border: '1px solid rgba(33,150,175,0.2)' }}>$ Unlocked</span>
+              </div>
             </div>
           </div>
           {(stats.approved + stats.rejected) > 0 && (
             <>
               <div className="mt-4 h-2 rounded-full bg-gray-100 overflow-hidden">
-                <div className="h-2 rounded-full" style={{ backgroundColor: '#61ab5e', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
+                <div className="h-2 rounded-full" style={{ backgroundColor: '#2196af', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
               </div>
               <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate · {stats.approved + stats.rejected} total decisions</div>
             </>
@@ -452,32 +464,44 @@ export default function Approvals({ onAgentClick }) {
 
         {/* Hero cards */}
         <div className="grid grid-cols-4 gap-5">
-          <div className="rounded-xl p-5" style={{ background: 'linear-gradient(135deg, #e8f5f0 0%, #d4eae5 100%)', border: '1px solid #b8ddd5' }}>
-            <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#2196af' }}>Potential Gain</div>
-            <div className="text-4xl font-extrabold" style={{ color: '#1a7a8a' }}>$847K</div>
-            <div className="text-xs text-gray-500 mt-1">Across {pending.length} pending decisions</div>
-            <div className="text-xs font-semibold mt-1" style={{ color: '#61ab5e' }}>↑ Act now to capture</div>
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Potential Gain</div>
+            <div className="text-4xl font-extrabold text-gray-900">$847K</div>
+            <div className="text-xs text-gray-400 mt-1">Across {pending.length} pending decisions</div>
+            <div className="text-xs font-semibold mt-1" style={{ color: '#2196af' }}>↑ Act now to capture</div>
           </div>
 
-          <div className="bg-white border border-red-200 rounded-xl p-5">
-            <div className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-1">Critical Pending</div>
-            <div className="text-4xl font-extrabold text-red-600">{critical}</div>
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Critical Pending</div>
+            <div className="text-4xl font-extrabold text-gray-900">{critical}</div>
             <div className="text-xs text-gray-400 mt-1">Immediate action required</div>
-            <div className="text-xs font-semibold text-red-600 mt-1">${pending.filter(a=>a.criticality==='critical').reduce((s,a)=>s+(a.dollarAtStake||0),0).toLocaleString()} potential gain</div>
+            <div className="mt-1">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                ${pending.filter(a=>a.criticality==='critical').reduce((s,a)=>s+(a.dollarAtStake||0),0).toLocaleString()} potential gain
+              </span>
+            </div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5">
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Total Pending</div>
             <div className="text-4xl font-extrabold text-gray-900">{pending.length}</div>
             <div className="text-xs text-gray-400 mt-1">Awaiting human sign-off</div>
-            <div className="text-xs font-semibold mt-1" style={{ color: '#2196af' }}>$847K potential gain</div>
+            <div className="mt-1">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(33,150,175,0.08)', color: '#2196af', border: '1px solid rgba(33,150,175,0.2)' }}>
+                $847K potential gain
+              </span>
+            </div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#61ab5e' }}>$ Unlocked by Approvals</div>
-            <div className="text-4xl font-extrabold" style={{ color: '#61ab5e' }}>$118K</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">$ Unlocked by Approvals</div>
+            <div className="text-4xl font-extrabold text-gray-900">$118K</div>
             <div className="text-xs text-gray-400 mt-1">6 approved · 1 rejected this placement</div>
-            <div className="text-xs font-semibold mt-1" style={{ color: '#61ab5e' }}>↑ Recovered or projected incremental</div>
+            <div className="mt-1">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>
+                ↑ Recovered or projected
+              </span>
+            </div>
           </div>
         </div>
       </div>
