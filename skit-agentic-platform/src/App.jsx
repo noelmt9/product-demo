@@ -18,7 +18,7 @@ const navItems = [
   { id: 'agents', label: 'Agents', icon: 'smart_toy' },
   { id: 'approvals', label: 'Approvals', icon: 'fact_check' },
   { id: 'conversations', label: 'Conversations', icon: 'forum' },
-  { id: 'quality', label: 'Quality/Compliance', icon: 'rule' },
+  { id: 'quality', label: 'Quality', icon: 'rule' },
 ];
 
 
@@ -53,7 +53,7 @@ function App() {
       case 'payments':
         return <Payments />;
       case 'agents':
-        return <Agents onAgentClick={setSelectedAgent} />;
+        return <Agents />;
       case 'campaigns':
         return <Campaigns />;
       case 'conversations':
