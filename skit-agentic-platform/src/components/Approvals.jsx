@@ -124,24 +124,9 @@ function calcStats(history) {
   const approved = history.filter(h => h.outcome === 'Approved');
   const rejected = history.filter(h => h.outcome === 'Rejected');
   const approvedDollar = approved.reduce((s, h) => s + h.dollarImpact, 0);
-  const rejectedCount  = rejected.length;
-
-  // Avg turnaround by criticality (pending not counted — only resolved history)
-  const byLevel = {};
-  ['critical','high','medium','low'].forEach(level => {
-    const rows = history.filter(h => h.criticality === level);
-    byLevel[level] = rows.length ? +(rows.reduce((s,h) => s + h.turnaround, 0) / rows.length).toFixed(1) : null;
-  });
-
-  return { approved: approved.length, rejected: rejectedCount, approvedDollar, byLevel };
+  return { approved: approved.length, rejected: rejected.length, approvedDollar };
 }
 
-const lostOpportunities = [
-  { category: 'Installment Request Unresolved', count: 14, description: 'Consumer asked for installment plan but wasn\'t offered one', urgency: 'amber', action: 'Queue for human agent callback with plan offer' },
-  { category: 'Talk to Spouse Unresolved',      count: 8,  description: 'Consumer deferred decision without a follow-up scheduled', urgency: 'amber', action: 'Schedule callback in 48h with SMS reminder' },
-  { category: 'Written Validation Pending',      count: 6,  description: 'Consumer requested written validation — no response sent', urgency: 'red',   action: 'Compliance to send validation letter within 5 days (FDCPA)' },
-  { category: 'Voice Unresolved',               count: 23, description: 'Voice contact made, no resolution or disposition captured', urgency: 'amber', action: 'Analyst flagged for re-attempt next cycle' },
-];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -229,29 +214,18 @@ const ApprovalCard = ({ a, onAgentClick }) => {
 
 function OverallTab({ onAgentClick }) {
   const pending = allApprovals.filter(a => a.status === 'pending');
-  const totalAtStake = pending.reduce((s, a) => s + (a.dollarAtStake || 0), 0);
-  const critical = pending.filter(a => a.criticality === 'critical');
-  const high = pending.filter(a => a.criticality === 'high');
   const stats = calcStats(approvalHistory);
-
-  // Agent funnel summary
-  const agentSummary = Object.keys(AGENT_META).map(agent => {
-    const agentPending = pending.filter(a => a.agent === agent);
-    const agentStake = agentPending.reduce((s, a) => s + (a.dollarAtStake || 0), 0);
-    return { agent, count: agentPending.length, stake: agentStake };
-  }).filter(a => a.count > 0);
 
   return (
     <div className="px-8 py-6 space-y-6">
 
-      {/* ── Cross-agent approval / rejection summary ── */}
-      <div className="grid grid-cols-3 gap-4">
-        {/* Approved vs Rejected */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5 col-span-1">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Approvals vs Rejections</div>
-          <div className="flex gap-6">
+      {/* Approved vs Rejected summary */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Approvals vs Rejections (Historical)</div>
+          <div className="flex gap-8">
             <div>
-              <div className="text-3xl font-extrabold text-green-600">{stats.approved}</div>
+              <div className="text-3xl font-extrabold" style={{ color: '#61ab5e' }}>{stats.approved}</div>
               <div className="text-xs text-gray-500 mt-0.5">Approved</div>
             </div>
             <div className="w-px bg-gray-100" />
@@ -259,106 +233,44 @@ function OverallTab({ onAgentClick }) {
               <div className="text-3xl font-extrabold text-red-500">{stats.rejected}</div>
               <div className="text-xs text-gray-500 mt-0.5">Rejected</div>
             </div>
+            <div className="w-px bg-gray-100" />
+            <div>
+              <div className="text-3xl font-extrabold" style={{ color: '#2196af' }}>${(stats.approvedDollar/1000).toFixed(0)}K</div>
+              <div className="text-xs text-gray-500 mt-0.5">$ Unlocked</div>
+            </div>
           </div>
-          <div className="mt-3 h-2 rounded-full bg-gray-100 overflow-hidden">
-            <div className="h-2 rounded-full bg-green-500" style={{ width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
+          <div className="mt-4 h-2 rounded-full bg-gray-100 overflow-hidden">
+            <div className="h-2 rounded-full" style={{ backgroundColor: '#61ab5e', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
           </div>
-          <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate</div>
+          <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate across {stats.approved + stats.rejected} decisions</div>
         </div>
 
-        {/* $ impacted */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5 col-span-1">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">$ Impact from Decisions</div>
-          <div className="text-3xl font-extrabold text-green-600">${(stats.approvedDollar / 1000).toFixed(0)}K</div>
-          <div className="text-xs text-gray-500 mt-0.5 mb-3">Unlocked via approved decisions</div>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
-            <span>{stats.rejected} rejection{stats.rejected !== 1 ? 's' : ''} — opportunity cost tracked separately</span>
-          </div>
-        </div>
-
-        {/* Avg turnaround by criticality */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5 col-span-1">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Avg Turnaround by Criticality</div>
-          <div className="space-y-2">
-            {[
-              { level: 'critical', label: 'Critical', color: '#ef4444' },
-              { level: 'high',     label: 'High',     color: '#f59e0b' },
-              { level: 'medium',   label: 'Medium',   color: '#2196af' },
-            ].map(({ level, label, color }) => (
-              <div key={level} className="flex items-center gap-3">
-                <div className="w-14 text-xs font-semibold" style={{ color }}>{label}</div>
-                <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
-                  <div className="h-2 rounded-full" style={{ backgroundColor: color, width: `${stats.byLevel[level] ? Math.min((stats.byLevel[level] / 7) * 100, 100) : 0}%` }} />
-                </div>
-                <div className="w-12 text-right text-xs font-bold text-gray-700 tabular-nums">
-                  {stats.byLevel[level] != null ? `${stats.byLevel[level]}h` : '—'}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Criticality breakdown */}
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-white border border-red-200 rounded-xl p-4">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-red-500 mb-1">Critical</div>
-          <div className="text-3xl font-extrabold text-red-600">{critical.length}</div>
-          <div className="text-xs text-gray-500 mt-1">Requires immediate action</div>
-          <div className="text-xs font-semibold text-red-600 mt-1">${critical.reduce((s,a) => s+(a.dollarAtStake||0),0).toLocaleString()} at stake</div>
-        </div>
-        <div className="bg-white border border-amber-200 rounded-xl p-4">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-amber-600 mb-1">High</div>
-          <div className="text-3xl font-extrabold text-amber-600">{high.length}</div>
-          <div className="text-xs text-gray-500 mt-1">Act within 4 hours</div>
-          <div className="text-xs font-semibold text-amber-600 mt-1">${high.reduce((s,a) => s+(a.dollarAtStake||0),0).toLocaleString()} at stake</div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Medium / Low</div>
-          <div className="text-3xl font-extrabold text-gray-700">{pending.filter(a => a.criticality === 'medium' || a.criticality === 'low').length}</div>
-          <div className="text-xs text-gray-500 mt-1">Act within 24 hours</div>
-          <div className="text-xs font-semibold text-gray-600 mt-1">${pending.filter(a => a.criticality === 'medium' || a.criticality === 'low').reduce((s,a) => s+(a.dollarAtStake||0),0).toLocaleString()} at stake</div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Avg Turnaround</div>
-          <div className="text-3xl font-extrabold text-gray-900">3.2 hrs</div>
-          <div className="text-xs text-gray-500 mt-1">Avg time to act</div>
-          <div className="text-xs font-semibold text-green-600 mt-1">↓ 1.4 hrs vs last week</div>
-        </div>
-      </div>
-
-      {/* Agent funnel — who's requesting what */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Pending by Agent</h2>
-        <div className="space-y-3">
-          {agentSummary.map((a, i) => {
-            const meta = AGENT_META[a.agent];
-            const maxCount = Math.max(...agentSummary.map(x => x.count));
-            return (
-              <div key={i} className="flex items-center gap-4">
-                <div className="w-24 text-xs font-semibold text-gray-700 flex-shrink-0 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: meta.color }} />
-                  {a.agent}
-                </div>
-                <div className="flex-1 h-7 rounded-lg overflow-hidden" style={{ backgroundColor: '#e5e7eb' }}>
-                  <div
-                    className="h-7 rounded-lg flex items-center px-3 transition-all"
-                    style={{ width: `${(a.count / maxCount) * 100}%`, backgroundColor: meta.color, minWidth: '32px' }}
-                  >
-                    <span className="text-xs font-bold text-white">{a.count}</span>
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Pending by Agent</div>
+          <div className="space-y-2.5">
+            {Object.keys(AGENT_META).map(agent => {
+              const meta = AGENT_META[agent];
+              const count = pending.filter(a => a.agent === agent).length;
+              const stake = pending.filter(a => a.agent === agent).reduce((s,a) => s+(a.dollarAtStake||0), 0);
+              const maxCount = Math.max(...Object.keys(AGENT_META).map(ag => pending.filter(a => a.agent === ag).length), 1);
+              return (
+                <div key={agent} className="flex items-center gap-3">
+                  <div className="w-20 text-xs font-semibold text-gray-700 flex-shrink-0 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: meta.color }} />
+                    {agent}
+                  </div>
+                  <div className="flex-1 h-5 rounded-md bg-gray-100 overflow-hidden">
+                    <div className="h-5 rounded-md flex items-center px-2" style={{ width: count > 0 ? `${(count/maxCount)*100}%` : '0%', backgroundColor: meta.color, minWidth: count > 0 ? '28px' : '0' }}>
+                      {count > 0 && <span className="text-[10px] font-bold text-white">{count}</span>}
+                    </div>
+                  </div>
+                  <div className="w-24 text-right text-xs text-gray-500 flex-shrink-0 tabular-nums">
+                    {stake > 0 ? <span className="font-semibold text-gray-700">${(stake/1000).toFixed(0)}K gain</span> : <span className="text-gray-300">—</span>}
                   </div>
                 </div>
-                <div className="w-28 text-xs text-gray-500 text-right flex-shrink-0">
-                  {a.stake > 0 ? <span className="font-semibold text-gray-700">${a.stake.toLocaleString()} at stake</span> : <span>—</span>}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between text-xs">
-          <span className="text-gray-500">Total pending approvals</span>
-          <span className="font-bold text-gray-900">{pending.length} · <span style={{ color: '#2196af' }}>${totalAtStake.toLocaleString()} total at stake</span></span>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -372,70 +284,6 @@ function OverallTab({ onAgentClick }) {
               return order[a.criticality] - order[b.criticality];
             })
             .map(a => <ApprovalCard key={a.id} a={a} onAgentClick={onAgentClick} />)}
-        </div>
-      </div>
-
-      {/* Approval timeline */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Approval History</h2>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
-                {['Day', 'Agent', 'Decision', 'Outcome', 'Turnaround', '$ Impact'].map(h => (
-                  <th key={h} className={`py-2.5 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Decision' ? 'text-left' : 'text-center'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {approvalHistory.map((row, i) => {
-                const meta = AGENT_META[row.agent] || AGENT_META.Analyst;
-                return (
-                  <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
-                    <td className="py-2.5 px-4 text-center text-xs text-gray-500 font-medium">{row.date}</td>
-                    <td className="py-2.5 px-4 text-center">
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: meta.color }}>
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: meta.color }} />
-                        {row.agent}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-4 text-xs text-gray-700">{row.decision}</td>
-                    <td className="py-2.5 px-4 text-center">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${row.outcome === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {row.outcome}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-4 text-center text-xs text-gray-600 tabular-nums">{row.turnaround}</td>
-                    <td className="py-2.5 px-4 text-center text-xs font-semibold text-gray-700">{row.dollarLabel}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Lost opportunities */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-1">Lost Opportunities</h2>
-        <p className="text-xs text-gray-400 mb-4">Accounts with intent signals that went unresolved this week</p>
-        <div className="grid grid-cols-2 gap-3">
-          {lostOpportunities.map((opp, i) => (
-            <div key={i} className={`rounded-lg p-4 border ${opp.urgency === 'red' ? 'border-red-100 bg-red-50' : 'border-amber-100 bg-amber-50'}`}>
-              <div className="flex items-start justify-between mb-1">
-                <span className="text-xs font-bold text-gray-800 leading-tight">{opp.category}</span>
-                <span className={`text-xl font-extrabold ml-2 flex-shrink-0 ${opp.urgency === 'red' ? 'text-red-600' : 'text-amber-600'}`}>{opp.count}</span>
-              </div>
-              <p className="text-xs text-gray-500 mb-2">{opp.description}</p>
-              <div className={`text-[10px] font-medium px-2 py-1 rounded ${opp.urgency === 'red' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                → {opp.action}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
-          <span>Total unresolved</span>
-          <span className="font-bold text-gray-900">{lostOpportunities.reduce((s, o) => s + o.count, 0)} accounts</span>
         </div>
       </div>
     </div>
@@ -483,71 +331,34 @@ function AgentTab({ agent, onAgentClick }) {
         </div>
       </div>
 
-      {/* Historical decision stats */}
+      {/* Historical decision summary */}
       {agentHistory.length > 0 && (
-        <div className="grid grid-cols-3 gap-4">
-          {/* Approved vs Rejected */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Approvals vs Rejections</div>
-            <div className="flex gap-6">
-              <div>
-                <div className="text-3xl font-extrabold text-green-600">{stats.approved}</div>
-                <div className="text-xs text-gray-500 mt-0.5">Approved</div>
-              </div>
-              <div className="w-px bg-gray-100" />
-              <div>
-                <div className="text-3xl font-extrabold text-red-500">{stats.rejected}</div>
-                <div className="text-xs text-gray-500 mt-0.5">Rejected</div>
-              </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Historical Decisions</div>
+          <div className="flex gap-8">
+            <div>
+              <div className="text-3xl font-extrabold" style={{ color: '#61ab5e' }}>{stats.approved}</div>
+              <div className="text-xs text-gray-500 mt-0.5">Approved</div>
             </div>
-            {(stats.approved + stats.rejected) > 0 && (
-              <>
-                <div className="mt-3 h-2 rounded-full bg-gray-100 overflow-hidden">
-                  <div className="h-2 rounded-full bg-green-500" style={{ width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
-                </div>
-                <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate</div>
-              </>
-            )}
+            <div className="w-px bg-gray-100" />
+            <div>
+              <div className="text-3xl font-extrabold text-red-500">{stats.rejected}</div>
+              <div className="text-xs text-gray-500 mt-0.5">Rejected</div>
+            </div>
+            <div className="w-px bg-gray-100" />
+            <div>
+              <div className="text-3xl font-extrabold" style={{ color: '#2196af' }}>{stats.approvedDollar > 0 ? `$${(stats.approvedDollar/1000).toFixed(0)}K` : '—'}</div>
+              <div className="text-xs text-gray-500 mt-0.5">$ Unlocked</div>
+            </div>
           </div>
-
-          {/* $ unlocked */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">$ Unlocked by Approvals</div>
-            <div className="text-3xl font-extrabold text-green-600">{stats.approvedDollar > 0 ? `$${(stats.approvedDollar/1000).toFixed(0)}K` : '—'}</div>
-            <div className="text-xs text-gray-500 mt-0.5 mb-3">Recovered or projected incremental</div>
-            {stats.rejected > 0 && (
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
-                <span>{stats.rejected} rejection{stats.rejected !== 1 ? 's' : ''} — opportunity cost not quantified</span>
+          {(stats.approved + stats.rejected) > 0 && (
+            <>
+              <div className="mt-4 h-2 rounded-full bg-gray-100 overflow-hidden">
+                <div className="h-2 rounded-full" style={{ backgroundColor: '#61ab5e', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
               </div>
-            )}
-          </div>
-
-          {/* Avg turnaround by criticality */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Avg Turnaround by Criticality</div>
-            {['critical','high','medium'].some(l => stats.byLevel[l] != null) ? (
-              <div className="space-y-2">
-                {[
-                  { level: 'critical', label: 'Critical', color: '#ef4444' },
-                  { level: 'high',     label: 'High',     color: '#f59e0b' },
-                  { level: 'medium',   label: 'Medium',   color: meta.color },
-                ].map(({ level, label, color }) => (
-                  <div key={level} className="flex items-center gap-3">
-                    <div className="w-14 text-xs font-semibold" style={{ color }}>{label}</div>
-                    <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
-                      <div className="h-2 rounded-full" style={{ backgroundColor: color, width: `${stats.byLevel[level] ? Math.min((stats.byLevel[level] / 7) * 100, 100) : 0}%` }} />
-                    </div>
-                    <div className="w-12 text-right text-xs font-bold text-gray-700 tabular-nums">
-                      {stats.byLevel[level] != null ? `${stats.byLevel[level]}h` : '—'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-xs text-gray-400 mt-2">No resolved history yet</div>
-            )}
-          </div>
+              <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate · {stats.approved + stats.rejected} total decisions</div>
+            </>
+          )}
         </div>
       )}
 
@@ -597,38 +408,6 @@ function AgentTab({ agent, onAgentClick }) {
         </div>
       )}
 
-      {/* History for this agent */}
-      {approvalHistory.filter(h => h.agent === agent).length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Approval History</h2>
-          <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
-                  {['Day', 'Decision', 'Outcome', 'Turnaround', '$ Impact'].map(h => (
-                    <th key={h} className={`py-2.5 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Decision' ? 'text-left' : 'text-center'}`}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {approvalHistory.filter(h => h.agent === agent).map((row, i) => (
-                  <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
-                    <td className="py-2.5 px-4 text-center text-xs text-gray-500 font-medium">{row.date}</td>
-                    <td className="py-2.5 px-4 text-xs text-gray-700">{row.decision}</td>
-                    <td className="py-2.5 px-4 text-center">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${row.outcome === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {row.outcome}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-4 text-center text-xs text-gray-600 tabular-nums">{row.turnaround}</td>
-                    <td className="py-2.5 px-4 text-center text-xs font-semibold text-gray-700">{row.dollarLabel}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -673,32 +452,32 @@ export default function Approvals({ onAgentClick }) {
 
         {/* Hero cards */}
         <div className="grid grid-cols-4 gap-5">
+          <div className="rounded-xl p-5" style={{ background: 'linear-gradient(135deg, #e8f5f0 0%, #d4eae5 100%)', border: '1px solid #b8ddd5' }}>
+            <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#2196af' }}>Potential Gain</div>
+            <div className="text-4xl font-extrabold" style={{ color: '#1a7a8a' }}>$847K</div>
+            <div className="text-xs text-gray-500 mt-1">Across {pending.length} pending decisions</div>
+            <div className="text-xs font-semibold mt-1" style={{ color: '#61ab5e' }}>↑ Act now to capture</div>
+          </div>
+
           <div className="bg-white border border-red-200 rounded-xl p-5">
             <div className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-1">Critical Pending</div>
             <div className="text-4xl font-extrabold text-red-600">{critical}</div>
             <div className="text-xs text-gray-400 mt-1">Immediate action required</div>
-            <div className="text-xs font-semibold text-red-600 mt-1">${pending.filter(a=>a.criticality==='critical').reduce((s,a)=>s+(a.dollarAtStake||0),0).toLocaleString()} at stake</div>
+            <div className="text-xs font-semibold text-red-600 mt-1">${pending.filter(a=>a.criticality==='critical').reduce((s,a)=>s+(a.dollarAtStake||0),0).toLocaleString()} potential gain</div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5">
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Total Pending</div>
             <div className="text-4xl font-extrabold text-gray-900">{pending.length}</div>
             <div className="text-xs text-gray-400 mt-1">Awaiting human sign-off</div>
-            <div className="text-xs font-semibold mt-1" style={{ color: '#2196af' }}>${totalStake.toLocaleString()} total at stake</div>
+            <div className="text-xs font-semibold mt-1" style={{ color: '#2196af' }}>$847K potential gain</div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">$ Unlocked by Approvals</div>
-            <div className="text-4xl font-extrabold text-green-600">$118K</div>
+            <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#61ab5e' }}>$ Unlocked by Approvals</div>
+            <div className="text-4xl font-extrabold" style={{ color: '#61ab5e' }}>$118K</div>
             <div className="text-xs text-gray-400 mt-1">6 approved · 1 rejected this placement</div>
-            <div className="text-xs font-semibold text-green-600 mt-1">↑ Recovered or projected incremental</div>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Avg Turnaround</div>
-            <div className="text-4xl font-extrabold text-gray-900">3.2 hrs</div>
-            <div className="text-xs text-gray-400 mt-1">Avg time to act on approval</div>
-            <div className="text-xs font-semibold text-green-600 mt-1">↓ 1.4 hrs faster than last week</div>
+            <div className="text-xs font-semibold mt-1" style={{ color: '#61ab5e' }}>↑ Recovered or projected incremental</div>
           </div>
         </div>
       </div>
