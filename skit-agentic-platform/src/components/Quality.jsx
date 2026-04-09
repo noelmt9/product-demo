@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { complianceData, coachData } from '../data';
 
 // ── Improvement cases (Active Improvements tab — unchanged) ──────────────────
@@ -77,78 +77,6 @@ const scoreboard = [
   { agent: 'Agent 4', score: 86, trend: 'down', strength: 'Technical accuracy', need: "'Already paid' objection" },
 ];
 
-// ── Side Drawer ──────────────────────────────────────────────────────────────
-
-const LostDrawer = ({ open, onClose }) => {
-  const drawerRef = useRef(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handleClick = (e) => {
-      if (drawerRef.current && !drawerRef.current.contains(e.target)) onClose();
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [open, onClose]);
-
-  return (
-    <>
-      {open && <div className="fixed inset-0 bg-black/20 z-40" />}
-      <div
-        ref={drawerRef}
-        className={`fixed top-0 right-0 h-full z-50 transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}
-        style={{ width: 'max(480px, 35vw)', background: '#ffffff', borderLeft: '1px solid #d4eae5' }}
-      >
-        <div className="h-full overflow-y-auto p-6">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">Revenue & Quality Leakage</h2>
-              <p className="text-sm text-gray-400 mt-0.5">Breakdown of $Lost this week</p>
-            </div>
-            <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600" style={{ border: '1px solid #d4eae5' }}>
-              <span className="material-symbols-outlined text-sm">close</span>
-            </button>
-          </div>
-
-          {/* Total */}
-          <div className="text-3xl font-bold text-red-600 mb-6">$12,300</div>
-
-          {/* Breakdown */}
-          <div className="space-y-4 mb-8">
-            {lostBreakdown.map((item, i) => (
-              <div key={i}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-semibold text-gray-800">{item.label}</span>
-                  <span className="text-sm font-bold text-gray-900" style={{ fontVariantNumeric: 'tabular-nums' }}>${item.amount.toLocaleString()}</span>
-                </div>
-                <div className="w-full h-2 rounded-full mb-1.5" style={{ background: '#fef2f2' }}>
-                  <div className="h-2 rounded-full bg-red-400" style={{ width: `${item.pct}%` }} />
-                </div>
-                <p className="text-[11px] text-gray-400 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Bot detail */}
-          <div className="rounded-xl p-4" style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
-            <div className="text-xs font-bold text-red-700 uppercase tracking-widest mb-3">Bot Abandonment Detail</div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-lg font-bold text-red-600">22%</div>
-                <div className="text-[11px] text-gray-500">480 conversations, 106 abandoned</div>
-              </div>
-              <div>
-                <div className="text-lg font-bold text-red-600">3</div>
-                <div className="text-[11px] text-gray-500">Agents below quality threshold</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
 
 // ── Main Component ───────────────────────────────────────────────────────────
 
@@ -299,6 +227,45 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
             </div>
           )}
 
+          {/* ── $Lost Inline Expansion ──────────────────────────────────────── */}
+          {expandedSection === 'lost' && (
+            <div className="card p-5 mb-4 animate-fadeIn">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Revenue & Quality Leakage</h3>
+                  <p className="text-[11px] text-gray-400">Breakdown of $Lost this week</p>
+                </div>
+                <div className="text-2xl font-bold text-red-600">$12,300</div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-3 mb-5">
+                {lostBreakdown.map((item, i) => (
+                  <div key={i} className="rounded-xl p-3" style={{ background: '#fef2f2' }}>
+                    <div className="text-lg font-bold text-red-600" style={{ fontVariantNumeric: 'tabular-nums' }}>${item.amount.toLocaleString()}</div>
+                    <div className="text-[11px] font-semibold text-gray-700 mb-0.5">{item.label}</div>
+                    <div className="text-[10px] text-gray-400 leading-relaxed">{item.desc}</div>
+                    <div className="mt-2 w-full h-1.5 rounded-full" style={{ background: '#fecaca' }}>
+                      <div className="h-1.5 rounded-full bg-red-400" style={{ width: `${item.pct}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-xl p-4 grid grid-cols-2 gap-4" style={{ background: '#fef2f2', border: '1px solid #fecaca' }}>
+                <div>
+                  <div className="text-xs font-bold text-red-700 uppercase tracking-widest mb-1">Bot Abandonment Rate</div>
+                  <div className="text-lg font-bold text-red-600">22%</div>
+                  <div className="text-[11px] text-gray-500">480 conversations, 106 abandoned</div>
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-red-700 uppercase tracking-widest mb-1">Below Threshold</div>
+                  <div className="text-lg font-bold text-red-600">3</div>
+                  <div className="text-[11px] text-gray-500">Agents below quality threshold</div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ── Quality Score Inline Expansion ────────────────────────────────── */}
           {expandedSection === 'quality' && (
             <div className="card p-5 mb-4 animate-fadeIn">
@@ -436,8 +403,6 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
         </div>
       )}
 
-      {/* $Lost Drawer */}
-      <LostDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>
   );
 }
