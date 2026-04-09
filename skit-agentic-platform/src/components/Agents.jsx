@@ -4,18 +4,18 @@ import { agents } from '../data';
 const overnightTimeline = [
   { time: '08:15 AM', agent: 'Compliance', color: '#06b6d4', summary: 'Scanned 412 recordings. 0 critical violations. 2 low-risk deviations flagged.' },
   { time: '07:00 AM', agent: 'Manager', color: '#8b5cf6', summary: 'Optimized outbound frequency for Early-Arrears segment.' },
-  { time: '06:30 AM', agent: 'Data Enrichment', color: '#6366f1', summary: 'Skip trace batch complete. 78 new phone numbers appended.' },
+  { time: '06:30 AM', agent: 'Tracer', color: '#6366f1', summary: 'Skip trace batch complete. 78 new phone numbers appended.' },
   { time: '06:15 AM', agent: 'Analyst', color: '#3b82f6', summary: 'Identified $42K leakage in automated installment flows.' },
 ];
 
 const agentColors = {
   Analyst: '#3b82f6', Manager: '#8b5cf6', Compliance: '#ef4444',
-  Coach: '#06b6d4', Collector: '#f59e0b', 'Upsell Opportunity': '#10b981', 'Data Enrichment': '#6366f1'
+  Coach: '#06b6d4', Collector: '#f59e0b', 'Upsell Opportunity': '#10b981', 'Tracer': '#6366f1'
 };
 
 const agentIcons = {
   Analyst: 'query_stats', Manager: 'campaign', Compliance: 'shield',
-  Coach: 'school', Collector: 'call', 'Upsell Opportunity': 'trending_up', 'Data Enrichment': 'database'
+  Coach: 'school', Collector: 'call', 'Upsell Opportunity': 'trending_up', 'Tracer': 'database'
 };
 
 const agentLatestStatus = {
@@ -25,7 +25,7 @@ const agentLatestStatus = {
   Coach: '3 agents need coaching',
   Collector: '2,870 touchpoints today',
   'Upsell Opportunity': '$205K signals active',
-  'Data Enrichment': '78 numbers appended',
+  'Tracer': '78 numbers appended',
 };
 
 const agentDetails = {
@@ -119,7 +119,7 @@ const agentDetails = {
       { label: 'Benchmark Multiple', value: '1.6x', target: '1.0x', status: 'above' },
     ]
   },
-  'Data Enrichment': {
+  'Tracer': {
     skills: ['Skip tracing (phone, email, address)', 'Contact data refresh', 'Enrichment pipeline management', 'Recovery attribution tracking', 'Vendor coordination (TLO, LexisNexis)'],
     recentActions: [
       { time: '6h ago', action: 'Skip trace batch complete. 78 new phone numbers appended.' },

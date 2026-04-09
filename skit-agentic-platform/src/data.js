@@ -95,7 +95,7 @@ export const agentActivityFeed = [
     time: "2 hours ago"
   },
   {
-    agent: "Compliance",
+    agent: "Auditor",
     color: "red",
     action: "Audited 412 conversations today. 1 flag: potential time-zone violation on NY account. Escalated to QA lead.",
     time: "4 hours ago"
@@ -170,7 +170,7 @@ export const agents = [
     status: "Active"
   },
   {
-    name: "Compliance",
+    name: "Auditor",
     role: "Regulatory & Guardrails",
     color: "red",
     description: "Audits conversations for regulatory compliance and maintains pre-launch guardrails.",
@@ -188,7 +188,7 @@ export const agents = [
     status: "Active"
   },
   {
-    name: "Data Enrichment",
+    name: "Tracer",
     role: "Skip Trace & Contact Recovery",
     color: "indigo",
     description: "Continuously skip-traces unreachable accounts, refreshes stale contact data, and tracks collections from accounts the client could never have worked.",
