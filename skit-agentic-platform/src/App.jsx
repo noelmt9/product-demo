@@ -9,7 +9,6 @@ import Payments from './components/Payments';
 import Conversations from './components/Conversations';
 import Agents from './components/Agents';
 import AgentPanel from './components/AgentPanel';
-import ChatPanel from './components/ChatPanel';
 
 
 const navItems = [
@@ -26,7 +25,6 @@ const navItems = [
 function App() {
   const [activeScreen, setActiveScreen] = useState('insights');
   const [selectedAgent, setSelectedAgent] = useState(null);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [qualityTab, setQualityTab] = useState('overview');
   const mainContentRef = useRef(null);
@@ -152,20 +150,6 @@ function App() {
           <AgentPanel agent={selectedAgent} onClose={() => setSelectedAgent(null)} />
         )}
 
-        {/* Chat FAB — hidden on Insights since it has its own search */}
-        {activeScreen !== 'insights' && (
-          <button
-            onClick={() => setIsChatOpen(true)}
-            className="fixed bottom-6 right-6 w-14 h-14 text-white rounded-2xl hover:scale-105 transition-all flex items-center justify-center z-30 group"
-            style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)', boxShadow: '0 8px 24px rgba(33,150,175,0.35)'}}
-          >
-            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </button>
-        )}
-
-        <ChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       </div>
     </div>
   );

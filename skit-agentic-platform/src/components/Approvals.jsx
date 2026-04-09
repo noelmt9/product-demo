@@ -200,7 +200,7 @@ export default function Approvals({ onAgentClick }) {
           <div className="rounded-xl p-5 text-white" style={{background: 'linear-gradient(135deg, #162A44, #1e3a5f)'}}>
             <div className="flex items-center gap-2 mb-3">
               <span className="material-symbols-outlined text-sm">rocket_launch</span>
-              <span className="text-xs font-bold uppercase tracking-widest" style={{color: '#5FCFC4'}}>Upsell Opportunity</span>
+              <span className="text-xs font-bold uppercase tracking-widest" style={{color: '#5FCFC4'}}>Scrubber</span>
             </div>
             <h3 className="text-lg font-bold mb-2">Auto-finance &lt;$3K outperforming by 1.6x</h3>
             <p className="text-sm text-slate-300 mb-4">Client has 22,000 similar accounts in-house. Projected incremental recovery: $205K over 60 days.</p>

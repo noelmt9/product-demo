@@ -3,13 +3,13 @@ import { agents } from '../data';
 
 const agentColors = {
   Analyst: '#3b82f6', Manager: '#8b5cf6', Auditor: '#ef4444',
-  Coach: '#06b6d4', Collector: '#f59e0b', 'Upsell Opportunity': '#10b981', Tracer: '#6366f1'
+  Coach: '#06b6d4', Collector: '#f59e0b', 'Scrubber': '#10b981', Tracer: '#6366f1'
 };
 
 const allSuggestions = [
   { q: "What drove the liquidation rate increase this week?", agents: ['Analyst', 'Collector'] },
   { q: "Show me accounts most likely to settle", agents: ['Analyst', 'Manager'] },
-  { q: "Where are we losing money?", agents: ['Analyst', 'Upsell Opportunity'] },
+  { q: "Where are we losing money?", agents: ['Analyst', 'Scrubber'] },
   { q: "Summarize compliance issues this month", agents: ['Auditor', 'Coach'] },
   { q: "How are enriched accounts performing?", agents: ['Tracer', 'Analyst'] },
   { q: "Draft this week's client report", agents: ['Analyst', 'Auditor', 'Coach'] },

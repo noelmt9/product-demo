@@ -179,12 +179,12 @@ export const agents = [
     status: "Active"
   },
   {
-    name: "Upsell Opportunity",
-    role: "Growth & Client Expansion",
+    name: "Scrubber",
+    role: "Compliance · Pre-filter",
     color: "emerald",
-    description: "Identifies segments outperforming benchmarks and drafts upsell cases for clients. Turns the platform from a collection tool into a growth tool.",
-    keyMetric: "3 upsell signals active, $205K projected",
-    lastAction: "Auto-finance <$3K cohort crossed 4% liquidation. Upsell brief drafted.",
+    description: "Pre-filters every account before outreach. Runs DNC scrubs, bankruptcy checks, statute of limitations validation, and litigator screening.",
+    keyMetric: "11,847 accounts scrubbed, 97.4% pass rate",
+    lastAction: "Suppressed 312 accounts matching DNC registry.",
     status: "Active"
   },
   {
