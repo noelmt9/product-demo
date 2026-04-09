@@ -139,7 +139,7 @@ const CriticalityBadge = ({ level }) => {
   };
   return (
     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${map[level]}`}>
-      {level === 'critical' ? '🔴 Critical' : level === 'high' ? '🟠 High' : level === 'medium' ? '🔵 Medium' : '⚪ Low'}
+      {level === 'critical' ? 'Critical' : level === 'high' ? 'High' : level === 'medium' ? 'Medium' : 'Low'}
     </span>
   );
 };
@@ -214,71 +214,9 @@ const ApprovalCard = ({ a, onAgentClick }) => {
 
 function OverallTab({ onAgentClick }) {
   const pending = allApprovals.filter(a => a.status === 'pending');
-  const stats = calcStats(approvalHistory);
 
   return (
     <div className="px-8 py-6 space-y-6">
-
-      {/* Approved vs Rejected summary */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Approvals vs Rejections (Historical)</div>
-          <div className="flex gap-8">
-            <div>
-              <div className="text-3xl font-extrabold text-gray-900">{stats.approved}</div>
-              <div className="flex items-center gap-1 mt-1">
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>Approved</span>
-              </div>
-            </div>
-            <div className="w-px bg-gray-100" />
-            <div>
-              <div className="text-3xl font-extrabold text-gray-900">{stats.rejected}</div>
-              <div className="flex items-center gap-1 mt-1">
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>Rejected</span>
-              </div>
-            </div>
-            <div className="w-px bg-gray-100" />
-            <div>
-              <div className="text-3xl font-extrabold text-gray-900">${(stats.approvedDollar/1000).toFixed(0)}K</div>
-              <div className="flex items-center gap-1 mt-1">
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(33,150,175,0.08)', color: '#2196af', border: '1px solid rgba(33,150,175,0.2)' }}>$ Unlocked</span>
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 h-2 rounded-full bg-gray-100 overflow-hidden">
-            <div className="h-2 rounded-full" style={{ backgroundColor: '#2196af', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
-          </div>
-          <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate across {stats.approved + stats.rejected} decisions</div>
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Pending by Agent</div>
-          <div className="space-y-2.5">
-            {Object.keys(AGENT_META).map(agent => {
-              const meta = AGENT_META[agent];
-              const count = pending.filter(a => a.agent === agent).length;
-              const stake = pending.filter(a => a.agent === agent).reduce((s,a) => s+(a.dollarAtStake||0), 0);
-              const maxCount = Math.max(...Object.keys(AGENT_META).map(ag => pending.filter(a => a.agent === ag).length), 1);
-              return (
-                <div key={agent} className="flex items-center gap-3">
-                  <div className="w-20 text-xs font-semibold text-gray-700 flex-shrink-0 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: meta.color }} />
-                    {agent}
-                  </div>
-                  <div className="flex-1 h-5 rounded-md bg-gray-100 overflow-hidden">
-                    <div className="h-5 rounded-md flex items-center px-2" style={{ width: count > 0 ? `${(count/maxCount)*100}%` : '0%', backgroundColor: meta.color, minWidth: count > 0 ? '28px' : '0' }}>
-                      {count > 0 && <span className="text-[10px] font-bold text-white">{count}</span>}
-                    </div>
-                  </div>
-                  <div className="w-28 text-right text-xs flex-shrink-0 tabular-nums">
-                    {stake > 0 ? <span className="font-semibold text-gray-600">${(stake/1000).toFixed(0)}K potential</span> : <span className="text-gray-300">—</span>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
 
       {/* All pending — sorted by criticality */}
       <div>
