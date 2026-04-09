@@ -25,18 +25,18 @@ const allApprovals = [
     id: 2, agent: 'Manager', approver: 'Auditor',
     decision: 'Agent Settlement Protocol: $12K batch authorization',
     details: 'Recovery Agent initiated a new settlement protocol for the Southwest Residential Portfolio. Proposed settlement: $12,475 currently at 4-day delinquency.',
-    businessCase: 'Expected recovery: $216K · Settlement cost: $43K discount · Net gain: $173K · Each week of delay costs ~$2-3K in recovery probability',
-    counterfactual: 'If rejected: accounts age 30+ days, reducing recovery probability by ~40% ($86K at risk).',
-    dollarAtStake: 173000, criticality: 'critical', status: 'pending', hoursAgo: 4,
+    businessCase: 'Expected recovery: $512K · Settlement cost: $62K discount · Net gain: $450K · Each week of delay costs ~$8-12K in recovery probability',
+    counterfactual: 'If rejected: accounts age 30+ days, reducing recovery probability by ~40% ($180K at risk).',
+    dollarAtStake: 450000, criticality: 'critical', status: 'pending', hoursAgo: 4,
     category: 'Settlement Authority',
   },
   {
     id: 3, agent: 'Manager', approver: 'Client',
     decision: 'Extend campaign window by 2 weeks for Low Prop / High Bal cohort',
     details: 'Human agent ROI on this cohort is recovering after strategy adjustment. Extending gives 1,500 accounts 2 additional weeks of coverage.',
-    businessCase: 'Projected additional recovery: $28K · Cost: $4.2K agent hours · Net: $23.8K',
-    counterfactual: 'If rejected: cohort exits campaign with 65% of accounts unworked.',
-    dollarAtStake: 23800, criticality: 'medium', status: 'pending', hoursAgo: 8,
+    businessCase: 'Projected additional recovery: $118K · Cost: $13K agent hours · Net: $105K',
+    counterfactual: 'If rejected: cohort exits campaign with 65% of accounts unworked, forfeiting $105K in projected recovery.',
+    dollarAtStake: 105000, criticality: 'medium', status: 'pending', hoursAgo: 8,
     category: 'Campaign Change',
   },
   // Auditor
@@ -44,9 +44,9 @@ const allApprovals = [
     id: 4, agent: 'Auditor', approver: 'Manager',
     decision: 'Compliance Buffer Expansion: 3% → 5% for northeast accounts',
     details: 'Compliance system updated risk parameters for this account category in the northeast region. Buffer expansion covers 1,200 additional accounts.',
-    businessCase: 'Prevents estimated $64,500 in potential violation exposure · Covers 340 gray-zone accounts',
-    counterfactual: 'If rejected: 340 accounts in gray zone where state-specific rules may trigger violations.',
-    dollarAtStake: 64500, criticality: 'high', status: 'pending', hoursAgo: 6,
+    businessCase: 'Prevents estimated $190K in potential violation exposure · Covers 340 gray-zone accounts across NY, CA, IL',
+    counterfactual: 'If rejected: 340 accounts remain in gray zone where state-specific rules may trigger violations — $190K regulatory exposure.',
+    dollarAtStake: 190000, criticality: 'high', status: 'pending', hoursAgo: 6,
     category: 'Compliance Rule',
   },
   {
@@ -360,25 +360,101 @@ function AgentTab({ agent, onAgentClick }) {
   );
 }
 
-// ── TABS config ───────────────────────────────────────────────────────────────
+// ── TAB: Approved ─────────────────────────────────────────────────────────────
 
-const TABS = [
-  { id: 'overall',   label: 'Overall' },
-  { id: 'Manager',   label: 'Manager' },
-  { id: 'Auditor',   label: 'Auditor' },
-  { id: 'Coach',     label: 'Coach' },
-  { id: 'Analyst',   label: 'Analyst' },
-  { id: 'Collector', label: 'Collector' },
-];
+function ApprovedTab({ approvedHistory, rejectedHistory, approvedTotal }) {
+  const all = [...approvedHistory, ...rejectedHistory].sort((a, b) => {
+    // Sort by day number descending
+    const dayA = parseInt(a.date.replace('Day ', ''));
+    const dayB = parseInt(b.date.replace('Day ', ''));
+    return dayB - dayA;
+  });
+
+  return (
+    <div className="px-8 py-6 space-y-6">
+      {/* Summary row */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Approved</div>
+          <div className="text-3xl font-extrabold text-gray-900">{approvedHistory.length}</div>
+          <div className="mt-2">
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>
+              ${(approvedTotal/1000).toFixed(0)}K unlocked
+            </span>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Rejected</div>
+          <div className="text-3xl font-extrabold text-gray-900">{rejectedHistory.length}</div>
+          <div className="mt-2">
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+              Opportunity not captured
+            </span>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Approval Rate</div>
+          <div className="text-3xl font-extrabold text-gray-900">{Math.round((approvedHistory.length / (approvedHistory.length + rejectedHistory.length)) * 100)}%</div>
+          <div className="mt-3 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+            <div className="h-1.5 rounded-full" style={{ backgroundColor: '#2196af', width: `${(approvedHistory.length / (approvedHistory.length + rejectedHistory.length)) * 100}%` }} />
+          </div>
+          <div className="text-xs text-gray-400 mt-1">{approvedHistory.length + rejectedHistory.length} total decisions</div>
+        </div>
+      </div>
+
+      {/* Decision log */}
+      <div>
+        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Decision Log</h2>
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                {['Day', 'Agent', 'Decision', 'Outcome', '$ Impact'].map(h => (
+                  <th key={h} className={`py-3 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wide ${h === 'Decision' ? 'text-left' : 'text-center'}`}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {all.map((row, i) => {
+                const meta = AGENT_META[row.agent] || AGENT_META.Analyst;
+                return (
+                  <tr key={i} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                    <td className="py-3 px-5 text-center text-xs text-gray-400 font-medium tabular-nums">{row.date}</td>
+                    <td className="py-3 px-5 text-center">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: meta.color }}>
+                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: meta.color }} />
+                        {row.agent}
+                      </span>
+                    </td>
+                    <td className="py-3 px-5 text-xs text-gray-700">{row.decision}</td>
+                    <td className="py-3 px-5 text-center">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${row.outcome === 'Approved' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                        {row.outcome}
+                      </span>
+                    </td>
+                    <td className="py-3 px-5 text-center text-xs font-semibold text-gray-700 tabular-nums">{row.dollarLabel}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function Approvals({ onAgentClick }) {
-  const [activeTab, setActiveTab] = React.useState('overall');
+  const [activeTab, setActiveTab] = React.useState('pending');
 
   const pending = allApprovals.filter(a => a.status === 'pending');
   const totalStake = pending.reduce((s, a) => s + (a.dollarAtStake || 0), 0);
   const critical = pending.filter(a => a.criticality === 'critical').length;
+  const approvedHistory = approvalHistory.filter(h => h.outcome === 'Approved');
+  const rejectedHistory = approvalHistory.filter(h => h.outcome === 'Rejected');
+  const approvedTotal = approvedHistory.reduce((s, h) => s + h.dollarImpact, 0);
 
   return (
     <div className="min-h-full bg-gray-50">
@@ -402,7 +478,7 @@ export default function Approvals({ onAgentClick }) {
         <div className="grid grid-cols-4 gap-5">
           <div className="bg-white border border-gray-200 rounded-xl p-5">
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Potential Gain</div>
-            <div className="text-4xl font-extrabold text-gray-900">$847K</div>
+            <div className="text-4xl font-extrabold text-gray-900">${(totalStake/1000).toFixed(0)}K</div>
             <div className="text-xs text-gray-400 mt-1">Across {pending.length} pending decisions</div>
             <div className="text-xs font-semibold mt-1" style={{ color: '#2196af' }}>↑ Act now to capture</div>
           </div>
@@ -413,7 +489,7 @@ export default function Approvals({ onAgentClick }) {
             <div className="text-xs text-gray-400 mt-1">Immediate action required</div>
             <div className="mt-1">
               <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
-                ${pending.filter(a=>a.criticality==='critical').reduce((s,a)=>s+(a.dollarAtStake||0),0).toLocaleString()} potential gain
+                ${(pending.filter(a=>a.criticality==='critical').reduce((s,a)=>s+(a.dollarAtStake||0),0)/1000).toFixed(0)}K potential gain
               </span>
             </div>
           </div>
@@ -424,15 +500,15 @@ export default function Approvals({ onAgentClick }) {
             <div className="text-xs text-gray-400 mt-1">Awaiting human sign-off</div>
             <div className="mt-1">
               <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(33,150,175,0.08)', color: '#2196af', border: '1px solid rgba(33,150,175,0.2)' }}>
-                $847K potential gain
+                ${(totalStake/1000).toFixed(0)}K potential gain
               </span>
             </div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5">
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">$ Unlocked by Approvals</div>
-            <div className="text-4xl font-extrabold text-gray-900">$118K</div>
-            <div className="text-xs text-gray-400 mt-1">6 approved · 1 rejected this placement</div>
+            <div className="text-4xl font-extrabold text-gray-900">${(approvedTotal/1000).toFixed(0)}K</div>
+            <div className="text-xs text-gray-400 mt-1">{approvedHistory.length} approved · {rejectedHistory.length} rejected this placement</div>
             <div className="mt-1">
               <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>
                 ↑ Recovered or projected
@@ -445,11 +521,10 @@ export default function Approvals({ onAgentClick }) {
       {/* ── TAB BAR ──────────────────────────────────────────────────────────── */}
       <div className="bg-white border-b border-gray-200 px-8">
         <div className="flex gap-0">
-          {TABS.map(tab => {
-            const tabPending = tab.id === 'overall'
-              ? pending.length
-              : pending.filter(a => a.agent === tab.id).length;
-            const meta = AGENT_META[tab.id];
+          {[
+            { id: 'pending',  label: 'Pending',  count: pending.length },
+            { id: 'approved', label: 'Approved', count: approvedHistory.length },
+          ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
               <button
@@ -459,13 +534,10 @@ export default function Approvals({ onAgentClick }) {
                   isActive ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300'
                 }`}
               >
-                {meta && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: isActive ? meta.color : '#9ca3af' }} />}
                 {tab.label}
-                {tabPending > 0 && (
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-0.5 ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-                    {tabPending}
-                  </span>
-                )}
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+                  {tab.count}
+                </span>
               </button>
             );
           })}
@@ -473,12 +545,8 @@ export default function Approvals({ onAgentClick }) {
       </div>
 
       {/* ── TAB CONTENT ──────────────────────────────────────────────────────── */}
-      {activeTab === 'overall'   && <OverallTab onAgentClick={onAgentClick} />}
-      {activeTab === 'Manager'   && <AgentTab agent="Manager"   onAgentClick={onAgentClick} />}
-      {activeTab === 'Auditor'   && <AgentTab agent="Auditor"   onAgentClick={onAgentClick} />}
-      {activeTab === 'Coach'     && <AgentTab agent="Coach"     onAgentClick={onAgentClick} />}
-      {activeTab === 'Analyst'   && <AgentTab agent="Analyst"   onAgentClick={onAgentClick} />}
-      {activeTab === 'Collector' && <AgentTab agent="Collector" onAgentClick={onAgentClick} />}
+      {activeTab === 'pending'  && <OverallTab onAgentClick={onAgentClick} />}
+      {activeTab === 'approved' && <ApprovedTab approvedHistory={approvedHistory} rejectedHistory={rejectedHistory} approvedTotal={approvedTotal} />}
 
     </div>
   );
