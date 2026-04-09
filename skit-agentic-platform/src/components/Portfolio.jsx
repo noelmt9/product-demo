@@ -239,147 +239,129 @@ export default function Portfolio() {
 
       <div className="px-8 py-6 space-y-6">
 
-        {/* ── ORIGINAL CREDITOR TABLE ──────────────────────────────────────── */}
+        {/* ── ORIGINAL CREDITOR BREAKDOWN — horizontal bar view ────────────── */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-6 pt-5 pb-4 border-b border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Original Creditor Breakdown</h2>
-                <p className="text-xs text-gray-400 mt-0.5">Liquidation and performance by original creditor — from placement file</p>
+                <p className="text-xs text-gray-400 mt-0.5">Accounts and collections by original creditor — from placement file</p>
               </div>
-              {/* Search */}
-              <div className="relative">
-                <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search creditor or debt type..."
-                  className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:border-transparent w-64"
-                  style={{ '--tw-ring-color': '#2196af' }}
-                />
+              <div className="flex items-center gap-3">
+                {/* Legend */}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm inline-block" style={{ backgroundColor: '#2196af' }} /><span className="text-xs text-gray-500">Accounts</span></div>
+                  <div className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm inline-block" style={{ backgroundColor: '#f59e0b' }} /><span className="text-xs text-gray-500">Collected</span></div>
+                </div>
+                {/* Search */}
+                <div className="relative">
+                  <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Search creditor..."
+                    className="pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none w-44"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ backgroundColor: '#f8fcfb', borderBottom: '1px solid #d4eae5' }}>
-                  <SortTh col="name" label="Original Creditor" align="left" />
-                  <SortTh col="debtType" label="Debt Type" align="left" />
-                  <SortTh col="accounts" label="Accounts" />
-                  <SortTh col="totalBalance" label="Total Balance" />
-                  <SortTh col="avgBalance" label="Avg Balance" />
-                  <SortTh col="avgChargeoffAge" label="Avg CO Age" />
-                  <SortTh col="collected" label="Collected" />
-                  <SortTh col="liquidationRate" label="Liq Rate" />
-                  <SortTh col="contactRate" label="Contact %" />
-                  <SortTh col="ptpRate" label="PTP %" />
-                  <th className="py-2.5 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wide text-center">Status</th>
-                  <th className="py-2.5 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wide" />
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((c, i) => (
-                  <>
-                    <tr
-                      key={i}
-                      className="cursor-pointer hover:bg-gray-50 transition-colors"
-                      style={{ borderBottom: '1px solid #f0f0f0' }}
-                      onClick={() => setExpandedCreditor(expandedCreditor === i ? null : i)}
-                    >
-                      <td className="py-3 px-3 font-semibold text-gray-900">{c.name}</td>
-                      <td className="py-3 px-3">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                          c.debtType === 'Credit Card' ? 'bg-blue-100 text-blue-700' :
-                          c.debtType === 'Medical' ? 'bg-red-100 text-red-700' :
-                          'bg-purple-100 text-purple-700'
-                        }`}>{c.debtType}</span>
-                      </td>
-                      <td className="py-3 px-3 text-right tabular-nums text-gray-700">{c.accounts.toLocaleString()}</td>
-                      <td className="py-3 px-3 text-right tabular-nums text-gray-700">${(c.totalBalance / 1000000).toFixed(1)}M</td>
-                      <td className="py-3 px-3 text-right tabular-nums text-gray-700">${c.avgBalance.toLocaleString()}</td>
-                      <td className="py-3 px-3 text-right tabular-nums text-gray-600">{c.avgChargeoffAge} mo</td>
-                      <td className="py-3 px-3 text-right tabular-nums font-semibold text-gray-900">${c.collected.toLocaleString()}</td>
-                      <td className="py-3 px-3 text-right">
-                        <span className={`text-sm font-bold tabular-nums ${
-                          c.liquidationRate >= 3 ? 'text-green-600' :
-                          c.liquidationRate >= 2 ? 'text-blue-600' :
-                          'text-amber-600'
-                        }`}>{c.liquidationRate}%</span>
-                      </td>
-                      <td className="py-3 px-3 text-right tabular-nums text-gray-600">{c.contactRate}%</td>
-                      <td className="py-3 px-3 text-right tabular-nums text-gray-600">{c.ptpRate}%</td>
-                      <td className="py-3 px-3 text-center">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          c.status === 'above' ? 'bg-green-100 text-green-700' :
-                          c.status === 'on-target' ? 'bg-blue-100 text-blue-700' :
-                          'bg-amber-100 text-amber-700'
-                        }`}>
-                          {c.status === 'above' ? '↑ Above target' : c.status === 'on-target' ? '✓ On target' : '↓ Below target'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <span className="text-gray-400 text-xs">{expandedCreditor === i ? '▲' : '▼'}</span>
-                      </td>
-                    </tr>
-                    {expandedCreditor === i && (
-                      <tr key={`exp-${i}`} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                        <td colSpan={12} className="px-6 py-4" style={{ backgroundColor: '#f8fcfb' }}>
-                          <div className="grid grid-cols-4 gap-4">
-                            <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Liquidation Rate</div>
-                              <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#d4eae5' }}>
-                                <div className="h-2 rounded-full" style={{ width: `${(c.liquidationRate / 5) * 100}%`, backgroundColor: '#2196af' }} />
-                              </div>
-                              <div className="text-xs text-gray-500 mt-1">{c.liquidationRate}% vs 2.5% target</div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Top States</div>
-                              <div className="flex gap-1 flex-wrap">
-                                {c.states.map(s => (
-                                  <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 font-medium">{s}</span>
-                                ))}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Contact Rate</div>
-                              <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#d4eae5' }}>
-                                <div className="h-2 rounded-full" style={{ width: `${c.contactRate}%`, backgroundColor: '#61ab5e' }} />
-                              </div>
-                              <div className="text-xs text-gray-500 mt-1">{c.contactRate}% vs 40% target</div>
-                            </div>
-                            <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">PTP Rate</div>
-                              <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#d4eae5' }}>
-                                <div className="h-2 rounded-full" style={{ width: `${c.ptpRate * 5}%`, backgroundColor: '#f59e0b' }} />
-                              </div>
-                              <div className="text-xs text-gray-500 mt-1">{c.ptpRate}% vs 12% target</div>
-                            </div>
+          {/* Column headers */}
+          <div className="grid px-6 py-2 border-b border-gray-100" style={{ gridTemplateColumns: '180px 90px 1fr 90px' }}>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Creditor</div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Debt Type</div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 pl-1">Accounts · Collected</div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Liq Rate · Status</div>
+          </div>
+
+          {/* Rows */}
+          <div className="divide-y divide-gray-50">
+            {(() => {
+              const maxAccounts = Math.max(...originalCreditors.map(c => c.accounts));
+              const maxCollected = Math.max(...originalCreditors.map(c => c.collected));
+              return filtered.map((c, i) => {
+                const accPct = (c.accounts / maxAccounts) * 100;
+                const colPct = (c.collected / maxCollected) * 100;
+                return (
+                  <div key={i} className="grid items-center px-6 py-3.5 hover:bg-gray-50 transition-colors" style={{ gridTemplateColumns: '180px 90px 1fr 90px' }}>
+                    {/* A: Creditor name */}
+                    <div className="pr-3">
+                      <div className="text-sm font-semibold text-gray-900 leading-tight truncate">{c.name}</div>
+                      <div className="text-[10px] text-gray-400 mt-0.5 tabular-nums">{c.totalBalance >= 1000000 ? `$${(c.totalBalance/1000000).toFixed(1)}M` : `$${(c.totalBalance/1000).toFixed(0)}K`} total balance</div>
+                    </div>
+
+                    {/* B: Debt type badge */}
+                    <div>
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap ${
+                        c.debtType === 'Credit Card' ? 'bg-blue-100 text-blue-700' :
+                        c.debtType === 'Medical' ? 'bg-red-100 text-red-700' :
+                        'bg-purple-100 text-purple-700'
+                      }`}>{c.debtType}</span>
+                    </div>
+
+                    {/* C + G: Horizontal bars for accounts and collected */}
+                    <div className="px-1 space-y-1.5">
+                      {/* Accounts bar */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#e8f4f8' }}>
+                          <div
+                            className="h-5 rounded flex items-center px-2"
+                            style={{ width: `${accPct}%`, backgroundColor: '#2196af', minWidth: '32px' }}
+                          >
+                            <span className="text-[10px] font-semibold text-white whitespace-nowrap">{c.accounts.toLocaleString()}</span>
                           </div>
-                        </td>
-                      </tr>
-                    )}
-                  </>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr style={{ backgroundColor: '#f0faf8', borderTop: '2px solid #d4eae5' }}>
-                  <td className="py-3 px-3 font-bold text-gray-900" colSpan={2}>Total</td>
-                  <td className="py-3 px-3 text-right font-bold text-gray-900 tabular-nums">{originalCreditors.reduce((s,c) => s+c.accounts,0).toLocaleString()}</td>
-                  <td className="py-3 px-3 text-right font-bold text-gray-900 tabular-nums">${(originalCreditors.reduce((s,c) => s+c.totalBalance,0)/1000000).toFixed(1)}M</td>
-                  <td className="py-3 px-3 text-right font-semibold text-gray-700 tabular-nums">${Math.round(originalCreditors.reduce((s,c) => s+c.avgBalance,0)/originalCreditors.length).toLocaleString()}</td>
-                  <td className="py-3 px-3 text-right font-semibold text-gray-700 tabular-nums">{Math.round(originalCreditors.reduce((s,c) => s+c.avgChargeoffAge,0)/originalCreditors.length)} mo</td>
-                  <td className="py-3 px-3 text-right font-bold text-gray-900 tabular-nums">${originalCreditors.reduce((s,c) => s+c.collected,0).toLocaleString()}</td>
-                  <td className="py-3 px-3 text-right font-bold tabular-nums" style={{ color: '#2196af' }}>2.7%</td>
-                  <td className="py-3 px-3 text-right font-semibold text-gray-700 tabular-nums">38%</td>
-                  <td className="py-3 px-3 text-right font-semibold text-gray-700 tabular-nums">12%</td>
-                  <td colSpan={2} />
-                </tr>
-              </tfoot>
-            </table>
+                        </div>
+                      </div>
+                      {/* Collected bar */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#fef3cd' }}>
+                          <div
+                            className="h-5 rounded flex items-center px-2"
+                            style={{ width: `${colPct}%`, backgroundColor: '#f59e0b', minWidth: '52px' }}
+                          >
+                            <span className="text-[10px] font-semibold text-white whitespace-nowrap">${c.collected.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* H + K: Liq rate + status */}
+                    <div className="pl-3 text-right">
+                      <div className={`text-lg font-extrabold tabular-nums leading-tight ${
+                        c.liquidationRate >= 3 ? 'text-green-600' :
+                        c.liquidationRate >= 2 ? 'text-blue-600' :
+                        'text-amber-600'
+                      }`}>{c.liquidationRate}%</div>
+                      <div className="text-[9px] text-gray-400 mb-1">liq rate</div>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                        c.status === 'above' ? 'bg-green-100 text-green-700' :
+                        c.status === 'on-target' ? 'bg-blue-100 text-blue-700' :
+                        'bg-amber-100 text-amber-700'
+                      }`}>
+                        {c.status === 'above' ? '↑ Above' : c.status === 'on-target' ? '✓ On target' : '↓ Below'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+
+          {/* Totals footer */}
+          <div className="grid px-6 py-3 border-t-2" style={{ gridTemplateColumns: '180px 90px 1fr 90px', borderColor: '#d4eae5', backgroundColor: '#f8fcfb' }}>
+            <div className="text-xs font-bold text-gray-900">Total · 6 creditors</div>
+            <div />
+            <div className="px-1 space-y-1">
+              <div className="text-xs text-gray-500 tabular-nums"><span className="font-bold text-gray-900">{originalCreditors.reduce((s,c)=>s+c.accounts,0).toLocaleString()}</span> accounts</div>
+              <div className="text-xs text-gray-500 tabular-nums"><span className="font-bold text-gray-900">${originalCreditors.reduce((s,c)=>s+c.collected,0).toLocaleString()}</span> collected</div>
+            </div>
+            <div className="pl-3 text-right">
+              <div className="text-lg font-extrabold tabular-nums" style={{ color: '#2196af' }}>2.7%</div>
+              <div className="text-[9px] text-gray-400">portfolio avg</div>
+            </div>
           </div>
         </div>
 
