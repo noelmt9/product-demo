@@ -109,14 +109,32 @@ const allApprovals = [
 ];
 
 const approvalHistory = [
-  { date: 'Day 17', agent: 'Manager', decision: 'Settlement offer SMS for 2+ failed PTP accounts', outcome: 'Approved', turnaround: '1.8 hrs', dollarImpact: '$36K recovered' },
-  { date: 'Day 15', agent: 'Analyst', decision: 'Reallocation: 2 agents from Low Prop → Medium Prop', outcome: 'Approved', turnaround: '2.1 hrs', dollarImpact: '+$14K projected' },
-  { date: 'Day 12', agent: 'Auditor', decision: 'TCPA timezone fix for NY accounts', outcome: 'Approved', turnaround: '0.5 hrs', dollarImpact: 'Risk avoided' },
-  { date: 'Day 10', agent: 'Manager', decision: 'Voice AI frequency: 3x → 5x/week for High Prop/High Bal', outcome: 'Approved', turnaround: '3.2 hrs', dollarImpact: '+$28K projected' },
-  { date: 'Day 8',  agent: 'Coach',   decision: 'Spanish SMS campaign for TX/FL cohort', outcome: 'Approved', turnaround: '4.0 hrs', dollarImpact: '+$18K projected' },
-  { date: 'Day 5',  agent: 'Manager', decision: '22% settlement for 8 hardship accounts', outcome: 'Rejected', turnaround: '6.1 hrs', dollarImpact: '—' },
-  { date: 'Day 3',  agent: 'Analyst', decision: 'Shift medical debt cohort to SMS-first', outcome: 'Approved', turnaround: '1.2 hrs', dollarImpact: '+$22K projected' },
+  { date: 'Day 17', agent: 'Manager', decision: 'Settlement offer SMS for 2+ failed PTP accounts',     outcome: 'Approved', criticality: 'high',     turnaround: 1.8, dollarImpact: 36000,  dollarLabel: '$36K recovered' },
+  { date: 'Day 15', agent: 'Analyst', decision: 'Reallocation: 2 agents from Low Prop → Medium Prop', outcome: 'Approved', criticality: 'medium',   turnaround: 2.1, dollarImpact: 14000,  dollarLabel: '+$14K projected' },
+  { date: 'Day 12', agent: 'Auditor', decision: 'TCPA timezone fix for NY accounts',                  outcome: 'Approved', criticality: 'critical', turnaround: 0.5, dollarImpact: 0,      dollarLabel: 'Risk avoided' },
+  { date: 'Day 10', agent: 'Manager', decision: 'Voice AI frequency: 3x → 5x/week High Prop/High Bal',outcome: 'Approved', criticality: 'high',     turnaround: 3.2, dollarImpact: 28000,  dollarLabel: '+$28K projected' },
+  { date: 'Day 8',  agent: 'Coach',   decision: 'Spanish SMS campaign for TX/FL cohort',              outcome: 'Approved', criticality: 'medium',   turnaround: 4.0, dollarImpact: 18000,  dollarLabel: '+$18K projected' },
+  { date: 'Day 5',  agent: 'Manager', decision: '22% settlement for 8 hardship accounts',             outcome: 'Rejected', criticality: 'high',     turnaround: 6.1, dollarImpact: 0,      dollarLabel: '—' },
+  { date: 'Day 3',  agent: 'Analyst', decision: 'Shift medical debt cohort to SMS-first',             outcome: 'Approved', criticality: 'medium',   turnaround: 1.2, dollarImpact: 22000,  dollarLabel: '+$22K projected' },
 ];
+
+// ── Derived stats helpers ─────────────────────────────────────────────────────
+
+function calcStats(history) {
+  const approved = history.filter(h => h.outcome === 'Approved');
+  const rejected = history.filter(h => h.outcome === 'Rejected');
+  const approvedDollar = approved.reduce((s, h) => s + h.dollarImpact, 0);
+  const rejectedCount  = rejected.length;
+
+  // Avg turnaround by criticality (pending not counted — only resolved history)
+  const byLevel = {};
+  ['critical','high','medium','low'].forEach(level => {
+    const rows = history.filter(h => h.criticality === level);
+    byLevel[level] = rows.length ? +(rows.reduce((s,h) => s + h.turnaround, 0) / rows.length).toFixed(1) : null;
+  });
+
+  return { approved: approved.length, rejected: rejectedCount, approvedDollar, byLevel };
+}
 
 const lostOpportunities = [
   { category: 'Installment Request Unresolved', count: 14, description: 'Consumer asked for installment plan but wasn\'t offered one', urgency: 'amber', action: 'Queue for human agent callback with plan offer' },
@@ -214,6 +232,7 @@ function OverallTab({ onAgentClick }) {
   const totalAtStake = pending.reduce((s, a) => s + (a.dollarAtStake || 0), 0);
   const critical = pending.filter(a => a.criticality === 'critical');
   const high = pending.filter(a => a.criticality === 'high');
+  const stats = calcStats(approvalHistory);
 
   // Agent funnel summary
   const agentSummary = Object.keys(AGENT_META).map(agent => {
@@ -224,6 +243,63 @@ function OverallTab({ onAgentClick }) {
 
   return (
     <div className="px-8 py-6 space-y-6">
+
+      {/* ── Cross-agent approval / rejection summary ── */}
+      <div className="grid grid-cols-3 gap-4">
+        {/* Approved vs Rejected */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5 col-span-1">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Approvals vs Rejections</div>
+          <div className="flex gap-6">
+            <div>
+              <div className="text-3xl font-extrabold text-green-600">{stats.approved}</div>
+              <div className="text-xs text-gray-500 mt-0.5">Approved</div>
+            </div>
+            <div className="w-px bg-gray-100" />
+            <div>
+              <div className="text-3xl font-extrabold text-red-500">{stats.rejected}</div>
+              <div className="text-xs text-gray-500 mt-0.5">Rejected</div>
+            </div>
+          </div>
+          <div className="mt-3 h-2 rounded-full bg-gray-100 overflow-hidden">
+            <div className="h-2 rounded-full bg-green-500" style={{ width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
+          </div>
+          <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate</div>
+        </div>
+
+        {/* $ impacted */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5 col-span-1">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">$ Impact from Decisions</div>
+          <div className="text-3xl font-extrabold text-green-600">${(stats.approvedDollar / 1000).toFixed(0)}K</div>
+          <div className="text-xs text-gray-500 mt-0.5 mb-3">Unlocked via approved decisions</div>
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
+            <span>{stats.rejected} rejection{stats.rejected !== 1 ? 's' : ''} — opportunity cost tracked separately</span>
+          </div>
+        </div>
+
+        {/* Avg turnaround by criticality */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5 col-span-1">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Avg Turnaround by Criticality</div>
+          <div className="space-y-2">
+            {[
+              { level: 'critical', label: 'Critical', color: '#ef4444' },
+              { level: 'high',     label: 'High',     color: '#f59e0b' },
+              { level: 'medium',   label: 'Medium',   color: '#2196af' },
+            ].map(({ level, label, color }) => (
+              <div key={level} className="flex items-center gap-3">
+                <div className="w-14 text-xs font-semibold" style={{ color }}>{label}</div>
+                <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
+                  <div className="h-2 rounded-full" style={{ backgroundColor: color, width: `${stats.byLevel[level] ? Math.min((stats.byLevel[level] / 7) * 100, 100) : 0}%` }} />
+                </div>
+                <div className="w-12 text-right text-xs font-bold text-gray-700 tabular-nums">
+                  {stats.byLevel[level] != null ? `${stats.byLevel[level]}h` : '—'}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Criticality breakdown */}
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white border border-red-200 rounded-xl p-4">
@@ -330,7 +406,7 @@ function OverallTab({ onAgentClick }) {
                       </span>
                     </td>
                     <td className="py-2.5 px-4 text-center text-xs text-gray-600 tabular-nums">{row.turnaround}</td>
-                    <td className="py-2.5 px-4 text-center text-xs font-semibold text-gray-700">{row.dollarImpact}</td>
+                    <td className="py-2.5 px-4 text-center text-xs font-semibold text-gray-700">{row.dollarLabel}</td>
                   </tr>
                 );
               })}
@@ -375,13 +451,15 @@ function AgentTab({ agent, onAgentClick }) {
   const resolved = agentApprovals.filter(a => a.status !== 'pending');
   const totalStake = pending.reduce((s, a) => s + (a.dollarAtStake || 0), 0);
   const oldest = pending.length ? Math.max(...pending.map(a => a.hoursAgo)) : 0;
+  const agentHistory = approvalHistory.filter(h => h.agent === agent);
+  const stats = calcStats(agentHistory);
 
   // Category breakdown
   const categories = [...new Set(agentApprovals.map(a => a.category))];
 
   return (
     <div className="px-8 py-6 space-y-6">
-      {/* Agent highlights */}
+      {/* Agent highlights — top row */}
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Pending Approvals</div>
@@ -389,8 +467,8 @@ function AgentTab({ agent, onAgentClick }) {
           <div className="text-xs text-gray-400 mt-1">Awaiting human sign-off</div>
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">$ At Stake</div>
-          <div className="text-3xl font-extrabold text-gray-900">{totalStake > 0 ? `$${totalStake.toLocaleString()}` : '—'}</div>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">$ At Stake (Pending)</div>
+          <div className="text-3xl font-extrabold text-gray-900">{totalStake > 0 ? `$${(totalStake/1000).toFixed(0)}K` : '—'}</div>
           <div className="text-xs text-gray-400 mt-1">Across pending decisions</div>
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -404,6 +482,74 @@ function AgentTab({ agent, onAgentClick }) {
           <div className="text-xs text-gray-400 mt-1">No human action needed</div>
         </div>
       </div>
+
+      {/* Historical decision stats */}
+      {agentHistory.length > 0 && (
+        <div className="grid grid-cols-3 gap-4">
+          {/* Approved vs Rejected */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Approvals vs Rejections</div>
+            <div className="flex gap-6">
+              <div>
+                <div className="text-3xl font-extrabold text-green-600">{stats.approved}</div>
+                <div className="text-xs text-gray-500 mt-0.5">Approved</div>
+              </div>
+              <div className="w-px bg-gray-100" />
+              <div>
+                <div className="text-3xl font-extrabold text-red-500">{stats.rejected}</div>
+                <div className="text-xs text-gray-500 mt-0.5">Rejected</div>
+              </div>
+            </div>
+            {(stats.approved + stats.rejected) > 0 && (
+              <>
+                <div className="mt-3 h-2 rounded-full bg-gray-100 overflow-hidden">
+                  <div className="h-2 rounded-full bg-green-500" style={{ width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
+                </div>
+                <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate</div>
+              </>
+            )}
+          </div>
+
+          {/* $ unlocked */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">$ Unlocked by Approvals</div>
+            <div className="text-3xl font-extrabold text-green-600">{stats.approvedDollar > 0 ? `$${(stats.approvedDollar/1000).toFixed(0)}K` : '—'}</div>
+            <div className="text-xs text-gray-500 mt-0.5 mb-3">Recovered or projected incremental</div>
+            {stats.rejected > 0 && (
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
+                <span>{stats.rejected} rejection{stats.rejected !== 1 ? 's' : ''} — opportunity cost not quantified</span>
+              </div>
+            )}
+          </div>
+
+          {/* Avg turnaround by criticality */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3">Avg Turnaround by Criticality</div>
+            {['critical','high','medium'].some(l => stats.byLevel[l] != null) ? (
+              <div className="space-y-2">
+                {[
+                  { level: 'critical', label: 'Critical', color: '#ef4444' },
+                  { level: 'high',     label: 'High',     color: '#f59e0b' },
+                  { level: 'medium',   label: 'Medium',   color: meta.color },
+                ].map(({ level, label, color }) => (
+                  <div key={level} className="flex items-center gap-3">
+                    <div className="w-14 text-xs font-semibold" style={{ color }}>{label}</div>
+                    <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
+                      <div className="h-2 rounded-full" style={{ backgroundColor: color, width: `${stats.byLevel[level] ? Math.min((stats.byLevel[level] / 7) * 100, 100) : 0}%` }} />
+                    </div>
+                    <div className="w-12 text-right text-xs font-bold text-gray-700 tabular-nums">
+                      {stats.byLevel[level] != null ? `${stats.byLevel[level]}h` : '—'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs text-gray-400 mt-2">No resolved history yet</div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Categories */}
       {categories.length > 1 && (
@@ -475,7 +621,7 @@ function AgentTab({ agent, onAgentClick }) {
                       </span>
                     </td>
                     <td className="py-2.5 px-4 text-center text-xs text-gray-600 tabular-nums">{row.turnaround}</td>
-                    <td className="py-2.5 px-4 text-center text-xs font-semibold text-gray-700">{row.dollarImpact}</td>
+                    <td className="py-2.5 px-4 text-center text-xs font-semibold text-gray-700">{row.dollarLabel}</td>
                   </tr>
                 ))}
               </tbody>
@@ -542,10 +688,10 @@ export default function Approvals({ onAgentClick }) {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">At-Risk PTP Value</div>
-            <div className="text-4xl font-extrabold text-amber-600">$142K</div>
-            <div className="text-xs text-gray-400 mt-1">89 accounts · missed 1st installment</div>
-            <div className="text-xs text-gray-400 mt-1">620 total broken this placement</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">$ Unlocked by Approvals</div>
+            <div className="text-4xl font-extrabold text-green-600">$118K</div>
+            <div className="text-xs text-gray-400 mt-1">6 approved · 1 rejected this placement</div>
+            <div className="text-xs font-semibold text-green-600 mt-1">↑ Recovered or projected incremental</div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5">
