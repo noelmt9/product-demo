@@ -22,13 +22,11 @@ export default function Reports() {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Liquidation Rate</p>
           <div className="flex items-baseline gap-2 mb-2">
-            <p className="text-3xl font-semibold text-green-600 text-numeric">2.7%</p>
-            <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
+            <p className="text-3xl font-semibold text-gray-900 text-numeric">2.7%</p>
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">Above target</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-600">
-            <span className="text-green-600 font-medium">+50%</span>
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">+50%</span>
             <span>vs Week 1 (1.8%)</span>
           </div>
         </div>
@@ -42,7 +40,7 @@ export default function Reports() {
             </svg>
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-600">
-            <span className="text-green-600 font-medium">+23%</span>
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">+23%</span>
             <span>vs Week 1 (31%)</span>
           </div>
         </div>
@@ -56,7 +54,7 @@ export default function Reports() {
             </svg>
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-600">
-            <span className="text-green-600 font-medium">+50%</span>
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">+50%</span>
             <span>vs Week 1 (8%)</span>
           </div>
         </div>
@@ -64,7 +62,7 @@ export default function Reports() {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Compliance Score</p>
           <div className="flex items-baseline gap-2 mb-2">
-            <p className="text-3xl font-semibold text-green-600 text-numeric">99.86%</p>
+            <p className="text-3xl font-semibold text-gray-900 text-numeric">99.86%</p>
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-600">
             <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
@@ -86,11 +84,16 @@ export default function Reports() {
               <div className="space-y-3">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Liquidation</p>
-                  <p className={`text-2xl font-semibold text-numeric ${
-                    cohort.liquidation >= 3 ? 'text-green-600' : cohort.liquidation >= 2 ? 'text-amber-600' : 'text-gray-700'
-                  }`}>
-                    {cohort.liquidation}%
-                  </p>
+                  <div className="flex items-baseline gap-1.5">
+                    <p className="text-2xl font-semibold text-gray-900 text-numeric">
+                      {cohort.liquidation}%
+                    </p>
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                      cohort.liquidation >= 3 ? 'bg-green-50 text-green-700' : cohort.liquidation >= 2 ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {cohort.liquidation >= 3 ? 'Above' : cohort.liquidation >= 2 ? 'Near' : 'Below'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-gray-100">

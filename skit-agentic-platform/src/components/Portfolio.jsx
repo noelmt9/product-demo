@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 const originalCreditors = [
   {
-    name: 'Chase Bank',
+    name: 'Meridian Bank',
     debtType: 'Credit Card',
     accounts: 2840,
     totalBalance: 8200000,
@@ -18,7 +18,7 @@ const originalCreditors = [
     status: 'above',
   },
   {
-    name: 'Synchrony Financial',
+    name: 'Pinnacle Financial',
     debtType: 'Credit Card',
     accounts: 2180,
     totalBalance: 5960000,
@@ -32,7 +32,7 @@ const originalCreditors = [
     status: 'on-target',
   },
   {
-    name: 'Avant LLC',
+    name: 'Crestline Lending',
     debtType: 'Personal Loan',
     accounts: 1920,
     totalBalance: 6720000,
@@ -46,7 +46,7 @@ const originalCreditors = [
     status: 'below',
   },
   {
-    name: 'LendingClub',
+    name: 'Harbor Finance',
     debtType: 'Personal Loan',
     accounts: 1440,
     totalBalance: 5040000,
@@ -60,7 +60,7 @@ const originalCreditors = [
     status: 'below',
   },
   {
-    name: 'Envision Healthcare',
+    name: 'Clearview Medical Group',
     debtType: 'Medical',
     accounts: 2040,
     totalBalance: 3570000,
@@ -74,7 +74,7 @@ const originalCreditors = [
     status: 'above',
   },
   {
-    name: 'LifePoint Health',
+    name: 'Summit Health Systems',
     debtType: 'Medical',
     accounts: 1580,
     totalBalance: 2133000,
@@ -87,6 +87,57 @@ const originalCreditors = [
     states: ['TX', 'CA', 'NY'],
     status: 'above',
   },
+];
+
+// ── Cohorts & campaigns per client ──────────────────────────────────────────
+
+const clientCohorts = {
+  'Meridian Bank': [
+    { cohort: 'High Prop / High Bal', accounts: 620, collected: 84200, avgBal: 4200, debtAge: '8 mo', debtType: 'Credit Card', strategy: 'Voice AI + Human escalation', channels: ['Voice', 'SMS', 'Human'], liqRate: 3.4 },
+    { cohort: 'High Prop / Low Bal', accounts: 480, collected: 38400, avgBal: 1100, debtAge: '9 mo', debtType: 'Credit Card', strategy: 'Digital only', channels: ['SMS', 'Email'], liqRate: 2.9 },
+    { cohort: 'Medium Prop / All Bal', accounts: 740, collected: 48100, avgBal: 2800, debtAge: '12 mo', debtType: 'Credit Card', strategy: 'Multi-channel blitz', channels: ['Voice', 'SMS', 'Email'], liqRate: 2.4 },
+    { cohort: 'Low Prop / High Bal', accounts: 340, collected: 22100, avgBal: 5100, debtAge: '18 mo', debtType: 'Credit Card', strategy: 'Human agent priority', channels: ['Human', 'SMS'], liqRate: 1.6 },
+    { cohort: 'Low Prop / Low Bal', accounts: 280, collected: 4200, avgBal: 900, debtAge: '22 mo', debtType: 'Credit Card', strategy: 'Email only, monthly', channels: ['Email'], liqRate: 0.5 },
+    { cohort: 'Medical Subset', accounts: 180, collected: 12400, avgBal: 1800, debtAge: '7 mo', debtType: 'Medical', strategy: 'Empathetic voice', channels: ['Voice'], liqRate: 3.1 },
+    { cohort: 'Spanish Preference', accounts: 120, collected: 8200, avgBal: 2400, debtAge: '10 mo', debtType: 'Credit Card', strategy: 'Spanish SMS + Voice', channels: ['Voice', 'SMS'], liqRate: 2.8 },
+    { cohort: 'Tertiary Placement', accounts: 80, collected: 3800, avgBal: 3200, debtAge: '30 mo', debtType: 'Credit Card', strategy: 'Email nurture only', channels: ['Email'], liqRate: 0.3 },
+  ],
+  'Pinnacle Financial': [
+    { cohort: 'High Prop / All Bal', accounts: 540, collected: 52200, avgBal: 3200, debtAge: '10 mo', debtType: 'Credit Card', strategy: 'Voice AI first', channels: ['Voice', 'SMS'], liqRate: 3.0 },
+    { cohort: 'Medium Prop', accounts: 780, collected: 48600, avgBal: 2400, debtAge: '14 mo', debtType: 'Credit Card', strategy: 'SMS + Email', channels: ['SMS', 'Email'], liqRate: 2.2 },
+    { cohort: 'Low Prop / High Bal', accounts: 420, collected: 28400, avgBal: 4800, debtAge: '19 mo', debtType: 'Credit Card', strategy: 'Human agent', channels: ['Human'], liqRate: 1.4 },
+    { cohort: 'Low Prop / Low Bal', accounts: 440, collected: 14200, avgBal: 1100, debtAge: '20 mo', debtType: 'Credit Card', strategy: 'Email only', channels: ['Email'], liqRate: 0.4 },
+  ],
+  'Crestline Lending': [
+    { cohort: 'High Prop', accounts: 380, collected: 42800, avgBal: 3800, debtAge: '12 mo', debtType: 'Personal Loan', strategy: 'Voice AI + settlement SMS', channels: ['Voice', 'SMS'], liqRate: 2.6 },
+    { cohort: 'Medium Prop', accounts: 640, collected: 44200, avgBal: 3200, debtAge: '17 mo', debtType: 'Personal Loan', strategy: 'Multi-channel', channels: ['Voice', 'SMS', 'Email'], liqRate: 1.7 },
+    { cohort: 'Low Prop', accounts: 900, collected: 33960, avgBal: 3600, debtAge: '22 mo', debtType: 'Personal Loan', strategy: 'Email nurture', channels: ['Email'], liqRate: 0.6 },
+  ],
+  'Harbor Finance': [
+    { cohort: 'High Prop', accounts: 320, collected: 36400, avgBal: 4100, debtAge: '14 mo', debtType: 'Personal Loan', strategy: 'Voice AI priority', channels: ['Voice', 'SMS'], liqRate: 2.8 },
+    { cohort: 'Medium Prop', accounts: 520, collected: 34200, avgBal: 3200, debtAge: '19 mo', debtType: 'Personal Loan', strategy: 'SMS + Human', channels: ['SMS', 'Human'], liqRate: 1.8 },
+    { cohort: 'Low Prop', accounts: 600, collected: 25160, avgBal: 3400, debtAge: '24 mo', debtType: 'Personal Loan', strategy: 'Digital only', channels: ['Email', 'SMS'], liqRate: 0.5 },
+  ],
+  'Clearview Medical Group': [
+    { cohort: 'High Prop / Empathetic', accounts: 680, collected: 58400, avgBal: 1900, debtAge: '6 mo', debtType: 'Medical', strategy: 'Empathetic Voice AI', channels: ['Voice'], liqRate: 4.6 },
+    { cohort: 'Medium Prop', accounts: 820, collected: 52800, avgBal: 1700, debtAge: '11 mo', debtType: 'Medical', strategy: 'SMS + Email', channels: ['SMS', 'Email'], liqRate: 3.2 },
+    { cohort: 'Low Prop', accounts: 540, collected: 24460, avgBal: 1400, debtAge: '16 mo', debtType: 'Medical', strategy: 'Email only', channels: ['Email'], liqRate: 1.4 },
+  ],
+  'Summit Health Systems': [
+    { cohort: 'High Prop', accounts: 520, collected: 38200, avgBal: 1500, debtAge: '5 mo', debtType: 'Medical', strategy: 'Empathetic Voice + SMS', channels: ['Voice', 'SMS'], liqRate: 5.1 },
+    { cohort: 'Medium Prop', accounts: 640, collected: 34800, avgBal: 1300, debtAge: '10 mo', debtType: 'Medical', strategy: 'SMS campaign', channels: ['SMS', 'Email'], liqRate: 3.6 },
+    { cohort: 'Low Prop', accounts: 420, collected: 17000, avgBal: 1200, debtAge: '14 mo', debtType: 'Medical', strategy: 'Email nurture', channels: ['Email'], liqRate: 1.8 },
+  ],
+};
+
+// ── Ageing buckets ──────────────────────────────────────────────────────────
+
+const ageingBuckets = [
+  { label: '0-6 months', accounts: 2160, balance: 5940000, liqRate: 3.8, contactRate: 48, note: 'Freshest accounts, highest propensity' },
+  { label: '6-12 months', accounts: 3840, balance: 10750000, liqRate: 2.9, contactRate: 41, note: 'Primary placement bulk' },
+  { label: '12-18 months', accounts: 3120, balance: 8740000, liqRate: 2.2, contactRate: 35, note: 'Secondary placement, moderate returns' },
+  { label: '18-24 months', accounts: 1680, balance: 4700000, liqRate: 1.4, contactRate: 26, note: 'Tertiary, stale contact info' },
+  { label: '24+ months', accounts: 1200, balance: 3500000, liqRate: 0.6, contactRate: 14, note: 'Low yield, enrichment dependent' },
 ];
 
 // ── Portfolio placement metadata (read-only from placement file) ──────────────
@@ -139,6 +190,10 @@ export default function Portfolio() {
   const [sortBy, setSortBy] = useState('accounts');
   const [sortDir, setSortDir] = useState('desc');
   const [expandedCreditor, setExpandedCreditor] = useState(null);
+  const [viewBy, setViewBy] = useState('client');
+  const [viewDropdownOpen, setViewDropdownOpen] = useState(false);
+  const [hoveredCohort, setHoveredCohort] = useState(null);
+  const [cohortView, setCohortView] = useState('table'); // 'table' | 'chart'
 
   const handleFileSelect = (e) => { const f = e.target.files[0]; if (f) setSelectedFile(f); };
 
@@ -223,36 +278,60 @@ export default function Portfolio() {
         {/* ── PLACEMENT SUMMARY CARDS ──────────────────────────────────────── */}
         <div className="grid grid-cols-6 gap-4">
           {[
-            { label: 'Total Accounts', value: placementMeta.totalRows.toLocaleString(), sub: `From ${placementMeta.uploadedAt.split('·')[0].trim()}`, color: null },
-            { label: 'Clean Accounts', value: placementMeta.cleanRows.toLocaleString(), sub: `${((placementMeta.cleanRows/placementMeta.totalRows)*100).toFixed(1)}% of total`, color: '#61ab5e' },
-            { label: 'Flagged', value: placementMeta.flaggedRows.toString(), sub: 'Missing contact / duplicate', color: '#f59e0b' },
-            { label: 'Total Balance', value: `$${(placementMeta.totalBalance/1000000).toFixed(1)}M`, sub: 'Face value at placement', color: null },
-            { label: 'Avg Balance', value: `$${placementMeta.avgBalance.toLocaleString()}`, sub: 'Across all accounts', color: null },
-            { label: 'Avg CO Age', value: `${placementMeta.avgChargeoffAge} mo`, sub: 'Since charge-off date', color: null },
+            { label: 'Total Accounts', value: placementMeta.totalRows.toLocaleString(), sub: `From ${placementMeta.uploadedAt.split('·')[0].trim()}`, badge: null },
+            { label: 'Clean Accounts', value: placementMeta.cleanRows.toLocaleString(), sub: `${((placementMeta.cleanRows/placementMeta.totalRows)*100).toFixed(1)}% of total`, badge: { className: 'bg-green-50 text-green-700', text: 'Clean' } },
+            { label: 'Flagged', value: placementMeta.flaggedRows.toString(), sub: 'Missing contact / duplicate', badge: { className: 'bg-amber-50 text-amber-700', text: 'Review' } },
+            { label: 'Total Balance', value: `$${(placementMeta.totalBalance/1000000).toFixed(1)}M`, sub: 'Face value at placement', badge: null },
+            { label: 'Avg Balance', value: `$${placementMeta.avgBalance.toLocaleString()}`, sub: 'Across all accounts', badge: null },
+            { label: 'Avg CO Age', value: `${placementMeta.avgChargeoffAge} mo`, sub: 'Since charge-off date', badge: null },
           ].map((card, i) => (
             <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
               <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{card.label}</div>
-              <div className="text-2xl font-extrabold" style={{ color: card.color || '#111827' }}>{card.value}</div>
+              <div className="flex items-baseline gap-1.5">
+                <div className="text-2xl font-extrabold text-gray-900">{card.value}</div>
+                {card.badge && <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${card.badge.className}`}>{card.badge.text}</span>}
+              </div>
               <div className="text-xs text-gray-400 mt-0.5">{card.sub}</div>
             </div>
           ))}
         </div>
 
-        {/* ── ORIGINAL CREDITOR BREAKDOWN — horizontal bar view ────────────── */}
+        {/* ── BREAKDOWN VIEW ────────────────────────────────────────────────── */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-6 pt-5 pb-4 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Original Creditor Breakdown</h2>
-                <p className="text-xs text-gray-400 mt-0.5">Accounts and collections by original creditor — from placement file</p>
+              <div className="flex items-center gap-3">
+                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Portfolio Breakdown</h2>
+                {/* View By dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setViewDropdownOpen(!viewDropdownOpen)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 transition-all"
+                    style={{ background: '#f0f8f6', border: '1px solid #d4eae5' }}
+                  >
+                    View by: {viewBy === 'client' ? 'Client' : viewBy === 'debtType' ? 'Debt Type' : 'Ageing'}
+                    <span className={`material-symbols-outlined text-xs transition-transform ${viewDropdownOpen ? 'rotate-180' : ''}`} style={{ fontSize: 14 }}>expand_more</span>
+                  </button>
+                  {viewDropdownOpen && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setViewDropdownOpen(false)} />
+                      <div className="absolute top-9 left-0 w-40 rounded-xl shadow-lg z-20 py-1" style={{ background: '#ffffff', border: '1px solid #d4eae5' }}>
+                        {[{ id: 'client', label: 'Client' }, { id: 'debtType', label: 'Debt Type' }, { id: 'ageing', label: 'Ageing' }].map(opt => (
+                          <button
+                            key={opt.id}
+                            onClick={() => { setViewBy(opt.id); setViewDropdownOpen(false); setExpandedCreditor(null); }}
+                            className={`w-full text-left px-3 py-2 text-xs transition-colors ${viewBy === opt.id ? 'font-semibold text-gray-900' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}`}
+                            style={viewBy === opt.id ? { background: '#f0f8f6' } : {}}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-3">
-                {/* Legend */}
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm inline-block" style={{ backgroundColor: '#2196af' }} /><span className="text-xs text-gray-500">Accounts</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-2.5 rounded-sm inline-block" style={{ backgroundColor: '#61ab5e' }} /><span className="text-xs text-gray-500">Collected</span></div>
-                </div>
-                {/* Search */}
                 <div className="relative">
                   <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -260,108 +339,319 @@ export default function Portfolio() {
                   <input
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Search creditor..."
-                    className="pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none w-44"
+                    placeholder="Search..."
+                    className="pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none w-36"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Column headers */}
-          <div className="grid px-6 py-2 border-b border-gray-100" style={{ gridTemplateColumns: '180px 90px 1fr 90px' }}>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Creditor</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Debt Type</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 pl-1">Accounts · Collected</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Liq Rate · Status</div>
-          </div>
-
-          {/* Rows */}
-          <div className="divide-y divide-gray-50">
-            {(() => {
-              const maxAccounts = Math.max(...originalCreditors.map(c => c.accounts));
-              const maxCollected = Math.max(...originalCreditors.map(c => c.collected));
-              return filtered.map((c, i) => {
-                const accPct = (c.accounts / maxAccounts) * 100;
-                const colPct = (c.collected / maxCollected) * 100;
+          {/* ── CLIENT VIEW ─────────────────────────────────────────────────── */}
+          {viewBy === 'client' && (<>
+            {/* Column headers */}
+            <div className="grid px-6 py-2.5 border-b border-gray-100" style={{ gridTemplateColumns: '1fr 90px 100px 100px 80px' }}>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Creditor</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Accounts</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Balance</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Collected</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Liq Rate</div>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {filtered.map((c, i) => {
+                const isExpanded = expandedCreditor === c.name;
+                const cohorts = clientCohorts[c.name] || [];
                 return (
-                  <div key={i} className="grid items-center px-6 py-3.5 hover:bg-gray-50 transition-colors" style={{ gridTemplateColumns: '180px 90px 1fr 90px' }}>
-                    {/* A: Creditor name */}
-                    <div className="pr-3">
-                      <div className="text-sm font-semibold text-gray-900 leading-tight truncate">{c.name}</div>
-                      <div className="text-[10px] text-gray-400 mt-0.5 tabular-nums">{c.totalBalance >= 1000000 ? `$${(c.totalBalance/1000000).toFixed(1)}M` : `$${(c.totalBalance/1000).toFixed(0)}K`} total balance</div>
-                    </div>
-
-                    {/* B: Debt type badge */}
-                    <div>
-                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap ${
-                        c.debtType === 'Credit Card' ? 'bg-blue-100 text-blue-700' :
-                        c.debtType === 'Medical' ? 'bg-red-100 text-red-700' :
-                        'bg-purple-100 text-purple-700'
-                      }`}>{c.debtType}</span>
-                    </div>
-
-                    {/* C + G: Horizontal bars for accounts and collected */}
-                    <div className="px-1 space-y-1.5">
-                      {/* Accounts bar */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#e8f4f8' }}>
-                          <div
-                            className="h-5 rounded flex items-center px-2"
-                            style={{ width: `${accPct}%`, backgroundColor: '#2196af', minWidth: '32px' }}
-                          >
-                            <span className="text-[10px] font-semibold text-white whitespace-nowrap">{c.accounts.toLocaleString()}</span>
+                  <div key={i}>
+                    {/* Creditor row */}
+                    <div
+                      onClick={() => { setExpandedCreditor(isExpanded ? null : c.name); setHoveredCohort(null); }}
+                      className={`grid items-center px-6 py-3 cursor-pointer transition-colors ${isExpanded ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+                      style={{ gridTemplateColumns: '1fr 90px 100px 100px 80px' }}
+                    >
+                      <div className="flex items-center gap-2 pr-3 min-w-0">
+                        <span className={`material-symbols-outlined text-gray-400 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`} style={{ fontSize: 14 }}>chevron_right</span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-gray-900 truncate">{c.name}</span>
+                            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0 ${
+                              c.debtType === 'Credit Card' ? 'bg-blue-50 text-blue-700' :
+                              c.debtType === 'Medical' ? 'bg-red-50 text-red-700' :
+                              'bg-purple-50 text-purple-700'
+                            }`}>{c.debtType}</span>
                           </div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">avg {c.avgChargeoffAge} mo since charge-off</div>
                         </div>
                       </div>
-                      {/* Collected bar */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#e8f5e2' }}>
-                          <div
-                            className="h-5 rounded flex items-center px-2"
-                            style={{ width: `${colPct}%`, backgroundColor: '#61ab5e', minWidth: '52px' }}
-                          >
-                            <span className="text-[10px] font-semibold text-white whitespace-nowrap">${c.collected.toLocaleString()}</span>
-                          </div>
-                        </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-gray-900 tabular-nums">{c.accounts.toLocaleString()}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-gray-900 tabular-nums">{c.totalBalance >= 1000000 ? `$${(c.totalBalance/1000000).toFixed(1)}M` : `$${(c.totalBalance/1000).toFixed(0)}K`}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-gray-900 tabular-nums">${c.collected.toLocaleString()}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-gray-900 tabular-nums">{c.liquidationRate}%</div>
+                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
+                          c.status === 'above' ? 'bg-emerald-50 text-emerald-700' :
+                          c.status === 'on-target' ? 'bg-blue-50 text-blue-700' :
+                          'bg-amber-50 text-amber-700'
+                        }`}>
+                          {c.status === 'above' ? '↑ Above' : c.status === 'on-target' ? 'On target' : '↓ Below'}
+                        </span>
                       </div>
                     </div>
 
-                    {/* H + K: Liq rate + status */}
-                    <div className="pl-3 text-right">
-                      <div className={`text-lg font-extrabold tabular-nums leading-tight ${
-                        c.liquidationRate >= 3 ? 'text-green-600' :
-                        c.liquidationRate >= 2 ? 'text-blue-600' :
-                        'text-amber-600'
-                      }`}>{c.liquidationRate}%</div>
-                      <div className="text-[9px] text-gray-400 mb-1">liq rate</div>
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                        c.status === 'above' ? 'bg-green-100 text-green-700' :
-                        c.status === 'on-target' ? 'bg-blue-100 text-blue-700' :
-                        'bg-amber-100 text-amber-700'
-                      }`}>
-                        {c.status === 'above' ? '↑ Above' : c.status === 'on-target' ? '✓ On target' : '↓ Below'}
-                      </span>
-                    </div>
+                    {/* Expanded: cohort breakdown */}
+                    {isExpanded && cohorts.length > 0 && (() => {
+                      const totalCollected = cohorts.reduce((s, ch) => s + ch.collected, 0);
+                      const maxCohortCollected = Math.max(...cohorts.map(ch => ch.collected));
+                      return (
+                      <div className="animate-fadeIn" style={{ background: '#f8fcfb' }}>
+                        {/* Toggle: Table / Chart */}
+                        <div className="flex items-center justify-between px-6 py-2 ml-6" style={{ borderBottom: '1px solid #ecf6f3' }}>
+                          <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400">{cohorts.length} cohorts</div>
+                          <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setCohortView('table'); }}
+                              className={`px-2.5 py-1 text-[10px] font-medium transition-all ${cohortView === 'table' ? 'text-white' : 'text-gray-500'}`}
+                              style={cohortView === 'table' ? { background: '#2196af' } : {}}
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: 12 }}>table_rows</span>
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setCohortView('chart'); }}
+                              className={`px-2.5 py-1 text-[10px] font-medium transition-all ${cohortView === 'chart' ? 'text-white' : 'text-gray-500'}`}
+                              style={cohortView === 'chart' ? { background: '#2196af' } : {}}
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: 12 }}>bar_chart</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {cohortView === 'table' ? (
+                          <>
+                            {/* Table sub-header */}
+                            <div className="grid px-6 py-1.5 ml-6" style={{ gridTemplateColumns: '1fr 80px 80px 70px 60px 80px', borderBottom: '1px solid #ecf6f3' }}>
+                              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Cohort</div>
+                              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">Collected</div>
+                              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">% Share</div>
+                              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">Liq Rate</div>
+                              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">Age</div>
+                              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-center">Channels</div>
+                            </div>
+                            {cohorts.map((ch, j) => {
+                              const collPct = Math.round((ch.collected / totalCollected) * 100);
+                              const isHovered = hoveredCohort === `${c.name}-${j}`;
+                              const someHovered = hoveredCohort && hoveredCohort.startsWith(c.name);
+                              const dimmed = someHovered && !isHovered;
+                              return (
+                                <div
+                                  key={j}
+                                  onMouseEnter={() => setHoveredCohort(`${c.name}-${j}`)}
+                                  onMouseLeave={() => setHoveredCohort(null)}
+                                  className={`grid items-center px-6 py-2 ml-6 transition-all ${isHovered ? 'bg-white' : ''}`}
+                                  style={{ gridTemplateColumns: '1fr 80px 80px 70px 60px 80px', opacity: dimmed ? 0.25 : 1, borderBottom: '1px solid #ecf6f3' }}
+                                >
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-xs font-medium ${isHovered ? 'text-gray-900' : 'text-gray-700'}`}>{ch.cohort}</span>
+                                      <span className={`text-[8px] font-semibold px-1 py-0.5 rounded flex-shrink-0 ${
+                                        ch.debtType === 'Credit Card' ? 'bg-blue-50 text-blue-600' :
+                                        ch.debtType === 'Medical' ? 'bg-red-50 text-red-600' :
+                                        'bg-purple-50 text-purple-600'
+                                      }`}>{ch.debtType}</span>
+                                    </div>
+                                    <div className="text-[10px] text-gray-400">{ch.accounts.toLocaleString()} accounts · ${ch.avgBal.toLocaleString()} avg</div>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className={`text-xs font-bold tabular-nums ${isHovered ? 'text-gray-900' : 'text-gray-600'}`}>${(ch.collected/1000).toFixed(0)}K</span>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className={`text-[11px] font-bold tabular-nums ${isHovered ? 'text-gray-900' : 'text-gray-500'}`}>{collPct}%</span>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className={`text-xs font-bold tabular-nums ${isHovered ? 'text-gray-900' : 'text-gray-600'}`}>{ch.liqRate}%</span>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className="text-xs text-gray-500 tabular-nums">{ch.debtAge}</span>
+                                  </div>
+                                  <div className="flex gap-0.5 justify-center">
+                                    {ch.channels.map(chan => (
+                                      <span key={chan} className={`text-[7px] font-semibold px-1 py-0.5 rounded ${
+                                        chan === 'Voice' ? 'bg-emerald-50 text-emerald-700' :
+                                        chan === 'SMS' ? 'bg-blue-50 text-blue-700' :
+                                        chan === 'Email' ? 'bg-purple-50 text-purple-700' :
+                                        'bg-amber-50 text-amber-700'
+                                      }`}>{chan}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </>
+                        ) : (
+                          /* Chart view: dual bars — collected + liq rate */
+                          <div className="px-6 py-3 ml-6">
+                            <div className="flex items-center gap-4 mb-3">
+                              <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ background: '#2196af' }} /><span className="text-[9px] text-gray-400">Collected ($)</span></div>
+                              <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ background: '#61ab5e' }} /><span className="text-[9px] text-gray-400">Liq Rate (%)</span></div>
+                            </div>
+                            {cohorts.map((ch, j) => {
+                              const collPct = (ch.collected / totalCollected) * 100;
+                              const maxLiq = Math.max(...cohorts.map(x => x.liqRate));
+                              const liqBarPct = (ch.liqRate / maxLiq) * 100;
+                              const isHovered = hoveredCohort === `${c.name}-${j}`;
+                              const someHovered = hoveredCohort && hoveredCohort.startsWith(c.name);
+                              const dimmed = someHovered && !isHovered;
+                              return (
+                                <div
+                                  key={j}
+                                  onMouseEnter={() => setHoveredCohort(`${c.name}-${j}`)}
+                                  onMouseLeave={() => setHoveredCohort(null)}
+                                  className="transition-all cursor-pointer py-1.5"
+                                  style={{ opacity: dimmed ? 0.25 : 1, borderTop: j > 0 ? '1px solid #ecf6f3' : 'none' }}
+                                >
+                                  <div className="flex items-center justify-between mb-1.5">
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-[11px] font-semibold ${isHovered ? 'text-gray-900' : 'text-gray-700'}`}>{ch.cohort}</span>
+                                      <span className={`text-[8px] font-semibold px-1 py-0.5 rounded flex-shrink-0 ${
+                                        ch.debtType === 'Credit Card' ? 'bg-blue-50 text-blue-600' :
+                                        ch.debtType === 'Medical' ? 'bg-red-50 text-red-600' :
+                                        'bg-purple-50 text-purple-600'
+                                      }`}>{ch.debtType}</span>
+                                      <span className="text-[10px] text-gray-400">{ch.debtAge}</span>
+                                    </div>
+                                  </div>
+                                  {/* Collected bar */}
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <div className="flex-1 h-3 rounded" style={{ background: '#e8f4f8' }}>
+                                      <div className="h-3 rounded" style={{ width: `${collPct}%`, background: isHovered ? '#2196af' : '#2196af80', minWidth: '4px' }} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-gray-700 tabular-nums w-12 text-right">${(ch.collected/1000).toFixed(0)}K</span>
+                                  </div>
+                                  {/* Liq rate bar */}
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex-1 h-3 rounded" style={{ background: '#e8f5e2' }}>
+                                      <div className="h-3 rounded" style={{ width: `${liqBarPct}%`, background: isHovered ? '#61ab5e' : '#61ab5e80', minWidth: '4px' }} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-gray-700 tabular-nums w-12 text-right">{ch.liqRate}%</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                      );
+                    })()}
                   </div>
                 );
-              });
-            })()}
-          </div>
+              })}
+            </div>
+            {/* Footer */}
+            <div className="grid px-6 py-3 border-t-2" style={{ gridTemplateColumns: '1fr 90px 100px 100px 80px', borderColor: '#d4eae5', backgroundColor: '#f8fcfb' }}>
+              <div className="text-xs font-bold text-gray-900 pl-5">Total · {filtered.length} creditors</div>
+              <div className="text-right text-xs font-bold text-gray-900 tabular-nums">{originalCreditors.reduce((s,c)=>s+c.accounts,0).toLocaleString()}</div>
+              <div className="text-right text-xs font-bold text-gray-900 tabular-nums">${(originalCreditors.reduce((s,c)=>s+c.totalBalance,0)/1000000).toFixed(1)}M</div>
+              <div className="text-right text-xs font-bold text-gray-900 tabular-nums">${originalCreditors.reduce((s,c)=>s+c.collected,0).toLocaleString()}</div>
+              <div className="text-right text-xs font-bold text-gray-900 tabular-nums">2.7%</div>
+            </div>
+          </>)}
 
-          {/* Totals footer */}
-          <div className="grid px-6 py-3 border-t-2" style={{ gridTemplateColumns: '180px 90px 1fr 90px', borderColor: '#d4eae5', backgroundColor: '#f8fcfb' }}>
-            <div className="text-xs font-bold text-gray-900">Total · 6 creditors</div>
-            <div />
-            <div className="px-1 space-y-1">
-              <div className="text-xs text-gray-500 tabular-nums"><span className="font-bold text-gray-900">{originalCreditors.reduce((s,c)=>s+c.accounts,0).toLocaleString()}</span> accounts</div>
-              <div className="text-xs text-gray-500 tabular-nums"><span className="font-bold text-gray-900">${originalCreditors.reduce((s,c)=>s+c.collected,0).toLocaleString()}</span> collected</div>
+          {/* ── DEBT TYPE VIEW ────────────────────────────────────────────────── */}
+          {viewBy === 'debtType' && (<>
+            <div className="divide-y divide-gray-50">
+              {['Credit Card', 'Personal Loan', 'Medical'].map(dt => {
+                const creditors = originalCreditors.filter(c => c.debtType === dt);
+                const totalAccounts = creditors.reduce((s,c) => s+c.accounts, 0);
+                const totalCollected = creditors.reduce((s,c) => s+c.collected, 0);
+                const totalBalance = creditors.reduce((s,c) => s+c.totalBalance, 0);
+                const avgLiq = creditors.reduce((s,c) => s+c.liquidationRate*c.accounts, 0) / totalAccounts;
+                const isExpanded = expandedCreditor === dt;
+                return (
+                  <div key={dt}>
+                    <div
+                      onClick={() => setExpandedCreditor(isExpanded ? null : dt)}
+                      className={`flex items-center px-6 py-4 cursor-pointer transition-colors ${isExpanded ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+                    >
+                      <span className={`material-symbols-outlined text-gray-400 transition-transform mr-3 ${isExpanded ? 'rotate-90' : ''}`} style={{ fontSize: 14 }}>chevron_right</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-sm font-bold text-gray-900">{dt}</span>
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                            dt === 'Credit Card' ? 'bg-blue-100 text-blue-700' :
+                            dt === 'Medical' ? 'bg-red-100 text-red-700' :
+                            'bg-purple-100 text-purple-700'
+                          }`}>{creditors.length} creditors</span>
+                        </div>
+                        <div className="text-xs text-gray-400">{totalAccounts.toLocaleString()} accounts · ${(totalBalance/1000000).toFixed(1)}M balance</div>
+                      </div>
+                      <div className="flex items-center gap-6 flex-shrink-0">
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-gray-900 tabular-nums">${totalCollected.toLocaleString()}</div>
+                          <div className="text-[10px] text-gray-400">collected</div>
+                        </div>
+                        <div className="text-right w-16">
+                          <div className="text-lg font-bold text-gray-900 tabular-nums">{avgLiq.toFixed(1)}%</div>
+                          <div className="text-[10px] text-gray-400">avg liq</div>
+                        </div>
+                      </div>
+                    </div>
+                    {isExpanded && (
+                      <div className="px-6 pb-4 animate-fadeIn" style={{ background: '#f8fcfb' }}>
+                        <div className="ml-5 pl-4 space-y-0" style={{ borderLeft: '2px solid #d4eae5' }}>
+                          {creditors.map((cr, j) => (
+                            <div key={j} className="flex items-center gap-4 py-2.5" style={{ borderTop: j > 0 ? '1px solid #ecf6f3' : 'none' }}>
+                              <div className="w-40"><div className="text-xs font-medium text-gray-800">{cr.name}</div><div className="text-[10px] text-gray-400">{cr.accounts.toLocaleString()} accounts</div></div>
+                              <div className="flex-1 text-xs text-gray-500">Contact {cr.contactRate}% · PTP {cr.ptpRate}%</div>
+                              <div className="text-right w-20"><div className="text-sm font-bold text-gray-900 tabular-nums">{cr.liquidationRate}%</div></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <div className="pl-3 text-right">
-              <div className="text-lg font-extrabold tabular-nums" style={{ color: '#2196af' }}>2.7%</div>
-              <div className="text-[9px] text-gray-400">portfolio avg</div>
+          </>)}
+
+          {/* ── AGEING VIEW ──────────────────────────────────────────────────── */}
+          {viewBy === 'ageing' && (<>
+            <div className="grid px-6 py-2 border-b border-gray-100" style={{ gridTemplateColumns: '140px 1fr 80px 80px 80px' }}>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Age Bucket</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Accounts · Balance</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Liq Rate</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Contact</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Notes</div>
             </div>
-          </div>
+            <div className="divide-y divide-gray-50">
+              {ageingBuckets.map((b, i) => {
+                const pct = (b.accounts / 12000) * 100;
+                return (
+                  <div key={i} className="grid items-center px-6 py-3.5 hover:bg-gray-50" style={{ gridTemplateColumns: '140px 1fr 80px 80px 80px' }}>
+                    <div className="text-sm font-semibold text-gray-900">{b.label}</div>
+                    <div className="px-1">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#e8f4f8' }}>
+                          <div className="h-5 rounded flex items-center px-2" style={{ width: `${pct}%`, backgroundColor: '#2196af', minWidth: '40px' }}>
+                            <span className="text-[10px] font-semibold text-white whitespace-nowrap">{b.accounts.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        <span className="text-xs text-gray-400 tabular-nums flex-shrink-0 w-14 text-right">${(b.balance/1000000).toFixed(1)}M</span>
+                      </div>
+                    </div>
+                    <div className="text-right"><div className="text-sm font-bold text-gray-900 tabular-nums">{b.liqRate}%</div></div>
+                    <div className="text-right"><div className="text-sm text-gray-600 tabular-nums">{b.contactRate}%</div></div>
+                    <div className="text-right"><div className="text-[10px] text-gray-400">{b.note.split(',')[0]}</div></div>
+                  </div>
+                );
+              })}
+            </div>
+          </>)}
         </div>
 
         {/* ── PORTFOLIO COMPOSITION ────────────────────────────────────────── */}
@@ -422,16 +712,16 @@ export default function Portfolio() {
               <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Data Quality</h3>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="rounded-lg p-2" style={{ backgroundColor: '#f0faf8' }}>
-                  <div className="text-lg font-bold text-green-700">{placementMeta.cleanRows.toLocaleString()}</div>
-                  <div className="text-[10px] text-gray-500">Clean</div>
+                  <div className="text-lg font-bold text-gray-900">{placementMeta.cleanRows.toLocaleString()}</div>
+                  <div className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700 inline-block">Clean</div>
                 </div>
                 <div className="rounded-lg p-2 bg-amber-50">
-                  <div className="text-lg font-bold text-amber-700">{placementMeta.flaggedRows}</div>
-                  <div className="text-[10px] text-gray-500">Flagged</div>
+                  <div className="text-lg font-bold text-gray-900">{placementMeta.flaggedRows}</div>
+                  <div className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 inline-block">Flagged</div>
                 </div>
                 <div className="rounded-lg p-2 bg-blue-50">
-                  <div className="text-lg font-bold text-blue-700">878</div>
-                  <div className="text-[10px] text-gray-500">Enriched</div>
+                  <div className="text-lg font-bold text-gray-900">878</div>
+                  <div className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 inline-block">Enriched</div>
                 </div>
               </div>
             </div>
@@ -461,7 +751,7 @@ export default function Portfolio() {
                       <div className="h-2 rounded-full" style={{ width: `${c.after}%`, backgroundColor: '#2196af' }} />
                     </div>
                   </div>
-                  <div className="text-xs font-bold text-green-600 w-12 text-right">+{c.after - c.before}pts</div>
+                  <div className="w-16 text-right"><span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">+{c.after - c.before}pts</span></div>
                 </div>
               </div>
             ))}

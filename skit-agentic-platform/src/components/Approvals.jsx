@@ -24,7 +24,7 @@ const allApprovals = [
   {
     id: 2, agent: 'Manager', approver: 'Auditor',
     decision: 'Agent Settlement Protocol: $12K batch authorization',
-    details: 'Recovery Agent initiated a new settlement protocol for the Southwest Residential Portfolio. Proposed settlement: $12,475 currently at 4-day delinquency.',
+    details: 'Collector proposed a new settlement protocol for the Medium Propensity cohort. Proposed settlement: $12,475 at 15% discount for accounts with 2+ broken promises.',
     businessCase: 'Expected recovery: $512K · Settlement cost: $62K discount · Net gain: $450K · Each week of delay costs ~$8-12K in recovery probability',
     counterfactual: 'If rejected: accounts age 30+ days, reducing recovery probability by ~40% ($180K at risk).',
     dollarAtStake: 450000, criticality: 'critical', status: 'pending', hoursAgo: 4,

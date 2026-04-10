@@ -368,7 +368,7 @@ export default function Agents() {
           <div>
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-bold text-gray-900">4,280</span>
-              <span className="text-[11px] font-semibold text-emerald-600">+12%</span>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">+12%</span>
             </div>
             <div className="text-[11px] text-gray-400">Accounts touched today</div>
           </div>

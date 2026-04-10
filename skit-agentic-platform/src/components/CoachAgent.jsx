@@ -31,11 +31,11 @@ export default function CoachAgent() {
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Human Avg Quality</p>
-            <p className="text-2xl font-semibold text-cyan-600 text-numeric">{coachData.weekSummary.humanAvgQuality}/100</p>
+            <p className="text-2xl font-semibold text-gray-900 text-numeric">{coachData.weekSummary.humanAvgQuality}/100</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">AI Avg Quality</p>
-            <p className="text-2xl font-semibold text-cyan-600 text-numeric">{coachData.weekSummary.aiAvgQuality}/100</p>
+            <p className="text-2xl font-semibold text-gray-900 text-numeric">{coachData.weekSummary.aiAvgQuality}/100</p>
           </div>
         </div>
         <div className="p-3 bg-cyan-50 border border-cyan-200 rounded space-y-1">
@@ -61,10 +61,14 @@ export default function CoachAgent() {
               <tr key={idx} className="border-b border-gray-100 last:border-0">
                 <td className="py-2 px-3 font-medium text-gray-900">{agent.agent}</td>
                 <td className="py-2 px-3 text-right">
-                  <span className={`font-semibold text-numeric ${
-                    agent.score >= 85 ? 'text-green-600' : agent.score >= 80 ? 'text-amber-600' : 'text-red-600'
-                  }`}>
+                  <span className="font-semibold text-gray-900 text-numeric">
                     {agent.score}/100
+                  </span>
+                  {' '}
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                    agent.score >= 85 ? 'bg-green-50 text-green-700' : agent.score >= 80 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'
+                  }`}>
+                    {agent.trend === 'up' ? '↑' : agent.trend === 'down' ? '↓' : '→'}
                   </span>
                 </td>
                 <td className="py-2 px-3">

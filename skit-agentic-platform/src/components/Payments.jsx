@@ -32,7 +32,7 @@ export default function Payments() {
       <div className="grid grid-cols-4 gap-6 mb-6">
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Total Collected (This Month)</p>
-          <p className="text-3xl font-semibold text-green-600 text-numeric">$287,400</p>
+          <p className="text-3xl font-semibold text-gray-900 text-numeric">$287,400</p>
           <p className="text-xs text-gray-500 mt-1">Feb 1-24, 2026</p>
         </div>
 
@@ -120,7 +120,7 @@ export default function Payments() {
             <tr className="border-t-2 border-gray-200 bg-gray-50">
               <td className="py-2 px-3 font-semibold text-gray-900">Total</td>
               <td className="py-2 px-3 text-right font-semibold text-gray-900 text-numeric">142</td>
-              <td className="py-2 px-3 text-right font-semibold text-green-600 text-numeric">$297,875</td>
+              <td className="py-2 px-3 text-right font-semibold text-gray-900 text-numeric">$297,875 <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">Total</span></td>
               <td className="py-2 px-3 text-right font-semibold text-gray-900 text-numeric">$2,097</td>
             </tr>
           </tbody>
