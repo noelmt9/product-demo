@@ -532,10 +532,10 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Scoring Legend</p>
             <div className="flex gap-4 flex-wrap">
               {[
-                { label: '5 — No errors', bg: 'bg-emerald-100', text: 'text-emerald-700' },
-                { label: '4 — 1–2 minor errors', bg: 'bg-blue-50', text: 'text-blue-700' },
-                { label: '3 — 2–3 errors, coaching needed', bg: 'bg-amber-50', text: 'text-amber-700' },
-                { label: '≤2 — Significant gaps', bg: 'bg-red-50', text: 'text-red-700' },
+                { label: '5  Clean call', bg: 'bg-emerald-100', text: 'text-emerald-700' },
+                { label: '4  Minor slips', bg: 'bg-blue-50', text: 'text-blue-700' },
+                { label: '3  Needs work', bg: 'bg-amber-50', text: 'text-amber-700' },
+                { label: '1-2  Flag for coaching', bg: 'bg-red-50', text: 'text-red-700' },
               ].map(l => (
                 <div key={l.label} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${l.bg}`}>
                   <span className={`text-xs font-medium ${l.text}`}>{l.label}</span>
