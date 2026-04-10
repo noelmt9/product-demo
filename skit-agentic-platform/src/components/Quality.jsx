@@ -22,7 +22,7 @@ const DIMENSIONS = [
 // listening failures, missing recap/closing are the most common issues.
 const agentScoreCards = [
   {
-    name: 'Mark',
+    name: 'Jason',
     process: 'Tate & Kirlin',
     callsScored: 12,
     compliancePass: true,
@@ -33,7 +33,7 @@ const agentScoreCards = [
     auditorNote: 'Strong performer. Consistent assumptive opening. Could improve PTP confirmation hygiene.',
   },
   {
-    name: 'Sushmitha',
+    name: 'Rachel',
     process: 'Tate & Kirlin',
     callsScored: 14,
     compliancePass: true,
@@ -44,7 +44,7 @@ const agentScoreCards = [
     auditorNote: 'Opening delayed on multiple calls. Tape disclosure missing or placed post-authentication. Objection handling goes blank — repeats balance instead of rebuttal.',
   },
   {
-    name: 'Faraz',
+    name: 'Carlos',
     process: 'Autofinance USA',
     callsScored: 10,
     compliancePass: true,
@@ -55,7 +55,7 @@ const agentScoreCards = [
     auditorNote: 'ROS too high in opening. Dead air during system navigation — should engage consumer. "I appreciate" overused; "I understand" preferred. Missing recap on several calls.',
   },
   {
-    name: 'Raichal',
+    name: 'Brittany',
     process: 'Autofinance USA',
     callsScored: 11,
     compliancePass: false,
@@ -66,7 +66,7 @@ const agentScoreCards = [
     auditorNote: 'FLAG: One call — disclosed account info before authentication (compliance). Offline conversation recorded. Opening "Hello" vs assumptive standard. Closing consistently weak — no recap, no next steps.',
   },
   {
-    name: 'Dikshetha',
+    name: 'Nicole',
     process: 'Autofinance USA / Global Finance',
     callsScored: 9,
     compliancePass: true,
@@ -77,7 +77,7 @@ const agentScoreCards = [
     auditorNote: 'Handled non-payment calls well. Needs assumptive opening — said "I am not sure why you got the call" on one call. Long hold on Global Finance without engaging consumer.',
   },
   {
-    name: 'Anil',
+    name: 'Kevin',
     process: 'Lane Health',
     callsScored: 8,
     compliancePass: true,
@@ -91,18 +91,18 @@ const agentScoreCards = [
 
 // ── Error taxonomy — from real audit error consequence table ─────────────────
 const errorTaxonomy = [
-  { error: 'Failure to use assumptive opening',     consequence: 'RPC Conversion',        count: 11, agents: ['Sushmitha', 'Faraz', 'Raichal', 'Anil'] },
-  { error: 'No recap / PTP confirmation',           consequence: 'Broken PTP',             count: 9,  agents: ['Faraz', 'Raichal', 'Anil', 'Mark'] },
-  { error: 'Active listening failure',              consequence: 'Negative Rapport',       count: 8,  agents: ['Sushmitha', 'Faraz', 'Anil'] },
-  { error: 'Mini-Miranda missing / late',           consequence: 'Compliance',             count: 5,  agents: ['Raichal', 'Mark'] },
-  { error: 'No acknowledgment on negative emotion', consequence: 'Negative Rapport',       count: 7,  agents: ['Anil', 'Faraz', 'Sushmitha'] },
-  { error: 'Missed settlement / payment plan pitch',consequence: 'Lost Payment Conversion',count: 6,  agents: ['Anil', 'Sushmitha', 'Faraz'] },
-  { error: 'Incorrect choice of words',             consequence: 'Loss of Confidence',     count: 8,  agents: ['Faraz', 'Sushmitha'] },
-  { error: 'No objection rebuttal (goes blank)',    consequence: 'Lost Payment Conversion',count: 5,  agents: ['Sushmitha', 'Raichal'] },
-  { error: 'Debt info disclosed before auth',       consequence: 'Compliance',             count: 2,  agents: ['Raichal', 'Sharonin'] },
-  { error: 'Dead air / hold without informing',     consequence: 'Hang-Up',                count: 6,  agents: ['Faraz', 'Dikshetha', 'Anil'] },
-  { error: 'Tape disclosure missing / wrong order', consequence: 'Compliance',             count: 4,  agents: ['Sushmitha', 'Anil'] },
-  { error: 'No callback hygiene / door left open',  consequence: 'Lost Future Opportunity',count: 5,  agents: ['Raichal', 'Anil'] },
+  { error: 'Failure to use assumptive opening',     consequence: 'RPC Conversion',        count: 11, agents: ['Rachel', 'Carlos', 'Brittany', 'Kevin'] },
+  { error: 'No recap / PTP confirmation',           consequence: 'Broken PTP',             count: 9,  agents: ['Carlos', 'Brittany', 'Kevin', 'Jason'] },
+  { error: 'Active listening failure',              consequence: 'Negative Rapport',       count: 8,  agents: ['Rachel', 'Carlos', 'Kevin'] },
+  { error: 'Mini-Miranda missing / late',           consequence: 'Compliance',             count: 5,  agents: ['Brittany', 'Jason'] },
+  { error: 'No acknowledgment on negative emotion', consequence: 'Negative Rapport',       count: 7,  agents: ['Kevin', 'Carlos', 'Rachel'] },
+  { error: 'Missed settlement / payment plan pitch',consequence: 'Lost Payment Conversion',count: 6,  agents: ['Kevin', 'Rachel', 'Carlos'] },
+  { error: 'Incorrect choice of words',             consequence: 'Loss of Confidence',     count: 8,  agents: ['Carlos', 'Rachel'] },
+  { error: 'No objection rebuttal (goes blank)',    consequence: 'Lost Payment Conversion',count: 5,  agents: ['Rachel', 'Brittany'] },
+  { error: 'Debt info disclosed before auth',       consequence: 'Compliance',             count: 2,  agents: ['Brittany', 'Shayla'] },
+  { error: 'Dead air / hold without informing',     consequence: 'Hang-Up',                count: 6,  agents: ['Carlos', 'Nicole', 'Kevin'] },
+  { error: 'Tape disclosure missing / wrong order', consequence: 'Compliance',             count: 4,  agents: ['Rachel', 'Kevin'] },
+  { error: 'No callback hygiene / door left open',  consequence: 'Lost Future Opportunity',count: 5,  agents: ['Brittany', 'Kevin'] },
 ];
 
 const consequenceColor = {
@@ -118,10 +118,10 @@ const consequenceColor = {
 
 // ── Compliance flags (human agent) ───────────────────────────────────────────
 const complianceFlags = [
-  { id: 1, type: 'FDCPA', desc: 'Mini-Miranda not stated within 30 seconds', channel: 'Voice', agentType: 'Human', agent: 'Mark', status: 'Resolved', action: 'Agent retrained, call script updated' },
-  { id: 2, type: 'FDCPA', desc: 'Mini-Miranda not stated within 30 seconds — second occurrence', channel: 'Voice', agentType: 'Human', agent: 'Mark', status: 'Resolved', action: 'Formal warning issued' },
-  { id: 3, type: 'FDCPA', desc: 'Account info disclosed before consumer authentication', channel: 'Voice', agentType: 'Human', agent: 'Raichal', status: 'Resolved', action: 'Compliance refresher, PDR reviewed' },
-  { id: 4, type: 'FDCPA', desc: 'Incorrect balance quoted to consumer', channel: 'Voice', agentType: 'Human', agent: 'Raichal', status: 'Resolved', action: 'Data sync issue identified, fix deployed' },
+  { id: 1, type: 'FDCPA', desc: 'Mini-Miranda not stated within 30 seconds', channel: 'Voice', agentType: 'Human', agent: 'Jason', status: 'Resolved', action: 'Agent retrained, call script updated' },
+  { id: 2, type: 'FDCPA', desc: 'Mini-Miranda not stated within 30 seconds — second occurrence', channel: 'Voice', agentType: 'Human', agent: 'Jason', status: 'Resolved', action: 'Formal warning issued' },
+  { id: 3, type: 'FDCPA', desc: 'Account info disclosed before consumer authentication', channel: 'Voice', agentType: 'Human', agent: 'Brittany', status: 'Resolved', action: 'Compliance refresher, PDR reviewed' },
+  { id: 4, type: 'FDCPA', desc: 'Incorrect balance quoted to consumer', channel: 'Voice', agentType: 'Human', agent: 'Brittany', status: 'Resolved', action: 'Data sync issue identified, fix deployed' },
   { id: 5, type: 'TCPA', desc: 'Call placed at 8:47 PM EST to NY consumer (after 8 PM NY rule)', channel: 'Voice', agentType: 'AI Bot', agent: 'Bot', status: 'Resolved', action: 'Timezone mapping corrected for NY accounts' },
 ];
 
@@ -169,12 +169,12 @@ const improvementCases = [
     id: 'objection-handling',
     title: 'Objection Handling — "I already paid this"',
     status: 'Fix deployed', statusColor: 'bg-emerald-600',
-    source: '12 scored calls this week. Sushmitha and Raichal consistently failing on this objection — going silent for 4–5 seconds, then repeating the balance amount.',
+    source: '12 scored calls this week. Rachel and Brittany consistently failing on this objection — going silent for 4–5 seconds, then repeating the balance amount.',
     diagnosis: 'Agents go blank after the objection instead of acknowledging → verifying → resolving. Drop-off rate at this moment: 34%. Root cause: no scripted rebuttal path, agents falling back to balance recitation.',
     proposedFix: 'New response flow — acknowledge first ("I hear you, let me pull that up"), verify payment record, then resolve based on outcome: confirmed → disposition; not found → explain, offer portal.',
     deployment: [
       { agent: 'Collector', action: 'Voice AI objection handling branch updated on all 3 bot variants. Live since Day 16.' },
-      { agent: 'Collector', action: 'Updated script pushed to human agent queue. Calibration session scheduled Friday for Sushmitha, Raichal.' }
+      { agent: 'Collector', action: 'Updated script pushed to human agent queue. Calibration session scheduled Friday for Rachel, Brittany.' }
     ],
     projectedImpact: '+12% RPC retention on accounts where this objection is raised.',
     earlySignal: 'Voice AI calls hitting this objection now show 18% drop-off vs 34% pre-fix.'
