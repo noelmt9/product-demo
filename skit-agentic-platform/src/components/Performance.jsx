@@ -118,20 +118,6 @@ const enrichmentData = {
   ],
 };
 
-const ptpDetailData = [
-  { week: 'Week 1', made: 144, kept: 89,  broken: 55,  keptPct: 62, value: 64800 },
-  { week: 'Week 2', made: 162, kept: 105, broken: 57,  keptPct: 65, value: 72900 },
-  { week: 'Week 3', made: 97,  kept: 80,  broken: 17,  keptPct: 82, value: 43700 },
-];
-
-const ptpByCohort = [
-  { cohort: 'High prop / High bal', ptpRate: 18, adherence: 76, avgValue: 4100, atRisk: 28400 },
-  { cohort: 'High prop / Low bal',  ptpRate: 15, adherence: 72, avgValue: 980,  atRisk: 14200 },
-  { cohort: 'Medium prop',          ptpRate: 11, adherence: 64, avgValue: 2200, atRisk: 62400 },
-  { cohort: 'Low prop / High bal',  ptpRate: 8,  adherence: 58, avgValue: 3800, atRisk: 31800 },
-  { cohort: 'Low prop / Low bal',   ptpRate: 3,  adherence: 55, avgValue: 640,  atRisk: 12200 },
-];
-
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
 const Sparkline = ({ data, dataKey, color = '#61ab5e' }) => (
@@ -142,8 +128,6 @@ const Sparkline = ({ data, dataKey, color = '#61ab5e' }) => (
   </ResponsiveContainer>
 );
 
-const sentColor = s => s === 'positive' ? 'text-green-600' : s === 'negative' ? 'text-red-500' : 'text-gray-500';
-const sentDot   = s => s === 'positive' ? 'bg-green-500'  : s === 'negative' ? 'bg-red-500'   : 'bg-gray-400';
 
 const hlBadgeMap = {
   'text-green-600': { bg: 'bg-green-50', text: 'text-green-700', label: '↑' },
@@ -166,87 +150,105 @@ const HL = ({ label, value, sub, color }) => {
   );
 };
 
+// Funnel base data per period
+const FUNNEL_BASE = {
+  'All Time': { accounts: 12000, contacted: 4560, rpc: 3360, ptp: 403, keptPtp: 274, resolved: 743 },
+  Jan:        { accounts: 12000, contacted: 3360, rpc: 2280, ptp: 216, keptPtp: 125, resolved: 144 },
+  Feb:        { accounts: 12000, contacted: 3840, rpc: 2760, ptp: 312, keptPtp: 197, resolved: 336 },
+  Mar:        { accounts: 12000, contacted: 4320, rpc: 3120, ptp: 372, keptPtp: 245, resolved: 552 },
+  Apr:        { accounts: 12000, contacted: 4560, rpc: 3360, ptp: 403, keptPtp: 274, resolved: 743 },
+};
+
+function getFunnelData(period, selectedClient, selectedCohort) {
+  const m = getFilteredMetrics(selectedClient, selectedCohort);
+  const periodScale = { 'All Time': 1.0, Jan: 0.55, Feb: 0.72, Mar: 0.88, Apr: 1.0 }[period] || 1.0;
+  const accounts  = m.accounts;
+  const contacted = Math.round(accounts * (m.contactRate / 100) * periodScale);
+  const rpc       = Math.round(accounts * (m.rpcRate / 100) * periodScale);
+  const ptp       = Math.round(accounts * (m.ptpRate / 100) * periodScale);
+  const keptPtp   = Math.round(ptp * 0.68);
+  const resolved  = Math.round(accounts * (m.liqRate / 100) * periodScale * 2.3);
+  return { accounts, contacted, rpc, ptp, keptPtp, resolved };
+}
+
 // Bar-chart style funnel (like Google Analytics screenshot)
-const BarFunnel = ({ viewMode }) => {
-  // Account-level values
+const BarFunnel = ({ viewMode, period, selectedCreditor, selectedCohort }) => {
+  const f = getFunnelData(period, selectedCreditor, selectedCohort);
+  const avgBal = 2800; // avg balance for dollar conversion
+
   const accountSteps = [
-    { label: 'Accounts',  accounts: 12000, dollars: 33600000, pct: 100,  convPct: null,   dropPct: null },
-    { label: 'Contacted', accounts: 4560,  dollars: 14400000, pct: 38,   convPct: '38%',  dropPct: '62%' },
-    { label: 'RPC',       accounts: 3360,  dollars: 10100000, pct: 28,   convPct: '74%',  dropPct: '26%' },
-    { label: 'PTP',       accounts: 403,   dollars: 1780000,  pct: 3.4,  convPct: '12%',  dropPct: '88%' },
-    { label: 'Kept PTP',  accounts: 274,   dollars: 1210000,  pct: 2.3,  convPct: '68%',  dropPct: '32%' },
-    { label: 'Resolved',  accounts: 743,   dollars: 2870000,  pct: 6.2,  convPct: null,   dropPct: null },
+    { label: 'Accounts',  accounts: f.accounts,  dollars: f.accounts  * avgBal, convPct: null,                                                     dropPct: null },
+    { label: 'Contacted', accounts: f.contacted,  dollars: f.contacted * avgBal, convPct: `${Math.round(f.contacted / f.accounts * 100)}%`,         dropPct: `${100 - Math.round(f.contacted / f.accounts * 100)}%` },
+    { label: 'RPC',       accounts: f.rpc,        dollars: f.rpc       * avgBal, convPct: `${Math.round(f.rpc / f.contacted * 100)}%`,              dropPct: `${100 - Math.round(f.rpc / f.contacted * 100)}%` },
+    { label: 'PTP',       accounts: f.ptp,        dollars: f.ptp       * avgBal, convPct: `${Math.round(f.ptp / f.rpc * 100)}%`,                   dropPct: `${100 - Math.round(f.ptp / f.rpc * 100)}%` },
+    { label: 'Kept PTP',  accounts: f.keptPtp,    dollars: f.keptPtp   * avgBal, convPct: `${Math.round(f.keptPtp / f.ptp * 100)}%`,               dropPct: `${100 - Math.round(f.keptPtp / f.ptp * 100)}%` },
+    { label: 'Resolved',  accounts: f.resolved,   dollars: f.resolved  * avgBal, convPct: null,                                                     dropPct: null },
   ];
 
-  const maxVal = viewMode === 'accounts' ? 12000 : 33600000;
   const fmtVal = (step) => viewMode === 'accounts'
     ? step.accounts.toLocaleString()
     : `$${(step.dollars / 1000000).toFixed(1)}M`;
-  const barPct = (step) => viewMode === 'accounts'
-    ? (step.accounts / maxVal) * 100
-    : (step.dollars / maxVal) * 100;
 
-  const BAR_COLOR = '#2196af';
-  const CONNECTOR_COLOR = '#d4eae5';
-  const MAX_BAR_HEIGHT = 160;
+  const maxAccounts = accountSteps[0].accounts;
+  const FUNNEL_H = 200;
+  const STEP_GAP = 2;
+
+  const LABEL_AREA = 30; // space above for value + badge
+  const BOTTOM_AREA = 24; // space below for label
+  const totalH = LABEL_AREA + FUNNEL_H + BOTTOM_AREA;
 
   return (
-    <div className="flex items-end gap-0 w-full" style={{ height: MAX_BAR_HEIGHT + 80 }}>
-      {accountSteps.map((step, i) => {
-        const h = Math.max((barPct(step) / 100) * MAX_BAR_HEIGHT, 8);
-        const isLast = i === accountSteps.length - 1;
-        return (
-          <React.Fragment key={step.label}>
-            <div className="flex flex-col items-center flex-1">
-              {/* Value label above bar */}
-              <div className="text-xs font-bold text-gray-700 mb-1 tabular-nums">{fmtVal(step)}</div>
-              {/* Conversion badge */}
-              {step.convPct && (
-                <div className="text-[10px] font-semibold px-1.5 py-0.5 rounded mb-1" style={{ background: 'rgba(33,150,175,0.12)', color: '#2196af' }}>
-                  {step.convPct}
-                </div>
+    <div className="w-full">
+      <svg width="100%" viewBox={`0 0 900 ${totalH}`} preserveAspectRatio="xMidYMid meet">
+        {accountSteps.map((step, i) => {
+          const stepW = 900 / accountSteps.length;
+          const x = i * stepW;
+          const ratio = step.accounts / maxAccounts;
+          const nextRatio = i < accountSteps.length - 1 ? accountSteps[i+1].accounts / maxAccounts : ratio;
+          const barH = Math.max(ratio * FUNNEL_H, 12);
+          const nextBarH = Math.max(nextRatio * FUNNEL_H, 12);
+          const yTop = (FUNNEL_H - barH) / 2 + LABEL_AREA;
+          const yBot = yTop + barH;
+          const nextYTop = (FUNNEL_H - nextBarH) / 2 + LABEL_AREA;
+          const nextYBot = nextYTop + nextBarH;
+          const isLast = i === accountSteps.length - 1;
+
+          // Center of this step's trapezoid top edge
+          const centerX = x + stepW / 2;
+
+          return (
+            <React.Fragment key={step.label}>
+              {/* Trapezoid shape */}
+              {!isLast ? (
+                <polygon
+                  points={`${x + STEP_GAP},${yTop} ${x + stepW - STEP_GAP},${nextYTop} ${x + stepW - STEP_GAP},${nextYBot} ${x + STEP_GAP},${yBot}`}
+                  fill="#4c6ef5"
+                  opacity={0.85 - i * 0.08}
+                />
+              ) : (
+                <rect x={x + STEP_GAP} y={nextYTop} width={stepW - STEP_GAP * 2} height={nextBarH} fill="#4c6ef5" opacity={0.5} rx="2" />
               )}
-              {!step.convPct && i > 0 && <div className="mb-4" />}
-              {/* Bar */}
-              <div
-                className="w-full rounded-t-md transition-all"
-                style={{ height: h, backgroundColor: BAR_COLOR, opacity: 0.85 + i * 0.02 }}
-              />
-              {/* Step label */}
-              <div className="text-[10px] font-bold uppercase tracking-wide text-gray-500 mt-2 text-center leading-tight">{step.label}</div>
-              {/* Drop-off */}
-              {step.dropPct && (
-                <div className="text-[10px] text-gray-900 font-medium mt-0.5">↓ {step.dropPct} <span className="text-[9px] font-semibold px-1 py-0.5 rounded-full bg-red-50 text-red-700">drop</span></div>
+              {/* Value + conversion badge — stacked above the bar */}
+              {step.convPct ? (
+                <>
+                  <text x={centerX} y={yTop - 16} textAnchor="middle" className="fill-gray-900" style={{ fontSize: 13, fontWeight: 700 }}>{fmtVal(step)}</text>
+                  <rect x={centerX - 16} y={yTop - 13} width={32} height={14} rx={7} fill="rgba(76,110,245,0.12)" />
+                  <text x={centerX} y={yTop - 4} textAnchor="middle" style={{ fontSize: 9, fontWeight: 600, fill: '#4c6ef5' }}>{step.convPct}</text>
+                </>
+              ) : (
+                <text x={centerX} y={yTop - 8} textAnchor="middle" className="fill-gray-900" style={{ fontSize: 13, fontWeight: 700 }}>{fmtVal(step)}</text>
               )}
-            </div>
-            {/* Arrow connector */}
-            {!isLast && (
-              <div className="flex-shrink-0 flex items-end pb-8">
-                <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
-                  <rect x="0" y="8" width="20" height="4" rx="2" fill={CONNECTOR_COLOR} />
-                  <path d="M18 4 L26 10 L18 16" stroke={CONNECTOR_COLOR} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                </svg>
-              </div>
-            )}
-          </React.Fragment>
-        );
-      })}
+              {/* Label below */}
+              <text x={centerX} y={LABEL_AREA + FUNNEL_H + 16} textAnchor="middle" className="fill-gray-500" style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{step.label}</text>
+            </React.Fragment>
+          );
+        })}
+      </svg>
     </div>
   );
 };
 
-// ── KPI / Chart data keyed by period + granularity ───────────────────────────
-
-const KPI_METRICS = [
-  { key: 'liq',     metric: 'Liquidation Rate', unit: '%', target: 2.5 },
-  { key: 'contact', metric: 'Contact Rate',      unit: '%', target: 40  },
-  { key: 'rpc',     metric: 'RPC Rate',          unit: '%', target: 30  },
-  { key: 'ptp',     metric: 'PTP Rate',          unit: '%', target: 12  },
-  { key: 'kptp',    metric: 'Kept-PTP Rate',     unit: '%', target: 70  },
-  { key: 'res',     metric: 'Resolution Rate',   unit: '%', target: null },
-];
-
-// Base KPI values per period (All Creditors baseline)
+// Base KPI values per period (All Clients baseline)
 const BASE_KPI = {
   'All Time': { monthly: [
     { label: 'Jan', liq: 1.4, contact: 28, rpc: 19, ptp: 6,  kptp: 58, res: 1.2 },
@@ -294,217 +296,305 @@ const BASE_KPI = {
   },
 };
 
-// Collections over time data per period
+// Collections over time data per period — realistic curves with mid-week peaks, weekend dips, noise
+const _janDaily = [
+  1800,1950,2100,2180,2050,1920,1850,
+  1980,2120,2240,2300,2150,2020,1940,
+  2080,2220,2350,2420,2280,2140,2060,
+  2200,2340,2480,2380,2260,2180,2100,
+  2320,2440,2380
+];
+const _febDaily = [
+  2300,2450,2580,2680,2520,2380,2300,
+  2500,2660,2780,2860,2700,2540,2460,
+  2620,2780,2900,2820,2680,2560,2480,
+  2740,2900,3020,3100,2940,2780,2700
+];
+const _marDaily = [
+  2800,2960,3100,3200,3040,2880,2800,
+  3000,3160,3300,3400,3220,3060,2960,
+  3120,3280,3420,3340,3200,3080,3000,
+  3240,3400,3540,3620,3460,3300,3200,
+  3380,3500,3440
+];
+const _aprDaily = [
+  3200,3360,3500,3580,3420,3280,3200,
+  3400,3560,3700,3640,3500,3420
+];
+
+function _buildCum(dailyArr, startCum) {
+  let cum = startCum || 0;
+  return dailyArr.map((d, i) => { cum += d; return { label: `${i+1}`, daily: d, cumulative: cum }; });
+}
+
 const COLLECTIONS_DATA = {
   'All Time': [
-    { label: 'Jan', daily: 62400,  cumulative: 62400  },
-    { label: 'Feb', daily: 75200,  cumulative: 137600 },
-    { label: 'Mar', daily: 98400,  cumulative: 236000 },
-    { label: 'Apr', daily: 51400,  cumulative: 287400 },
+    { label: 'Jan', daily: _janDaily.reduce((a,b)=>a+b,0),  cumulative: _janDaily.reduce((a,b)=>a+b,0) },
+    { label: 'Feb', daily: _febDaily.reduce((a,b)=>a+b,0),  cumulative: _janDaily.reduce((a,b)=>a+b,0) + _febDaily.reduce((a,b)=>a+b,0) },
+    { label: 'Mar', daily: _marDaily.reduce((a,b)=>a+b,0),  cumulative: _janDaily.reduce((a,b)=>a+b,0) + _febDaily.reduce((a,b)=>a+b,0) + _marDaily.reduce((a,b)=>a+b,0) },
+    { label: 'Apr', daily: _aprDaily.reduce((a,b)=>a+b,0),  cumulative: _janDaily.reduce((a,b)=>a+b,0) + _febDaily.reduce((a,b)=>a+b,0) + _marDaily.reduce((a,b)=>a+b,0) + _aprDaily.reduce((a,b)=>a+b,0) },
   ],
-  Jan: Array.from({length:31},(_,i) => ({ label: `${i+1}`, daily: 1200+Math.round(i*62), cumulative: (i+1)*2010+Math.round(i*i*3) })),
-  Feb: Array.from({length:28},(_,i) => ({ label: `${i+1}`, daily: 1800+Math.round(i*78), cumulative: 62400+(i+1)*2685+Math.round(i*i*4) })),
-  Mar: Array.from({length:31},(_,i) => ({ label: `${i+1}`, daily: 2400+Math.round(i*95), cumulative: 137600+(i+1)*3174+Math.round(i*i*5) })),
-  Apr: Array.from({length:13},(_,i) => ({ label: `${i+1}`, daily: 8200+Math.round(i*1309), cumulative: 236000+[8200,20600,36200,54400,69200,85400,96800,114600,133800,155200,172000,193600,216800,240000][i]||0 })),
+  Jan: _buildCum(_janDaily, 0),
+  Feb: _buildCum(_febDaily, _janDaily.reduce((a,b)=>a+b,0)),
+  Mar: _buildCum(_marDaily, _janDaily.reduce((a,b)=>a+b,0) + _febDaily.reduce((a,b)=>a+b,0)),
+  Apr: _buildCum(_aprDaily, _janDaily.reduce((a,b)=>a+b,0) + _febDaily.reduce((a,b)=>a+b,0) + _marDaily.reduce((a,b)=>a+b,0)),
 };
 
-// Apply creditor multiplier to a data point
-function applyCreditorMult(point, creditor) {
-  const m = CREDITOR_MULTIPLIERS[creditor] || CREDITOR_MULTIPLIERS['All Creditors'];
+// Apply creditor + cohort multipliers to a data point
+function applyFilters(point, creditor, cohort) {
+  const cm = CREDITOR_MULTIPLIERS[creditor] || CREDITOR_MULTIPLIERS['All Clients'];
+  const co = COHORT_MULTIPLIERS[cohort]     || COHORT_MULTIPLIERS['All Cohorts'];
+  const liqM     = cm.liq * co.liq;
+  const contactM = cm.contact * co.contact;
+  const collM    = cm.collected * co.collected;
   return {
     ...point,
-    liq:     +(point.liq     * m.liq).toFixed(2),
-    contact: Math.round(point.contact * m.contact),
-    rpc:     Math.round((point.rpc || 0) * m.contact),
-    ptp:     Math.round((point.ptp || 0) * m.liq),
-    kptp:    Math.round((point.kptp || 0) * ((m.liq + 1) / 2)),
-    res:     +((point.res || 0) * m.liq).toFixed(1),
-    daily:        point.daily        ? Math.round(point.daily        * m.collected) : undefined,
-    cumulative:   point.cumulative   ? Math.round(point.cumulative   * m.collected) : undefined,
+    liq:     +(point.liq     * liqM).toFixed(2),
+    contact: Math.round(point.contact * contactM),
+    rpc:     Math.round((point.rpc || 0) * contactM),
+    ptp:     Math.round((point.ptp || 0) * liqM),
+    kptp:    Math.round((point.kptp || 0) * ((liqM + 1) / 2)),
+    res:     +((point.res || 0) * liqM).toFixed(1),
+    daily:        point.daily        ? Math.round(point.daily        * collM) : undefined,
+    cumulative:   point.cumulative   ? Math.round(point.cumulative   * collM) : undefined,
   };
 }
 
-// Derive the periods array to show in KPI cards
-function getKpiPeriods(period, granularity, creditor) {
-  const gran = granularity === 'Monthly' ? 'monthly' : granularity === 'Weekly' ? 'weekly' : 'daily';
-  const raw = BASE_KPI[period]?.[gran] || BASE_KPI['All Time'].monthly;
-  return raw.map(p => applyCreditorMult(p, creditor));
+// ── Client/Cohort data from Portfolio (shared source of truth) ───────────────
+
+const PORTFOLIO_CLIENTS = {
+  'Meridian Bank':         { accounts: 2840, balance: 8200000, collected: 221400, liqRate: 2.7, contactRate: 41, ptpRate: 13 },
+  'Pinnacle Financial':    { accounts: 2180, balance: 5960000, collected: 143400, liqRate: 2.4, contactRate: 38, ptpRate: 11 },
+  'Crestline Lending':     { accounts: 1920, balance: 6720000, collected: 120960, liqRate: 1.8, contactRate: 31, ptpRate: 9 },
+  'Harbor Finance':        { accounts: 1440, balance: 5040000, collected: 95760,  liqRate: 1.9, contactRate: 28, ptpRate: 8 },
+  'Clearview Medical Group': { accounts: 2040, balance: 3570000, collected: 135660, liqRate: 3.8, contactRate: 47, ptpRate: 16 },
+  'Summit Health Systems': { accounts: 1580, balance: 2133000, collected: 90000,  liqRate: 4.2, contactRate: 51, ptpRate: 18 },
+};
+
+const PORTFOLIO_COHORTS = {
+  'Meridian Bank': [
+    { name: 'High Prop / High Bal', accounts: 620, collected: 84200, liqRate: 3.4, contactRate: 52, ptpRate: 18 },
+    { name: 'High Prop / Low Bal',  accounts: 480, collected: 38400, liqRate: 2.9, contactRate: 48, ptpRate: 15 },
+    { name: 'Medium Prop / All Bal',accounts: 740, collected: 48100, liqRate: 2.4, contactRate: 36, ptpRate: 11 },
+    { name: 'Low Prop / High Bal',  accounts: 340, collected: 22100, liqRate: 1.6, contactRate: 28, ptpRate: 8 },
+    { name: 'Low Prop / Low Bal',   accounts: 280, collected: 4200,  liqRate: 0.5, contactRate: 12, ptpRate: 3 },
+  ],
+  'Pinnacle Financial': [
+    { name: 'High Prop / All Bal',  accounts: 540, collected: 52200, liqRate: 3.0, contactRate: 44, ptpRate: 14 },
+    { name: 'Medium Prop',          accounts: 780, collected: 48600, liqRate: 2.2, contactRate: 36, ptpRate: 10 },
+    { name: 'Low Prop / High Bal',  accounts: 420, collected: 28400, liqRate: 1.4, contactRate: 26, ptpRate: 7 },
+    { name: 'Low Prop / Low Bal',   accounts: 440, collected: 14200, liqRate: 0.4, contactRate: 14, ptpRate: 3 },
+  ],
+  'Crestline Lending': [
+    { name: 'High Prop',   accounts: 380, collected: 42800, liqRate: 2.6, contactRate: 38, ptpRate: 12 },
+    { name: 'Medium Prop', accounts: 640, collected: 44200, liqRate: 1.7, contactRate: 30, ptpRate: 8 },
+    { name: 'Low Prop',    accounts: 900, collected: 33960, liqRate: 0.6, contactRate: 18, ptpRate: 4 },
+  ],
+  'Harbor Finance': [
+    { name: 'High Prop',   accounts: 320, collected: 36400, liqRate: 2.8, contactRate: 36, ptpRate: 11 },
+    { name: 'Medium Prop', accounts: 520, collected: 34200, liqRate: 1.8, contactRate: 28, ptpRate: 8 },
+    { name: 'Low Prop',    accounts: 600, collected: 25160, liqRate: 0.5, contactRate: 18, ptpRate: 4 },
+  ],
+  'Clearview Medical Group': [
+    { name: 'High Prop / Empathetic', accounts: 680, collected: 58400, liqRate: 4.6, contactRate: 55, ptpRate: 20 },
+    { name: 'Medium Prop',            accounts: 820, collected: 52800, liqRate: 3.2, contactRate: 42, ptpRate: 14 },
+    { name: 'Low Prop',               accounts: 540, collected: 24460, liqRate: 1.4, contactRate: 22, ptpRate: 6 },
+  ],
+  'Summit Health Systems': [
+    { name: 'High Prop',   accounts: 520, collected: 38200, liqRate: 5.1, contactRate: 58, ptpRate: 22 },
+    { name: 'Medium Prop', accounts: 640, collected: 34800, liqRate: 3.6, contactRate: 46, ptpRate: 16 },
+    { name: 'Low Prop',    accounts: 420, collected: 17000, liqRate: 1.8, contactRate: 28, ptpRate: 8 },
+  ],
+};
+
+const ALL_CLIENTS = ['All Clients', ...Object.keys(PORTFOLIO_CLIENTS)];
+
+function getFilteredMetrics(client, cohort) {
+  if (client === 'All Clients') return { accounts: 12000, balance: 33600000, collected: 287400, liqRate: 2.7, contactRate: 38, rpcRate: 28, ptpRate: 12 };
+  const cl = PORTFOLIO_CLIENTS[client];
+  if (!cl) return { accounts: 12000, balance: 33600000, collected: 287400, liqRate: 2.7, contactRate: 38, rpcRate: 28, ptpRate: 12 };
+  if (cohort === 'All Cohorts') return { accounts: cl.accounts, balance: cl.balance, collected: cl.collected, liqRate: cl.liqRate, contactRate: cl.contactRate, rpcRate: Math.round(cl.contactRate * 0.72), ptpRate: cl.ptpRate };
+  const co = (PORTFOLIO_COHORTS[client] || []).find(c => c.name === cohort);
+  if (!co) return { accounts: cl.accounts, balance: cl.balance, collected: cl.collected, liqRate: cl.liqRate, contactRate: cl.contactRate, rpcRate: Math.round(cl.contactRate * 0.72), ptpRate: cl.ptpRate };
+  return { accounts: co.accounts, balance: co.accounts * 2800, collected: co.collected, liqRate: co.liqRate, contactRate: co.contactRate, rpcRate: Math.round(co.contactRate * 0.72), ptpRate: co.ptpRate };
 }
 
-// Derive chart data for Collections Over Time
-function getCollectionsData(period, granularity, creditor) {
+function buildWeeklyData(baseVal, isMoney, period) {
   if (period === 'All Time') {
-    return COLLECTIONS_DATA['All Time'].map(p => applyCreditorMult(p, creditor));
-  }
-  const gran = granularity === 'Daily' ? period : period; // weekly also maps to daily data, sliced
-  const raw = COLLECTIONS_DATA[period] || COLLECTIONS_DATA['Apr'];
-  if (granularity === 'Weekly') {
-    // Aggregate daily into weeks
-    const weeks = [];
-    for (let w = 0; w < 4; w++) {
-      const slice = raw.slice(w*7, (w+1)*7);
-      if (!slice.length) break;
-      const sum = slice.reduce((a, b) => a + b.daily, 0);
-      const last = slice[slice.length - 1];
-      weeks.push({ label: `Wk ${w+1}`, daily: sum, cumulative: last.cumulative });
+    if (isMoney) {
+      // 4 month-groups; weights sum to 1.0 so bars sum to baseVal
+      const weights = [0.175, 0.23, 0.28, 0.315];
+      return weights.map((w, i) => ({ label: `Wk ${i*4+1}–${(i+1)*4}`, value: Math.round(baseVal * w) }));
     }
-    return weeks.map(p => applyCreditorMult(p, creditor));
+    // Rate metrics ramp up across 4 month-groups to the final value
+    const ramp = [0.55, 0.72, 0.88, 1.0];
+    return ramp.map((r, i) => ({ label: `Wk ${i*4+1}–${(i+1)*4}`, value: +(baseVal * r).toFixed(1) }));
   }
-  return raw.map(p => applyCreditorMult(p, creditor));
+  // Single month
+  const monthScale = { Jan: 0.55, Feb: 0.72, Mar: 0.88, Apr: 1.0 }[period] || 1.0;
+  if (isMoney) {
+    const monthTotal = baseVal * monthScale;
+    const weights = [0.18, 0.24, 0.28, 0.30];
+    return weights.map((w, i) => ({ label: `Wk ${i+1}`, value: Math.round(monthTotal * w) }));
+  }
+  // Rate metrics ramp within the month
+  const ramp = [0.78, 0.88, 0.95, 1.0];
+  return ramp.map((r, i) => ({ label: `Wk ${i+1}`, value: +(baseVal * monthScale * r).toFixed(1) }));
 }
 
-function getXLabel(period, granularity) {
-  if (period === 'All Time') return 'Month';
-  if (granularity === 'Weekly') return 'Week';
-  return 'Day';
-}
+function OverviewTab() {
+  const [period,   setPeriod]   = React.useState('All Time');
+  const [client,   setClient]   = React.useState('All Clients');
+  const [cohort,   setCohort]   = React.useState('All Cohorts');
+  const [viewMode, setViewMode] = React.useState('accounts');
 
-// ── KPI Summary ───────────────────────────────────────────────────────────────
+  const handleClientChange = (c) => { setClient(c); setCohort('All Cohorts'); };
+  const cohortOptions = client !== 'All Clients' ? ['All Cohorts', ...(PORTFOLIO_COHORTS[client] || []).map(c => c.name)] : [];
+  const metrics = getFilteredMetrics(client, cohort);
+  const filterSub = [client !== 'All Clients' ? client : null, cohort !== 'All Cohorts' ? cohort : null].filter(Boolean).join(' · ');
 
-function KpiSummary({ filters }) {
-  const { period, granularity, selectedCreditor } = filters;
-  const periods = getKpiPeriods(period, granularity, selectedCreditor);
-  const latest  = periods[periods.length - 1];
+  const convMetrics = [
+    { key: 'contact', label: 'Contact',  value: metrics.contactRate, target: 40, color: '#2196af' },
+    { key: 'rpc',     label: 'RPC',       value: metrics.rpcRate,     target: 30, color: '#6366f1' },
+    { key: 'ptp',     label: 'PTP',       value: metrics.ptpRate,     target: 12, color: '#f59e0b' },
+  ];
 
-  const periodLabel = period === 'All Time'
-    ? `Jan – Apr 13 · ${granularity}`
-    : `${period} · ${granularity}`;
-
-  return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">KPI Summary</h2>
-        <span className="text-xs text-gray-400">{periodLabel}{selectedCreditor !== 'All Creditors' ? ` · ${selectedCreditor}` : ''}</span>
-      </div>
-      <div className="grid grid-cols-3 gap-4">
-        {KPI_METRICS.map((m, i) => {
-          const vals   = periods.map(p => p[m.key]);
-          const current = latest[m.key];
-          const maxVal  = Math.max(...vals, m.target || 0);
-          const barW    = v => `${Math.min(Math.round((v / maxVal) * 100), 100)}%`;
-          const beat    = m.target ? current >= m.target : null;
-          return (
-            <div key={i} className="border border-gray-100 rounded-xl p-4">
-              <div className="flex items-start justify-between mb-3">
-                <span className="text-xs font-semibold text-gray-600">{m.metric}</span>
-                {beat !== null && (
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${beat ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                    {beat ? 'Above target' : 'Near target'}
-                  </span>
-                )}
-              </div>
-              <div className="text-2xl font-extrabold mb-0.5" style={{ color: '#2196af' }}>{current}{m.unit}</div>
-              <div className="text-[10px] text-gray-400 mb-3">{latest.label} · {m.target ? `Target: ${m.target}${m.unit}` : 'No target set'}</div>
-              <div className="space-y-1.5">
-                {periods.map((p, j) => (
-                  <div key={j} className="flex items-center gap-2">
-                    <span className="text-[9px] text-gray-400 w-7 flex-shrink-0 truncate">{p.label}</span>
-                    <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: '#f3f4f6' }}>
-                      <div className="h-2 rounded-full transition-all" style={{ width: barW(p[m.key]), backgroundColor: j === periods.length - 1 ? '#2196af' : '#93c5fd' }} />
-                    </div>
-                    <span className="text-[10px] font-semibold tabular-nums text-gray-700 w-8 text-right">{p[m.key]}{m.unit}</span>
-                  </div>
-                ))}
-                {m.target && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-gray-400 w-7 flex-shrink-0">Goal</span>
-                    <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: '#f3f4f6' }}>
-                      <div className="h-2 rounded-full" style={{ width: barW(m.target), backgroundColor: '#61ab5e', opacity: 0.55 }} />
-                    </div>
-                    <span className="text-[10px] font-semibold tabular-nums text-gray-700 w-8 text-right">{m.target}{m.unit}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ── TAB: Overview ─────────────────────────────────────────────────────────────
-
-function OverviewTab({ onNavigate, filters }) {
-  const { period, granularity, selectedCreditor, viewMode } = filters;
-  const chartData  = getCollectionsData(period, granularity, selectedCreditor);
-  const xLabel     = getXLabel(period, granularity);
-
-  const fmtTick = v => viewMode === 'dollars' ? `$${(v/1000).toFixed(0)}K` : v.toLocaleString();
-
-  const funnelLabel = period === 'All Time'
-    ? 'All Time · All channels'
-    : `${period} · ${granularity}`;
+  const chartDefs = [
+    { key: 'collected',  label: 'Collections',     baseVal: metrics.collected, color: '#2196af', unit: '$', isMoney: true,  gradId: 'mc-coll' },
+    { key: 'cumulative', label: 'Cumulative',       baseVal: metrics.collected, color: '#61ab5e', unit: '$', isMoney: true,  gradId: 'mc-cum', cumulative: true },
+    { key: 'liq',        label: 'Liquidation Rate', baseVal: metrics.liqRate,   color: '#2196af', unit: '%', isMoney: false, target: 2.5, gradId: 'mc-liq' },
+    { key: 'contact',    label: 'Contact Rate',     baseVal: metrics.contactRate,color: '#6366f1', unit: '%', isMoney: false, target: 40,  gradId: 'mc-con' },
+    { key: 'rpc',        label: 'RPC Rate',         baseVal: metrics.rpcRate,    color: '#f59e0b', unit: '%', isMoney: false, target: 30,  gradId: 'mc-rpc' },
+    { key: 'ptp',        label: 'PTP Rate',         baseVal: metrics.ptpRate,    color: '#61ab5e', unit: '%', isMoney: false, target: 12,  gradId: 'mc-ptp' },
+  ];
 
   return (
     <div className="px-8 py-6 space-y-6">
 
-      {/* Collections funnel */}
+      {/* ── Top filter bar ─────────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex bg-gray-100 rounded-lg p-0.5">
+          {PERIODS.map(p => (
+            <button key={p} onClick={() => setPeriod(p)}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${period === p ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            >{p}</button>
+          ))}
+        </div>
+        <select value={client} onChange={e => handleClientChange(e.target.value)}
+          className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-400"
+        >{ALL_CLIENTS.map(c => <option key={c} value={c}>{c}</option>)}</select>
+        {cohortOptions.length > 0 && (
+          <select value={cohort} onChange={e => setCohort(e.target.value)}
+            className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-400"
+          >{cohortOptions.map(c => <option key={c} value={c}>{c}</option>)}</select>
+        )}
+        <div className="flex bg-gray-100 rounded-lg p-0.5">
+          <button onClick={() => setViewMode('accounts')} className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'accounts' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}># Accounts</button>
+          <button onClick={() => setViewMode('dollars')} className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'dollars' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>$ Value</button>
+        </div>
+      </div>
+
+      {/* ══ Collections Funnel ═══════════════════════════════════════════ */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-6 pt-5 pb-4">
           <div className="flex items-center justify-between mb-1">
             <div>
               <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Collections Funnel</h2>
-              <p className="text-xs text-gray-400 mt-0.5">{funnelLabel} · End-to-end conversion{selectedCreditor !== 'All Creditors' ? ` · ${selectedCreditor}` : ''}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{period === 'All Time' ? 'All Time' : period}{filterSub ? ` · ${filterSub}` : ''} · End-to-end conversion</p>
             </div>
-            <span className="text-xs text-gray-400">Viewing by: <strong className="text-gray-700">{viewMode === 'accounts' ? '# Accounts' : '$ Value'}</strong></span>
+            <div className="text-right">
+              <div className="text-lg font-extrabold text-gray-900" style={{ fontVariantNumeric: 'tabular-nums' }}>{metrics.accounts.toLocaleString()}</div>
+              <div className="text-[10px] text-gray-400">Total accounts</div>
+            </div>
           </div>
-          <div className="mt-5 px-2">
-            <BarFunnel viewMode={viewMode} />
+          <div className="mt-4 px-2">
+            <BarFunnel viewMode={viewMode} period={period} selectedCreditor={client} selectedCohort={cohort} />
           </div>
         </div>
-        <div className="grid grid-cols-5 gap-px" style={{ borderTop: '1px solid #d4eae5' }}>
-          {[
-            { label: 'Unreached',   accounts: '7,440', dollars: '$18.6M', note: 'Skip trace / re-attempt in progress' },
-            { label: 'No RPC',      accounts: '1,200', dollars: '$4.3M',  note: 'Connected but not right party' },
-            { label: 'No PTP',      accounts: '2,957', dollars: '$8.3M',  note: 'Engaged but no commitment' },
-            { label: 'Broken PTP',  accounts: '129',   dollars: '$0.6M',  note: '620 total broken this placement' },
-            { label: 'In progress', accounts: '469',   dollars: '$1.7M',  note: 'Active payment plans running' },
-          ].map((d, i) => (
-            <div key={i} className="px-4 py-3" style={{ backgroundColor: '#f8fcfb' }}>
-              <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Drop-off: {d.label}</div>
-              <div className="text-sm font-bold text-gray-900">{viewMode === 'accounts' ? d.accounts : d.dollars} <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-red-50 text-red-700">Drop</span></div>
-              <div className="text-[10px] text-gray-400 mt-0.5">{d.note}</div>
+        <div className="grid grid-cols-3 gap-px" style={{ borderTop: '1px solid #d4eae5', backgroundColor: '#e5e7eb' }}>
+          {convMetrics.map((m) => (
+            <div key={m.key} className="bg-white px-5 py-4">
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: m.color }} />
+                <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">{m.label}</span>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-extrabold text-gray-900" style={{ fontVariantNumeric: 'tabular-nums' }}>{m.value}%</span>
+                <span className={`text-[10px] font-semibold ${m.value >= m.target ? 'text-green-600' : 'text-amber-600'}`}>
+                  {m.value >= m.target ? '↑' : '↓'} Target: {m.target}%
+                </span>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Collections over time — driven by filters */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Collections Over Time</h2>
-            <p className="text-xs text-gray-400 mt-0.5">
-              {period === 'All Time' ? 'Jan – Apr 13' : period} · {granularity}{selectedCreditor !== 'All Creditors' ? ` · ${selectedCreditor}` : ''}
-            </p>
+      {/* ══ Metric Charts — bar + line combo, 2-col grid ═══════════════ */}
+      <div className="grid grid-cols-2 gap-5">
+        {chartDefs.map(cd => <MetricChartCard key={cd.key} config={cd} period={period} />)}
+      </div>
+    </div>
+  );
+}
+
+// ── MetricChartCard — bar + line combo (reference screenshot style) ───────────
+
+function MetricChartCard({ config, period }) {
+  const { label, baseVal, color, unit, isMoney, target, gradId, cumulative } = config;
+
+  const data = buildWeeklyData(baseVal, isMoney, period);
+  if (cumulative && isMoney) { let cum = 0; data.forEach(d => { cum += d.value; d.value = cum; }); }
+
+  const latestVal = data[data.length - 1]?.value || 0;
+  const prevVal   = data.length > 1 ? data[data.length - 2]?.value || 0 : 0;
+  const wowChange = latestVal - prevVal;
+  const fmtVal = (v) => isMoney ? `$${(v / 1000).toFixed(0)}K` : `${v}${unit}`;
+  const fmtShort = (v) => isMoney ? `${(v / 1000).toFixed(0)}K` : `${v}`;
+
+  const renderLabel = (props) => {
+    const { x, y, value } = props;
+    return <text x={x} y={y - 10} textAnchor="middle" fill={color} fontSize={10} fontWeight={700} style={{ fontVariantNumeric: 'tabular-nums' }}>{fmtShort(value)}</text>;
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="px-5 pt-4 pb-2 flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">{label}</h3>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ backgroundColor: '#2196af' }} /><span className="text-xs text-gray-500">Daily collected</span></div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ backgroundColor: '#61ab5e' }} /><span className="text-xs text-gray-500">Cumulative</span></div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold text-gray-900" style={{ fontVariantNumeric: 'tabular-nums' }}>{fmtVal(latestVal)}</span>
+            {wowChange !== 0 && (
+              <span className={`text-xs font-bold ${wowChange > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                {wowChange > 0 ? '+' : ''}{fmtVal(wowChange)} WoW
+              </span>
+            )}
           </div>
+          {target && <div className="text-[10px] text-gray-400 mt-0.5">Target: {target}{unit}</div>}
         </div>
-        <ResponsiveContainer width="100%" height={260}>
-          <AreaChart data={chartData} key={`${period}-${granularity}-${selectedCreditor}`}>
+        <div className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-md">Weekly</div>
+      </div>
+      <div className="px-3 pb-4">
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={data} barSize={36}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={v => isMoney ? `$${(v/1000).toFixed(0)}K` : `${v}%`} stroke="#d1d5db" tick={{ fontSize: 9 }} axisLine={false} tickLine={false} width={isMoney ? 50 : 35} domain={[0, 'auto']} />
+            <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #e5e7eb', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', fontSize: 11 }} formatter={v => [isMoney ? `$${v.toLocaleString()}` : `${v}%`, label]} />
             <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="#2196af" stopOpacity={0.18} />
-                <stop offset="95%" stopColor="#2196af" stopOpacity={0} />
+              <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={color} stopOpacity={0.2} />
+                <stop offset="100%" stopColor={color} stopOpacity={0.05} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke="#9ca3af" label={{ value: xLabel, position: 'insideBottom', offset: -2, fontSize: 11 }} />
-            <YAxis yAxisId="left"  tickFormatter={v => `$${(v/1000).toFixed(0)}K`} stroke="#9ca3af" tick={{ fontSize: 10 }} width={52} />
-            <YAxis yAxisId="right" orientation="right" tickFormatter={v => `$${(v/1000).toFixed(0)}K`} stroke="#9ca3af" tick={{ fontSize: 10 }} width={52} />
-            <Tooltip formatter={(v, name) => [`$${v.toLocaleString()}`, name === 'daily' ? 'Daily collected' : 'Cumulative']} labelFormatter={l => `${xLabel} ${l}`} />
-            <Area yAxisId="left"  type="monotone" dataKey="daily"      name="daily"      stroke="#2196af" fill="url(#grad)" strokeWidth={2} />
-            <Line yAxisId="right" type="monotone" dataKey="cumulative" name="cumulative" stroke="#61ab5e" strokeWidth={2} dot={false} />
-          </AreaChart>
+            <Bar dataKey="value" fill={`url(#${gradId})`} radius={[4, 4, 0, 0]} />
+            <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2.5} dot={{ r: 4, fill: '#fff', stroke: color, strokeWidth: 2 }} label={renderLabel} />
+            {target && <ReferenceLine y={target} stroke={color} strokeDasharray="4 4" strokeOpacity={0.3} />}
+          </BarChart>
         </ResponsiveContainer>
       </div>
-
-      {/* KPI Summary */}
-      <KpiSummary filters={filters} />
     </div>
   );
 }
@@ -512,14 +602,47 @@ function OverviewTab({ onNavigate, filters }) {
 // ── TAB: Inbound ──────────────────────────────────────────────────────────────
 
 function InboundTab() {
+  const [selectedCreditor, setSelectedCreditor] = React.useState('All Clients');
+  const [selectedCohort,   setSelectedCohort]   = React.useState('All Cohorts');
+
+  const cm = CREDITOR_MULTIPLIERS[selectedCreditor] || CREDITOR_MULTIPLIERS['All Clients'];
+  const co = COHORT_MULTIPLIERS[selectedCohort]     || COHORT_MULTIPLIERS['All Cohorts'];
+  const scale = cm.contact * co.contact;
+
+  // Scale calling reason data
+  const reasonRows = sentimentData.callingReasons.map(r => ({ ...r, count: Math.round(r.count * scale) }));
+  const reasonTotal = reasonRows.reduce((s, r) => s + r.count, 0);
+  const reasons = reasonRows.map(r => ({ ...r, pct: reasonTotal > 0 ? Math.round((r.count / reasonTotal) * 100) : 0 }));
+  const maxCount = Math.max(...reasons.map(r => r.count));
+
+  const filterLabel = [
+    selectedCreditor !== 'All Clients' ? selectedCreditor : null,
+    selectedCohort !== 'All Cohorts' ? selectedCohort : null,
+  ].filter(Boolean).join(' · ');
+
   return (
     <div className="px-8 py-6 space-y-6">
+      {/* ── Filter bar ──────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Client</span>
+          <select value={selectedCreditor} onChange={e => setSelectedCreditor(e.target.value)}
+            className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-400"
+          >{ALL_CLIENTS.map(c => <option key={c} value={c}>{c}</option>)}</select>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Cohort</span>
+          <select value={selectedCohort} onChange={e => setSelectedCohort(e.target.value)}
+            className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-400"
+          >{['All Cohorts', ...(PORTFOLIO_COHORTS[selectedCreditor] || []).map(c => c.name)].map(c => <option key={c} value={c}>{c}</option>)}</select>
+        </div>
+      </div>
+
       {/* Highlights */}
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         <HL label="Inbound Calls Today" value="85" sub="Avg 4 min / call" />
         <HL label="Payment Bot Completion" value="78%" sub="Full IVR resolution" color="text-green-600" />
         <HL label="Live Transfers" value="20" sub="12 disputes · 8 hardship" />
-        <HL label="Email / Web Inbound" value="34" sub="18 payment portal visits" />
         <HL label="Avg Handle Time" value="4.2 min" sub="Bot: 3.1 · Human: 6.8" />
       </div>
 
@@ -544,11 +667,10 @@ function InboundTab() {
             <Area type="monotone" dataKey="paymentCalls" name="Payment calls" stroke="#61ab5e" fill="url(#payGrad)" strokeWidth={2} />
             <Line type="monotone" dataKey="disputes"    name="Disputes"       stroke="#ef4444" strokeWidth={2} dot={false} />
             <Line type="monotone" dataKey="hardship"    name="Hardship"       stroke="#f59e0b" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="emailInbound" name="Email/web"     stroke="#8b5cf6" strokeWidth={2} dot={false} />
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex items-center gap-5 mt-3">
-          {[['#61ab5e','Payment calls'], ['#ef4444','Disputes'], ['#f59e0b','Hardship'], ['#8b5cf6','Email/web']].map(([c, l]) => (
+          {[['#61ab5e','Payment calls'], ['#ef4444','Disputes'], ['#f59e0b','Hardship']].map(([c, l]) => (
             <div key={l} className="flex items-center gap-1.5">
               <span className="w-3 h-2 rounded-sm" style={{ backgroundColor: c }} />
               <span className="text-xs text-gray-500">{l}</span>
@@ -557,42 +679,52 @@ function InboundTab() {
         </div>
       </div>
 
-      {/* Calling reason + sentiment */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">Calling Reason Breakdown & Sentiment</h3>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
-                {['Reason', 'Count', 'Share', 'Sentiment', 'Resolution'].map(h => (
-                  <th key={h} className={`py-2 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Reason' || h === 'Resolution' ? 'text-left' : 'text-center'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sentimentData.callingReasons.map((row, i) => (
-                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
-                  <td className="py-2.5 px-3 font-medium text-gray-900">{row.reason}</td>
-                  <td className="py-2.5 px-3 text-center tabular-nums text-gray-700">{row.count}</td>
-                  <td className="py-2.5 px-3 text-center">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <div className="w-14 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#d4eae5' }}>
-                        <div className="h-full rounded-full" style={{ width: `${row.pct * 2.7}%`, backgroundColor: '#2196af' }} />
-                      </div>
-                      <span className="text-xs text-gray-600 tabular-nums w-7">{row.pct}%</span>
-                    </div>
-                  </td>
-                  <td className="py-2.5 px-3 text-center">
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium ${sentColor(row.sentiment)}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${sentDot(row.sentiment)}`} />
-                      {row.sentiment.charAt(0).toUpperCase() + row.sentiment.slice(1)}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-3 text-xs text-gray-600">{row.resolution}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Calling Reason Breakdown — card-based, filter-responsive */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="px-6 pt-5 pb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Calling Reasons</h2>
+            <p className="text-xs text-gray-400 mt-0.5">{reasonTotal.toLocaleString()} total inbound interactions{filterLabel ? ` · ${filterLabel}` : ''}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            {[
+              { label: 'Positive', color: '#61ab5e' },
+              { label: 'Neutral',  color: '#9ca3af' },
+              { label: 'Negative', color: '#ef4444' },
+            ].map(s => (
+              <div key={s.label} className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
+                <span className="text-[10px] text-gray-500">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="divide-y divide-gray-50">
+          {reasons.map((row, i) => {
+            const sentBg = row.sentiment === 'positive' ? '#61ab5e' : row.sentiment === 'negative' ? '#ef4444' : '#9ca3af';
+            return (
+              <div key={i} className="px-6 py-4 flex items-center gap-5 hover:bg-gray-50/50 transition-colors">
+                {/* Sentiment accent */}
+                <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ backgroundColor: sentBg }} />
+                {/* Reason + resolution */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-gray-900">{row.reason}</div>
+                  <div className="text-[11px] text-gray-400 mt-0.5">{row.resolution}</div>
+                </div>
+                {/* Bar */}
+                <div className="w-40 flex-shrink-0">
+                  <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#f3f4f6' }}>
+                    <div className="h-2 rounded-full transition-all" style={{ width: `${(row.count / maxCount) * 100}%`, backgroundColor: sentBg, opacity: 0.7 }} />
+                  </div>
+                </div>
+                {/* Count + pct */}
+                <div className="w-16 flex-shrink-0 text-right">
+                  <div className="text-sm font-bold text-gray-900" style={{ fontVariantNumeric: 'tabular-nums' }}>{row.count}</div>
+                  <div className="text-[10px] text-gray-400" style={{ fontVariantNumeric: 'tabular-nums' }}>{row.pct}%</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -603,7 +735,7 @@ function InboundTab() {
           <div className="space-y-3">
             {[
               { label: 'Payment completed via bot', count: 66,  pct: 78, color: '#61ab5e' },
-              { label: 'Transferred to live agent', count: 15,  pct: 18, color: '#2196af' },
+              { label: 'Transferred to live agent', count: 15,  pct: 18, color: '#4c6ef5' },
               { label: 'Abandoned / hung up',        count: 4,   pct: 5,  color: '#f59e0b' },
             ].map((r, i) => (
               <div key={i}>
@@ -611,7 +743,7 @@ function InboundTab() {
                   <span className="text-gray-700">{r.label}</span>
                   <span className="font-bold text-gray-900">{r.count} <span className="text-gray-400 font-normal">({r.pct}%)</span></span>
                 </div>
-                <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: '#d4eae5' }}>
+                <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: '#dee2e6' }}>
                   <div className="h-1.5 rounded-full" style={{ width: `${r.pct}%`, backgroundColor: r.color }} />
                 </div>
               </div>
@@ -637,184 +769,304 @@ function InboundTab() {
           </div>
         </div>
       </div>
+
     </div>
   );
 }
 
-// ── TAB: Promises ─────────────────────────────────────────────────────────────
+// ── TAB: Promises & Plans ─────────────────────────────────────────────────────
 
 function PromisesTab() {
+  const [subTab, setSubTab] = React.useState('promises');
+
+  // ── PROMISES DATA ──────────────────────────────────────────────────
+  const ptpWeekly = [
+    { week: 'Wk 1', made: 144, kept: 89,  broken: 55,  partial: 12, value: 64800,  avgAmt: 450, avgDays: 4.2 },
+    { week: 'Wk 2', made: 162, kept: 105, broken: 57,  partial: 18, value: 72900,  avgAmt: 450, avgDays: 3.8 },
+    { week: 'Wk 3', made: 97,  kept: 80,  broken: 17,  partial: 8,  value: 43700,  avgAmt: 451, avgDays: 3.1 },
+  ];
+  const totalMade    = ptpWeekly.reduce((s,w) => s+w.made, 0);
+  const totalKept    = ptpWeekly.reduce((s,w) => s+w.kept, 0);
+  const totalBroken  = ptpWeekly.reduce((s,w) => s+w.broken, 0);
+  const totalPartial = ptpWeekly.reduce((s,w) => s+w.partial, 0);
+  const totalValue   = ptpWeekly.reduce((s,w) => s+w.value, 0);
+  const uniqueAccts  = Math.round(totalMade * 0.82);
+  const adherenceRate = Math.round((totalKept / totalMade) * 100);
+  const avgPromiseAmt = Math.round(totalValue / totalKept);
+  const avgDaysToFulfill = 3.7;
+  const repeatRate = 14;
+
+  // Adherence trend (weekly)
+  const adhTrend = ptpWeekly.map(w => ({ label: w.week, rate: Math.round((w.kept / w.made) * 100), made: w.made }));
+
+  // Future promises
+  const futurePtps = [
+    { date: 'Apr 14', count: 18, value: 42600, probability: 72 },
+    { date: 'Apr 18', count: 24, value: 58200, probability: 68 },
+    { date: 'Apr 21', count: 12, value: 31400, probability: 74 },
+    { date: 'Apr 25', count: 31, value: 74800, probability: 65 },
+    { date: 'Apr 28', count: 8,  value: 19600, probability: 61 },
+  ];
+  const futureTotal = futurePtps.reduce((s,p) => s+p.count, 0);
+  const futureValue = futurePtps.reduce((s,p) => s+p.value, 0);
+  const futureAvgProb = Math.round(futurePtps.reduce((s,p) => s + p.probability * p.count, 0) / futureTotal);
+
+  // Risk segmentation
+  const riskSegments = [
+    { label: 'High probability (>70%)', count: 42, value: 98400, color: '#61ab5e' },
+    { label: 'Medium probability (50-70%)', count: 38, value: 84200, color: '#f59e0b' },
+    { label: 'Low probability (<50%)', count: 13, value: 43600, color: '#ef4444' },
+  ];
+
+  // ── PLANS DATA ─────────────────────────────────────────────────────
+  const totalAccounts = 12000;
+  const accountsOnPlans = 94;
+  const planConversion = +((accountsOnPlans / totalAccounts) * 100).toFixed(2);
+
+  const planBuckets = [
+    { tenure: '< 1 Year', accounts: 62, balance: 142600, avgBal: 2300, collected: 68400, collRate: 48, avgInstallment: 482, onTime: 89, prepay: 8 },
+    { tenure: '1–2 Years', accounts: 24, balance: 168000, avgBal: 7000, collected: 42000, collRate: 25, avgInstallment: 310, onTime: 75, prepay: 4 },
+    { tenure: '> 2 Years', accounts: 8,  balance: 124800, avgBal: 15600, collected: 12480, collRate: 10, avgInstallment: 186, onTime: 63, prepay: 0 },
+  ];
+  const planTotalBal    = planBuckets.reduce((s,b) => s+b.balance, 0);
+  const planTotalColl   = planBuckets.reduce((s,b) => s+b.collected, 0);
+  const activePlans     = 77;
+  const completedPlans  = 8;
+  const brokenPlans     = 9;
+  const avgPlanDuration = 14; // months
+  const overallOnTime   = Math.round(planBuckets.reduce((s,b) => s + b.onTime * b.accounts, 0) / accountsOnPlans);
+  const dropOffRate     = 9.6;
+
+  const TB = 'tabular-nums';
+
   return (
     <div className="px-8 py-6 space-y-6">
-      {/* Highlights */}
-      <div className="grid grid-cols-5 gap-4">
-        <HL label="Total PTPs Made" value="403" sub="All 3 weeks" />
-        <HL label="Kept-PTP Rate" value="68%" sub="274 kept · 129 broken" color="text-amber-600" />
-        <HL label="Warm PTP" value="312" sub="Via voice / direct contact" />
-        <HL label="Cold PTP" value="91" sub="Via SMS / email" />
-        <HL label="At-Risk PTP Value" value="$142K" sub="89 accounts · missed 1st installment" color="text-red-600" />
+      {/* Sub-tab toggle */}
+      <div className="flex items-center gap-6" style={{ borderBottom: '1px solid #e5e7eb' }}>
+        {[{ id: 'promises', label: 'Promises' }, { id: 'plans', label: 'Plans' }].map(t => (
+          <button key={t.id} onClick={() => setSubTab(t.id)}
+            className={`pb-3 text-sm font-medium transition-all relative ${subTab === t.id ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
+            {t.label}
+            {subTab === t.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#2196af' }} />}
+          </button>
+        ))}
       </div>
 
-      {/* Weekly PTP trend */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">PTP Pipeline by Week</h2>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={ptpDetailData} barGap={4}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="week" tick={{ fontSize: 11 }} stroke="#9ca3af" />
-            <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" />
-            <Tooltip />
-            <Bar dataKey="made"   name="PTPs Made"   fill="#2196af" radius={[3,3,0,0]} />
-            <Bar dataKey="kept"   name="PTPs Kept"   fill="#61ab5e" radius={[3,3,0,0]} />
-            <Bar dataKey="broken" name="PTPs Broken" fill="#ef4444" radius={[3,3,0,0]} />
-          </BarChart>
-        </ResponsiveContainer>
-        <div className="flex items-center gap-5 mt-3">
-          {[['#2196af','Made'], ['#61ab5e','Kept'], ['#ef4444','Broken']].map(([c, l]) => (
-            <div key={l} className="flex items-center gap-1.5">
-              <span className="w-3 h-2 rounded-sm" style={{ backgroundColor: c }} />
-              <span className="text-xs text-gray-500">{l}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* ══════════════ PROMISES SUB-TAB ══════════════ */}
+      {subTab === 'promises' && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* KPI row */}
+          <div className="grid grid-cols-5 gap-4">
+            {[
+              { label: 'Total Promises', val: totalMade, sub: `${uniqueAccts} unique accounts`, color: '#2196af' },
+              { label: 'Adherence Rate', val: `${adherenceRate}%`, sub: `${totalKept} kept of ${totalMade} (due ≤ yesterday)`, color: adherenceRate >= 70 ? '#61ab5e' : '#f59e0b' },
+              { label: 'Kept', val: totalKept, sub: `${Math.round((totalKept/totalMade)*100)}% of total`, color: '#61ab5e' },
+              { label: 'Broken', val: totalBroken, sub: `${Math.round((totalBroken/totalMade)*100)}% of total`, color: '#ef4444' },
+              { label: 'Partial Payments', val: totalPartial, sub: `${Math.round((totalPartial/totalMade)*100)}% of total`, color: '#8b5cf6' },
+            ].map((c, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: c.color }} />
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{c.label}</div>
+                <div className="text-2xl font-extrabold text-gray-900" style={{ fontVariantNumeric: TB }}>{c.val}</div>
+                <div className="text-[10px] text-gray-400 mt-0.5">{c.sub}</div>
+              </div>
+            ))}
+          </div>
 
-      {/* Weekly PTP detail table */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">Weekly PTP Detail</h3>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
-                {['Week', 'PTPs Made', 'Kept', 'Broken', 'Adherence %', 'Est. Value'].map(h => (
-                  <th key={h} className={`py-2.5 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Week' ? 'text-left' : 'text-center'}`}>{h}</th>
+          {/* Adherence breakdown bar + trend chart */}
+          <div className="grid grid-cols-2 gap-5">
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-4">Adherence Breakdown</h3>
+              <div className="h-3 rounded-full overflow-hidden flex mb-4" style={{ backgroundColor: '#f3f4f6' }}>
+                <div style={{ width: `${Math.round((totalKept/totalMade)*100)}%`, backgroundColor: '#61ab5e' }} />
+                <div style={{ width: `${Math.round((totalPartial/totalMade)*100)}%`, backgroundColor: '#8b5cf6' }} />
+                <div style={{ width: `${Math.round((totalBroken/totalMade)*100)}%`, backgroundColor: '#ef4444' }} />
+              </div>
+              <div className="space-y-2">
+                {[
+                  { label: 'Kept', count: totalKept, pct: Math.round((totalKept/totalMade)*100), color: '#61ab5e' },
+                  { label: 'Partial', count: totalPartial, pct: Math.round((totalPartial/totalMade)*100), color: '#8b5cf6' },
+                  { label: 'Broken', count: totalBroken, pct: Math.round((totalBroken/totalMade)*100), color: '#ef4444' },
+                ].map((r, i) => (
+                  <div key={i} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: r.color }} /><span className="text-gray-700">{r.label}</span></div>
+                    <div><span className="font-bold text-gray-900" style={{ fontVariantNumeric: TB }}>{r.count}</span> <span className="text-gray-400 text-xs">({r.pct}%)</span></div>
+                  </div>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ptpDetailData.map((row, i) => (
-                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
-                  <td className="py-2.5 px-4 font-medium text-gray-900">{row.week}</td>
-                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-700">{row.made}</td>
-                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-900 font-semibold">{row.kept} <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">Kept</span></td>
-                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-900 font-semibold">{row.broken} <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-red-50 text-red-700">Broken</span></td>
-                  <td className="py-2.5 px-4 text-center">
-                    <span className="text-sm font-bold text-gray-900">{row.keptPct}%</span>{' '}<span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${row.keptPct >= 70 ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>{row.keptPct >= 70 ? 'On track' : 'Monitor'}</span>
-                  </td>
-                  <td className="py-2.5 px-4 text-center tabular-nums font-semibold text-gray-900">${row.value.toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* PTP by cohort */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">PTP Performance by Cohort</h3>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
-                {['Cohort', 'PTP Rate', 'Adherence', 'Avg PTP Value', 'At-Risk Value', 'Status'].map(h => (
-                  <th key={h} className={`py-2.5 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Cohort' ? 'text-left' : 'text-center'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ptpByCohort.map((row, i) => (
-                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
-                  <td className="py-2.5 px-4 font-medium text-gray-900">{row.cohort}</td>
-                  <td className="py-2.5 px-4 text-center tabular-nums font-semibold" style={{ color: '#2196af' }}>{row.ptpRate}%</td>
-                  <td className="py-2.5 px-4 text-center">
-                    <span className="text-sm font-bold text-gray-900">{row.adherence}%</span>{' '}<span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${row.adherence >= 70 ? 'bg-green-50 text-green-700' : row.adherence >= 60 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}>{row.adherence >= 70 ? '↑' : row.adherence >= 60 ? '~' : '↓'}</span>
-                  </td>
-                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-700">${row.avgValue.toLocaleString()}</td>
-                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-900 font-semibold">${row.atRisk.toLocaleString()} <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-red-50 text-red-700">At risk</span></td>
-                  <td className="py-2.5 px-4 text-center">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-                      row.adherence >= 70 ? 'bg-green-100 text-green-700' :
-                      row.adherence >= 60 ? 'bg-amber-100 text-amber-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {row.adherence >= 70 ? '✓ On target' : row.adherence >= 60 ? '⚠ Monitor' : '↓ Action needed'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* PTP recovery actions */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">Broken PTP Recovery Actions</h3>
-        <div className="grid grid-cols-3 gap-4">
-          {[
-            { count: 89, label: 'Missed 1st installment', action: 'SMS reminder + human agent call within 24h', urgency: 'high' },
-            { count: 40, label: 'Missed 2nd installment', action: 'Escalate to settlement offer (15% discount)', urgency: 'high' },
-            { count: 620, label: 'Total broken (placement)', action: 'Analyst: re-score, queue for next wave', urgency: 'medium' },
-          ].map((r, i) => (
-            <div key={i} className={`rounded-lg p-4 border ${r.urgency === 'high' ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}>
-              <div className="text-3xl font-extrabold text-gray-900 mb-1">{r.count} <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${r.urgency === 'high' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}`}>{r.urgency === 'high' ? 'Urgent' : 'Monitor'}</span></div>
-              <div className="text-xs font-semibold text-gray-700 mb-2">{r.label}</div>
-              <div className={`text-xs ${r.urgency === 'high' ? 'text-red-700' : 'text-amber-700'}`}>→ {r.action}</div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Payment Plans section */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Payment Plans</h3>
-          <span className="text-xs text-gray-400">Active installment arrangements</span>
-        </div>
-        <div className="grid grid-cols-4 gap-4 mb-5">
-          {[
-            { label: 'Active Plans', value: '94', sub: 'In good standing', color: 'text-green-600' },
-            { label: 'Total Plan Value', value: '$218K', sub: 'Outstanding balance', color: 'text-gray-900' },
-            { label: 'Avg Monthly Payment', value: '$184', sub: 'Across all plans', color: 'text-gray-900' },
-            { label: 'Plans at Risk', value: '23', sub: 'Missed last installment', color: 'text-red-600' },
-          ].map((c, i) => (
-            <div key={i} className="border border-gray-100 rounded-lg p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{c.label}</div>
-              <div className={`text-2xl font-extrabold ${c.color}`}>{c.value}</div>
-              <div className="text-[10px] text-gray-400 mt-0.5">{c.sub}</div>
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-4">Trends</h3>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={adhTrend} barSize={28}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                  <XAxis dataKey="label" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tickFormatter={v => `${v}%`} tick={{ fontSize: 9 }} axisLine={false} tickLine={false} domain={[0, 100]} />
+                  <Tooltip formatter={(v, name) => [name === 'rate' ? `${v}%` : v, name === 'rate' ? 'Adherence' : 'Created']} />
+                  <Bar dataKey="made" name="Created" fill="#2196af" opacity={0.2} radius={[3,3,0,0]} />
+                  <Line type="monotone" dataKey="rate" name="Adherence" stroke="#61ab5e" strokeWidth={2.5} dot={{ r: 4, fill: '#fff', stroke: '#61ab5e', strokeWidth: 2 }} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-          ))}
-        </div>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
-                {['Cohort', 'Active Plans', 'Avg Plan ($)', 'Avg Term', 'On Track', 'At Risk'].map(h => (
-                  <th key={h} className={`py-2.5 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Cohort' ? 'text-left' : 'text-center'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { cohort: 'High prop / High bal',  plans: 32, avg: 4200, term: '6 mo', onTrack: 28, atRisk: 4 },
-                { cohort: 'Medium prop / All bal',  plans: 41, avg: 2100, term: '4 mo', onTrack: 33, atRisk: 8 },
-                { cohort: 'Low prop / High bal',    plans: 18, avg: 4800, term: '8 mo', onTrack: 9,  atRisk: 9 },
-                { cohort: 'High prop / Low bal',    plans: 3,  avg: 980,  term: '3 mo', onTrack: 3,  atRisk: 0 },
-                { cohort: 'Low prop / Low bal',     plans: 0,  avg: 0,    term: '—',    onTrack: 0,  atRisk: 2 },
-              ].map((row, i) => (
-                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
-                  <td className="py-2.5 px-4 font-medium text-gray-900">{row.cohort}</td>
-                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-700">{row.plans}</td>
-                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-700">{row.avg > 0 ? `$${row.avg.toLocaleString()}` : '—'}</td>
-                  <td className="py-2.5 px-4 text-center text-gray-600">{row.term}</td>
-                  <td className="py-2.5 px-4 text-center tabular-nums font-semibold text-green-700">{row.onTrack}</td>
-                  <td className="py-2.5 px-4 text-center tabular-nums font-semibold text-red-600">{row.atRisk > 0 ? row.atRisk : '—'}</td>
-                </tr>
+          </div>
+
+          {/* Future promises */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Future Promises — April</h3>
+                <p className="text-xs text-gray-400 mt-0.5">{futureTotal} promises · ${(futureValue/1000).toFixed(0)}K expected · {futureAvgProb}% predicted adherence</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-5 gap-3">
+              {futurePtps.map((p, i) => (
+                <div key={i} className="border border-gray-100 rounded-xl p-4 text-center">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">{p.date}</div>
+                  <div className="text-xl font-extrabold text-gray-900" style={{ fontVariantNumeric: TB }}>{p.count}</div>
+                  <div className="text-xs text-gray-500 mt-0.5" style={{ fontVariantNumeric: TB }}>${(p.value/1000).toFixed(1)}K</div>
+                  <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#f3f4f6' }}>
+                    <div className="h-1 rounded-full" style={{ width: `${p.probability}%`, backgroundColor: p.probability >= 70 ? '#61ab5e' : p.probability >= 50 ? '#f59e0b' : '#ef4444' }} />
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-1">{p.probability}% prob</div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
+
+          {/* Additional metrics */}
+          <div className="grid grid-cols-4 gap-4">
+            {[
+              { label: 'Avg Promise Amount', val: `$${avgPromiseAmt}` },
+              { label: 'Avg Days to Fulfill', val: `${avgDaysToFulfill}` },
+              { label: 'Repeat Promise Rate', val: `${repeatRate}%` },
+              { label: 'Total Value Collected', val: `$${(totalValue/1000).toFixed(0)}K` },
+            ].map((c, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{c.label}</div>
+                <div className="text-xl font-extrabold text-gray-900" style={{ fontVariantNumeric: TB }}>{c.val}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Risk segmentation */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-4">Risk Segmentation</h3>
+            <div className="space-y-3">
+              {riskSegments.map((r, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: r.color }} />
+                  <span className="text-sm text-gray-700 flex-1">{r.label}</span>
+                  <span className="text-sm font-bold text-gray-900 w-10 text-right" style={{ fontVariantNumeric: TB }}>{r.count}</span>
+                  <div className="w-32 h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#f3f4f6' }}>
+                    <div className="h-2 rounded-full" style={{ width: `${(r.count / futureTotal) * 100}%`, backgroundColor: r.color }} />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900 w-16 text-right" style={{ fontVariantNumeric: TB }}>${(r.value/1000).toFixed(0)}K</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* ══════════════ PLANS SUB-TAB ══════════════ */}
+      {subTab === 'plans' && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Funnel: Total → Plans → Conversion */}
+          <div className="grid grid-cols-3 gap-5">
+            <div className="bg-white border border-gray-200 rounded-xl p-5 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: '#2196af' }} />
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Total Accounts</div>
+              <div className="text-3xl font-extrabold text-gray-900" style={{ fontVariantNumeric: TB }}>{totalAccounts.toLocaleString()}</div>
+              <div className="text-[10px] text-gray-400 mt-1">Full placement</div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-xl p-5 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: '#61ab5e' }} />
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">On Payment Plans</div>
+              <div className="text-3xl font-extrabold text-gray-900" style={{ fontVariantNumeric: TB }}>{accountsOnPlans}</div>
+              <div className="text-[10px] text-gray-400 mt-1">${(planTotalBal/1000).toFixed(0)}K total balance</div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-xl p-5 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: '#8b5cf6' }} />
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Conversion Rate</div>
+              <div className="text-3xl font-extrabold text-gray-900" style={{ fontVariantNumeric: TB }}>{planConversion}%</div>
+              <div className="text-[10px] text-gray-400 mt-1">Accounts → Active plans</div>
+            </div>
+          </div>
+
+          {/* Plan health */}
+          <div className="grid grid-cols-5 gap-4">
+            {[
+              { label: 'Active Plans', val: activePlans, color: '#61ab5e' },
+              { label: 'Completed', val: completedPlans, color: '#2196af' },
+              { label: 'Broken', val: brokenPlans, color: '#ef4444' },
+              { label: 'On-Time Payment', val: `${overallOnTime}%`, color: overallOnTime >= 80 ? '#61ab5e' : '#f59e0b' },
+              { label: 'Drop-off Rate', val: `${dropOffRate}%`, color: '#ef4444' },
+            ].map((c, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: c.color }} />
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{c.label}</div>
+                <div className="text-2xl font-extrabold text-gray-900" style={{ fontVariantNumeric: TB }}>{c.val}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Tenure segmentation + collections */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="p-6 pb-3">
+              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Segmentation by Plan Tenure</h3>
+              <p className="text-xs text-gray-400 mt-0.5">{accountsOnPlans} plans · ${(planTotalBal/1000).toFixed(0)}K total balance · ${(planTotalColl/1000).toFixed(0)}K collected</p>
+            </div>
+            <div className="border-t border-gray-100">
+              <div className="grid px-6 py-2.5" style={{ gridTemplateColumns: '1fr 80px 90px 90px 90px 80px 80px 70px 60px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #f3f4f6' }}>
+                {['Tenure', 'Accounts', 'Balance', 'Avg Bal', 'Collected', 'Coll Rate', 'Avg Inst.', 'On-Time', 'Prepay'].map(h => (
+                  <div key={h} className={`text-[9px] font-bold uppercase tracking-wider text-gray-400 ${h === 'Tenure' ? '' : 'text-right'}`}>{h}</div>
+                ))}
+              </div>
+              {planBuckets.map((row, i) => (
+                <div key={i} className="grid items-center px-6 py-3" style={{ gridTemplateColumns: '1fr 80px 90px 90px 90px 80px 80px 70px 60px', borderBottom: '1px solid #f3f4f6' }}>
+                  <div className="text-sm font-semibold text-gray-900">{row.tenure}</div>
+                  <div className="text-sm font-bold text-gray-900 text-right" style={{ fontVariantNumeric: TB }}>{row.accounts}</div>
+                  <div className="text-sm text-gray-700 text-right" style={{ fontVariantNumeric: TB }}>${(row.balance/1000).toFixed(0)}K</div>
+                  <div className="text-sm text-gray-700 text-right" style={{ fontVariantNumeric: TB }}>${row.avgBal.toLocaleString()}</div>
+                  <div className="text-sm font-semibold text-gray-900 text-right" style={{ fontVariantNumeric: TB }}>${(row.collected/1000).toFixed(0)}K</div>
+                  <div className="text-right">
+                    <span className={`text-sm font-bold ${row.collRate >= 40 ? 'text-green-600' : row.collRate >= 20 ? 'text-amber-600' : 'text-red-500'}`} style={{ fontVariantNumeric: TB }}>{row.collRate}%</span>
+                  </div>
+                  <div className="text-right"><span className="text-sm font-bold" style={{ fontVariantNumeric: TB, color: '#2196af' }}>${row.avgInstallment}</span><span className="text-[10px] text-gray-400">/mo</span></div>
+                  <div className="text-sm text-right" style={{ fontVariantNumeric: TB }}>{row.onTime}%</div>
+                  <div className="text-sm text-right" style={{ fontVariantNumeric: TB }}>{row.prepay > 0 ? `${row.prepay}%` : '—'}</div>
+                </div>
+              ))}
+              <div className="grid px-6 py-3" style={{ gridTemplateColumns: '1fr 80px 90px 90px 90px 80px 80px 70px 60px', backgroundColor: '#f8f9fa', borderTop: '2px solid #dee2e6' }}>
+                <div className="text-xs font-bold text-gray-900">Total</div>
+                <div className="text-xs font-bold text-gray-900 text-right" style={{ fontVariantNumeric: TB }}>{accountsOnPlans}</div>
+                <div className="text-xs font-bold text-gray-900 text-right" style={{ fontVariantNumeric: TB }}>${(planTotalBal/1000).toFixed(0)}K</div>
+                <div className="text-xs font-bold text-gray-900 text-right" style={{ fontVariantNumeric: TB }}>${Math.round(planTotalBal/accountsOnPlans).toLocaleString()}</div>
+                <div className="text-xs font-bold text-gray-900 text-right" style={{ fontVariantNumeric: TB }}>${(planTotalColl/1000).toFixed(0)}K</div>
+                <div className="text-xs font-bold text-gray-900 text-right" style={{ fontVariantNumeric: TB }}>{Math.round((planTotalColl/planTotalBal)*100)}%</div>
+                <div className="text-xs font-bold text-right" style={{ fontVariantNumeric: TB, color: '#2196af' }}>${Math.round(planBuckets.reduce((s,b) => s+b.avgInstallment*b.accounts,0)/accountsOnPlans)}/mo</div>
+                <div className="text-xs font-bold text-gray-900 text-right" style={{ fontVariantNumeric: TB }}>{overallOnTime}%</div>
+                <div className="text-xs text-gray-400 text-right">—</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional plan metrics */}
+          <div className="grid grid-cols-4 gap-4">
+            {[
+              { label: 'Avg Installment', val: `$${Math.round(planBuckets.reduce((s,b)=>s+b.avgInstallment*b.accounts,0)/accountsOnPlans)}` },
+              { label: 'Avg Plan Duration', val: `${avgPlanDuration} mo` },
+              { label: 'Recovery Rate', val: `${Math.round((planTotalColl/planTotalBal)*100)}%` },
+              { label: 'Total Collected', val: `$${(planTotalColl/1000).toFixed(0)}K` },
+            ].map((c, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{c.label}</div>
+                <div className="text-xl font-extrabold text-gray-900" style={{ fontVariantNumeric: TB }}>{c.val}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -836,10 +1088,10 @@ function AgentPerformanceTab() {
       {/* Agent scoreboard */}
       <div className="bg-white border border-gray-200 rounded-xl p-6">
         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Human Agent Scoreboard</h2>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
+        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #dee2e6' }}>
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
+              <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' }}>
                 {['Agent', 'Daily Calls', 'RPC', 'PTP', 'Collections', 'Quality', 'Trend', 'Top Strength', 'Coaching Need'].map(h => (
                   <th key={h} className={`py-2.5 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wide ${['Agent','Top Strength','Coaching Need'].includes(h) ? 'text-left' : 'text-center'}`}>{h}</th>
                 ))}
@@ -847,11 +1099,11 @@ function AgentPerformanceTab() {
             </thead>
             <tbody>
               {agentPerfData.map((a, i) => (
-                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
+                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
                   <td className="py-2.5 px-3 font-semibold text-gray-900">{a.name}</td>
                   <td className="py-2.5 px-3 text-center tabular-nums text-gray-700">{a.calls}</td>
                   <td className="py-2.5 px-3 text-center tabular-nums text-gray-700">{a.rpc}</td>
-                  <td className="py-2.5 px-3 text-center tabular-nums font-semibold" style={{ color: '#2196af' }}>{a.ptp}</td>
+                  <td className="py-2.5 px-3 text-center tabular-nums font-semibold" style={{ color: '#4c6ef5' }}>{a.ptp}</td>
                   <td className="py-2.5 px-3 text-center tabular-nums font-semibold text-gray-900">${a.collections.toLocaleString()}</td>
                   <td className="py-2.5 px-3 text-center">
                     <span className="text-sm font-bold text-gray-900">{a.quality}</span>{' '}<span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${a.quality >= 90 ? 'bg-green-50 text-green-700' : a.quality >= 85 ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}`}>{a.quality >= 90 ? '↑' : a.quality >= 85 ? '~' : '↓'}</span>
@@ -882,7 +1134,7 @@ function AgentPerformanceTab() {
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div><span className="text-gray-400">Calls/day</span><br /><span className="font-bold text-gray-900">{b.calls.toLocaleString()}</span></div>
-                <div><span className="text-gray-400">Connect rate</span><br /><span className="font-bold" style={{ color: '#2196af' }}>{b.connect}</span></div>
+                <div><span className="text-gray-400">Connect rate</span><br /><span className="font-bold" style={{ color: '#4c6ef5' }}>{b.connect}</span></div>
                 <div><span className="text-gray-400">PTP rate</span><br /><span className="font-bold text-gray-900">{b.ptp}</span></div>
                 <div><span className="text-gray-400">Quality</span><br /><span className="font-bold text-gray-900">{b.quality}/100</span></div>
               </div>
@@ -944,7 +1196,7 @@ function AgentPerformanceTab() {
                     <span className="text-gray-700">{t.module}</span>
                     <span className="font-bold" style={{ color: t.pct === 100 ? '#61ab5e' : '#f59e0b' }}>{t.completed}/{t.total}</span>
                   </div>
-                  <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: '#d4eae5' }}>
+                  <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: '#dee2e6' }}>
                     <div className="h-1.5 rounded-full" style={{ width: `${t.pct}%`, backgroundColor: t.pct === 100 ? '#61ab5e' : '#f59e0b' }} />
                   </div>
                 </div>
@@ -999,15 +1251,15 @@ function BenchmarkTab() {
                     return (
                       <div key={j}>
                         <div className="flex justify-between text-[10px] mb-1">
-                          <span className={a.isSkit ? 'font-bold' : 'text-gray-400'} style={a.isSkit ? { color: '#2196af' } : {}}>
+                          <span className={a.isSkit ? 'font-bold' : 'text-gray-400'} style={a.isSkit ? { color: '#4c6ef5' } : {}}>
                             {a.label}
                           </span>
-                          <span className={a.isSkit ? 'font-bold' : 'text-gray-500'} style={a.isSkit ? { color: '#2196af' } : {}}>
+                          <span className={a.isSkit ? 'font-bold' : 'text-gray-500'} style={a.isSkit ? { color: '#4c6ef5' } : {}}>
                             {formatVal(a.val)}
                           </span>
                         </div>
                         <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: '#e5e7eb' }}>
-                          <div className="h-1.5 rounded-full" style={{ width: `${cappedPct}%`, backgroundColor: a.isSkit ? '#2196af' : '#9ca3af' }} />
+                          <div className="h-1.5 rounded-full" style={{ width: `${cappedPct}%`, backgroundColor: a.isSkit ? '#4c6ef5' : '#9ca3af' }} />
                         </div>
                       </div>
                     );
@@ -1026,18 +1278,18 @@ function BenchmarkTab() {
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Intelligence: Upsell Signals</h2>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div className="border-2 rounded-xl p-5" style={{ borderColor: '#2196af40' }}>
+          <div className="border-2 rounded-xl p-5" style={{ borderColor: '#4c6ef540' }}>
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded text-white" style={{ background: 'linear-gradient(135deg, #2196af, #61ab5e)' }}>Outperforming</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded text-white" style={{ background: '#4c6ef5' }}>Outperforming</span>
               <span className="text-sm font-bold text-gray-900">Auto-Finance &lt;$3K Portfolio</span>
             </div>
             <p className="text-sm text-gray-600 mb-3">Outperforming at 4.1%, 1.6x above aggregate benchmark. Client has 22,000 similar accounts in-house.</p>
             <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-              <span>Confidence: <strong style={{ color: '#2196af' }}>High</strong></span>
+              <span>Confidence: <strong style={{ color: '#4c6ef5' }}>High</strong></span>
               <span>|</span>
               <span>Projected: <strong>$205K over 60 days</strong></span>
             </div>
-            <button className="px-4 py-2 rounded-lg text-white text-xs font-bold" style={{ background: 'linear-gradient(135deg, #2196af, #61ab5e)' }}>Draft Upsell Case</button>
+            <button className="px-4 py-2 rounded-lg text-white text-xs font-bold" style={{ background: '#4c6ef5' }}>Draft Upsell Case</button>
           </div>
           <div className="border border-gray-200 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-3">
@@ -1050,7 +1302,7 @@ function BenchmarkTab() {
               <span>|</span>
               <span>Est. impact: <strong>-$34K/month</strong></span>
             </div>
-            <button className="px-4 py-2 rounded-lg text-gray-700 text-xs font-bold" style={{ backgroundColor: '#f0faf8', border: '1px solid #d4eae5' }}>Review Economic Draft</button>
+            <button className="px-4 py-2 rounded-lg text-gray-700 text-xs font-bold" style={{ backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}>Review Economic Draft</button>
           </div>
         </div>
       </div>
@@ -1089,9 +1341,9 @@ function EnrichmentTab() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <div className="text-[10px] mb-0.5" style={{ color: '#2196af' }}>Now ({c.after}%)</div>
+                  <div className="text-[10px] mb-0.5" style={{ color: '#4c6ef5' }}>Now ({c.after}%)</div>
                   <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#e5e7eb' }}>
-                    <div className="h-2 rounded-full" style={{ width: `${c.after}%`, backgroundColor: '#2196af' }} />
+                    <div className="h-2 rounded-full" style={{ width: `${c.after}%`, backgroundColor: '#4c6ef5' }} />
                   </div>
                 </div>
                 <div className="w-16 text-right"><span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">+{c.after - c.before}pts</span></div>
@@ -1112,8 +1364,8 @@ function EnrichmentTab() {
                   <span className="text-gray-700">{s.source}</span>
                   <span className="font-bold text-gray-900">{s.found} <span className="text-gray-400 font-normal">({s.pct}%)</span></span>
                 </div>
-                <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: '#d4eae5' }}>
-                  <div className="h-1.5 rounded-full" style={{ width: `${s.pct}%`, backgroundColor: s.source === 'Failed' ? '#ef4444' : '#2196af' }} />
+                <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: '#dee2e6' }}>
+                  <div className="h-1.5 rounded-full" style={{ width: `${s.pct}%`, backgroundColor: s.source === 'Failed' ? '#ef4444' : '#4c6ef5' }} />
                 </div>
               </div>
             ))}
@@ -1127,12 +1379,12 @@ function EnrichmentTab() {
           <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">Portfolio Composition</h3>
           <div className="space-y-3">
             {[
-              { label: 'Debt Type: Credit Card',    pct: 42, color: '#2196af' },
+              { label: 'Debt Type: Credit Card',    pct: 42, color: '#4c6ef5' },
               { label: 'Debt Type: Medical',        pct: 30, color: '#ef4444' },
               { label: 'Debt Type: Personal Loan',  pct: 28, color: '#8b5cf6' },
               { label: 'State: TX + FL',            pct: 33, color: '#f59e0b' },
               { label: 'State: CA + NY',            pct: 26, color: '#61ab5e' },
-              { label: 'Prior Placements: Primary', pct: 45, color: '#06b6d4' },
+              { label: 'Prior Placements: Primary', pct: 45, color: '#4c6ef5' },
             ].map((d, i) => (
               <div key={i}>
                 <div className="flex justify-between text-xs mb-1">
@@ -1151,10 +1403,10 @@ function EnrichmentTab() {
       {/* Propensity re-scoring signals */}
       <div className="bg-white border border-gray-200 rounded-xl p-6">
         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Propensity Re-Scoring Signals</h2>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
+        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #dee2e6' }}>
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
+              <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' }}>
                 {['Signal', 'Weight', 'Accounts Affected', 'Action Triggered'].map(h => (
                   <th key={h} className={`py-2.5 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Signal' || h === 'Action Triggered' ? 'text-left' : 'text-center'}`}>{h}</th>
                 ))}
@@ -1162,7 +1414,7 @@ function EnrichmentTab() {
             </thead>
             <tbody>
               {enrichmentData.propensitySignals.map((row, i) => (
-                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
+                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
                   <td className="py-2.5 px-4 font-medium text-gray-900">{row.signal}</td>
                   <td className="py-2.5 px-4 text-center">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
@@ -1183,153 +1435,6 @@ function EnrichmentTab() {
   );
 }
 
-// ── TAB: Cohorts ──────────────────────────────────────────────────────────────
-
-const perfClients = [
-  { client: 'Meridian Bank', debtType: 'Credit Card', accounts: 2840, balance: 8200000, collected: 221400, liqRate: 2.7, avgAge: '11 mo', status: 'above',
-    cohorts: [
-      { name: 'High Prop / High Bal', accounts: 620, collected: 84200, liqRate: 3.4, age: '8 mo', channels: ['Voice', 'SMS', 'Human'] },
-      { name: 'High Prop / Low Bal', accounts: 480, collected: 38400, liqRate: 2.9, age: '9 mo', channels: ['SMS', 'Email'] },
-      { name: 'Medium Prop', accounts: 740, collected: 48100, liqRate: 2.4, age: '12 mo', channels: ['Voice', 'SMS', 'Email'] },
-      { name: 'Low Prop / High Bal', accounts: 340, collected: 22100, liqRate: 1.6, age: '18 mo', channels: ['Human', 'SMS'] },
-      { name: 'Low Prop / Low Bal', accounts: 280, collected: 4200, liqRate: 0.5, age: '22 mo', channels: ['Email'] },
-    ]},
-  { client: 'Pinnacle Financial', debtType: 'Credit Card', accounts: 2180, balance: 5960000, collected: 143400, liqRate: 2.4, avgAge: '13 mo', status: 'on-target',
-    cohorts: [
-      { name: 'High Prop', accounts: 540, collected: 52200, liqRate: 3.0, age: '10 mo', channels: ['Voice', 'SMS'] },
-      { name: 'Medium Prop', accounts: 780, collected: 48600, liqRate: 2.2, age: '14 mo', channels: ['SMS', 'Email'] },
-      { name: 'Low Prop / High Bal', accounts: 420, collected: 28400, liqRate: 1.4, age: '19 mo', channels: ['Human'] },
-      { name: 'Low Prop / Low Bal', accounts: 440, collected: 14200, liqRate: 0.4, age: '20 mo', channels: ['Email'] },
-    ]},
-  { client: 'Clearview Medical', debtType: 'Medical', accounts: 2040, balance: 3570000, collected: 135660, liqRate: 3.8, avgAge: '10 mo', status: 'above',
-    cohorts: [
-      { name: 'High Prop / Empathetic', accounts: 680, collected: 58400, liqRate: 4.6, age: '6 mo', channels: ['Voice'] },
-      { name: 'Medium Prop', accounts: 820, collected: 52800, liqRate: 3.2, age: '11 mo', channels: ['SMS', 'Email'] },
-      { name: 'Low Prop', accounts: 540, collected: 24460, liqRate: 1.4, age: '16 mo', channels: ['Email'] },
-    ]},
-  { client: 'Crestline Lending', debtType: 'Personal Loan', accounts: 1920, balance: 6720000, collected: 120960, liqRate: 1.8, avgAge: '16 mo', status: 'below',
-    cohorts: [
-      { name: 'High Prop', accounts: 380, collected: 42800, liqRate: 2.6, age: '12 mo', channels: ['Voice', 'SMS'] },
-      { name: 'Medium Prop', accounts: 640, collected: 44200, liqRate: 1.7, age: '17 mo', channels: ['Voice', 'SMS', 'Email'] },
-      { name: 'Low Prop', accounts: 900, collected: 33960, liqRate: 0.6, age: '22 mo', channels: ['Email'] },
-    ]},
-  { client: 'Summit Health', debtType: 'Medical', accounts: 1580, balance: 2133000, collected: 90000, liqRate: 4.2, avgAge: '9 mo', status: 'above',
-    cohorts: [
-      { name: 'High Prop', accounts: 520, collected: 38200, liqRate: 5.1, age: '5 mo', channels: ['Voice', 'SMS'] },
-      { name: 'Medium Prop', accounts: 640, collected: 34800, liqRate: 3.6, age: '10 mo', channels: ['SMS', 'Email'] },
-      { name: 'Low Prop', accounts: 420, collected: 17000, liqRate: 1.8, age: '14 mo', channels: ['Email'] },
-    ]},
-  { client: 'Harbor Finance', debtType: 'Personal Loan', accounts: 1440, balance: 5040000, collected: 95760, liqRate: 1.9, avgAge: '18 mo', status: 'below',
-    cohorts: [
-      { name: 'High Prop', accounts: 320, collected: 36400, liqRate: 2.8, age: '14 mo', channels: ['Voice', 'SMS'] },
-      { name: 'Medium Prop', accounts: 520, collected: 34200, liqRate: 1.8, age: '19 mo', channels: ['SMS', 'Human'] },
-      { name: 'Low Prop', accounts: 600, collected: 25160, liqRate: 0.5, age: '24 mo', channels: ['Email', 'SMS'] },
-    ]},
-];
-
-function CohortsTab({ onNavigate }) {
-  const [expandedClient, setExpandedClient] = React.useState(null);
-  const [hoveredCohort, setHoveredCohort] = React.useState(null);
-  const totalCohorts = perfClients.reduce((s, c) => s + c.cohorts.length, 0);
-
-  return (
-    <div className="px-8 py-6 space-y-6">
-      <div className="grid grid-cols-4 gap-4">
-        <HL label="Clients" value="6" sub="All with active cohorts" />
-        <HL label="Total Cohorts" value={totalCohorts.toString()} sub="Across all clients" />
-        <HL label="Best Client Liq" value="4.2%" sub="Summit Health" />
-        <HL label="Re-scored" value="340" sub="Low to Medium propensity" />
-      </div>
-
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="grid px-6 py-2.5 border-b border-gray-100" style={{ gridTemplateColumns: '1fr 90px 100px 100px 80px' }}>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Client</div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Accounts</div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Balance</div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Collected</div>
-          <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 text-right">Liq Rate</div>
-        </div>
-        <div className="divide-y divide-gray-50">
-          {perfClients.map((cl, i) => {
-            const isExp = expandedClient === cl.client;
-            const totalCohortColl = cl.cohorts.reduce((s, ch) => s + ch.collected, 0);
-            return (
-              <div key={i}>
-                <div
-                  onClick={() => { setExpandedClient(isExp ? null : cl.client); setHoveredCohort(null); }}
-                  className={`grid items-center px-6 py-3 cursor-pointer transition-colors ${isExp ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
-                  style={{ gridTemplateColumns: '1fr 90px 100px 100px 80px' }}
-                >
-                  <div className="flex items-center gap-2 pr-3 min-w-0">
-                    <span className={`material-symbols-outlined text-gray-400 transition-transform flex-shrink-0 ${isExp ? 'rotate-90' : ''}`} style={{ fontSize: 14 }}>chevron_right</span>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-900 truncate">{cl.client}</span>
-                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0 ${cl.debtType === 'Credit Card' ? 'bg-blue-50 text-blue-700' : cl.debtType === 'Medical' ? 'bg-red-50 text-red-700' : 'bg-purple-50 text-purple-700'}`}>{cl.debtType}</span>
-                      </div>
-                      <div className="text-[10px] text-gray-400 mt-0.5">avg {cl.avgAge} · {cl.cohorts.length} cohorts</div>
-                    </div>
-                  </div>
-                  <div className="text-right"><div className="text-sm font-bold text-gray-900 tabular-nums">{cl.accounts.toLocaleString()}</div></div>
-                  <div className="text-right"><div className="text-sm font-bold text-gray-900 tabular-nums">${(cl.balance/1000000).toFixed(1)}M</div></div>
-                  <div className="text-right"><div className="text-sm font-bold text-gray-900 tabular-nums">${cl.collected.toLocaleString()}</div></div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-gray-900 tabular-nums">{cl.liqRate}%</div>
-                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${cl.status === 'above' ? 'bg-emerald-50 text-emerald-700' : cl.status === 'on-target' ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}`}>{cl.status === 'above' ? 'Above' : cl.status === 'on-target' ? 'On target' : 'Below'}</span>
-                  </div>
-                </div>
-                {isExp && (
-                  <div className="animate-fadeIn" style={{ background: '#f8fcfb' }}>
-                    <div className="grid px-6 py-1.5 ml-6" style={{ gridTemplateColumns: '1fr 80px 80px 70px 60px 80px', borderBottom: '1px solid #ecf6f3' }}>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Cohort</div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">Collected</div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">% Share</div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">Liq Rate</div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">Age</div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-center">Channels</div>
-                    </div>
-                    {cl.cohorts.map((ch, j) => {
-                      const share = Math.round((ch.collected / totalCohortColl) * 100);
-                      const isHov = hoveredCohort === `${cl.client}-${j}`;
-                      const someHov = hoveredCohort && hoveredCohort.startsWith(cl.client);
-                      const dim = someHov && !isHov;
-                      return (
-                        <div key={j} onMouseEnter={() => setHoveredCohort(`${cl.client}-${j}`)} onMouseLeave={() => setHoveredCohort(null)}
-                          className={`grid items-center px-6 py-2 ml-6 transition-all ${isHov ? 'bg-white' : ''}`}
-                          style={{ gridTemplateColumns: '1fr 80px 80px 70px 60px 80px', opacity: dim ? 0.25 : 1, borderBottom: '1px solid #ecf6f3' }}>
-                          <div className="min-w-0">
-                            <div className={`text-xs font-medium ${isHov ? 'text-gray-900' : 'text-gray-700'}`}>{ch.name}</div>
-                            <div className="text-[10px] text-gray-400">{ch.accounts.toLocaleString()} accounts</div>
-                          </div>
-                          <div className="text-right"><span className={`text-xs font-bold tabular-nums ${isHov ? 'text-gray-900' : 'text-gray-600'}`}>${(ch.collected/1000).toFixed(0)}K</span></div>
-                          <div className="text-right"><span className={`text-[11px] font-bold tabular-nums ${isHov ? 'text-gray-900' : 'text-gray-500'}`}>{share}%</span></div>
-                          <div className="text-right"><span className={`text-xs font-bold tabular-nums ${isHov ? 'text-gray-900' : 'text-gray-600'}`}>{ch.liqRate}%</span></div>
-                          <div className="text-right"><span className="text-xs text-gray-500 tabular-nums">{ch.age}</span></div>
-                          <div className="flex gap-0.5 justify-center">
-                            {ch.channels.map(chan => (
-                              <span key={chan} className={`text-[7px] font-semibold px-1 py-0.5 rounded ${chan === 'Voice' ? 'bg-emerald-50 text-emerald-700' : chan === 'SMS' ? 'bg-blue-50 text-blue-700' : chan === 'Email' ? 'bg-purple-50 text-purple-700' : 'bg-amber-50 text-amber-700'}`}>{chan}</span>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        <div className="grid px-6 py-3 border-t-2" style={{ gridTemplateColumns: '1fr 90px 100px 100px 80px', borderColor: '#d4eae5', backgroundColor: '#f8fcfb' }}>
-          <div className="text-xs font-bold text-gray-900 pl-5">Total · 6 clients · {totalCohorts} cohorts</div>
-          <div className="text-right text-xs font-bold text-gray-900 tabular-nums">{perfClients.reduce((s,c) => s+c.accounts, 0).toLocaleString()}</div>
-          <div className="text-right text-xs font-bold text-gray-900 tabular-nums">${(perfClients.reduce((s,c) => s+c.balance, 0)/1000000).toFixed(1)}M</div>
-          <div className="text-right text-xs font-bold text-gray-900 tabular-nums">${perfClients.reduce((s,c) => s+c.collected, 0).toLocaleString()}</div>
-          <div className="text-right text-xs font-bold text-gray-900 tabular-nums">2.7%</div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── TABS config ───────────────────────────────────────────────────────────────
 
@@ -1337,18 +1442,15 @@ const TABS = [
   { id: 'overview',   label: 'Overview' },
   { id: 'inbound',    label: 'Inbound' },
   { id: 'promises',   label: 'Promises & Plans' },
-  { id: 'cohorts',    label: 'Cohorts' },
 ];
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-const PERIODS   = ['All Time', 'Jan', 'Feb', 'Mar', 'Apr'];
-const GRANULARS = ['Monthly', 'Weekly', 'Daily'];
-const CREDITORS = ['All Creditors', 'Chase Bank', 'Synchrony Financial', 'Avant LLC', 'LendingClub', 'Envision Healthcare', 'LifePoint Health'];
+const PERIODS = ['All Time', 'Jan', 'Feb', 'Mar', 'Apr'];
 
 // Per-creditor multipliers so charts shift when creditor changes
 const CREDITOR_MULTIPLIERS = {
-  'All Creditors':        { liq: 1.00, contact: 1.00, collected: 1.00 },
+  'All Clients':        { liq: 1.00, contact: 1.00, collected: 1.00 },
   'Chase Bank':           { liq: 1.12, contact: 1.08, collected: 0.77 },
   'Synchrony Financial':  { liq: 0.94, contact: 1.00, collected: 0.50 },
   'Avant LLC':            { liq: 0.70, contact: 0.82, collected: 0.42 },
@@ -1357,93 +1459,38 @@ const CREDITOR_MULTIPLIERS = {
   'LifePoint Health':     { liq: 1.63, contact: 1.34, collected: 0.31 },
 };
 
-export default function Performance({ onNavigate }) {
-  const [activeTab,        setActiveTab]        = React.useState('overview');
-  const [viewMode,         setViewMode]         = React.useState('accounts');
-  const [period,           setPeriod]           = React.useState('All Time');
-  const [granularity,      setGranularity]      = React.useState('Monthly');
-  const [selectedCreditor, setSelectedCreditor] = React.useState('All Creditors');
+// Per-cohort multipliers — derived from cohortMetrics ratios vs portfolio average
+const COHORT_MULTIPLIERS = {
+  'All Cohorts':          { liq: 1.00, contact: 1.00, collected: 1.00 },
+  'High Prop / High Bal': { liq: 1.41, contact: 1.37, collected: 1.64 },
+  'High Prop / Low Bal':  { liq: 1.52, contact: 1.26, collected: 0.87 },
+  'Medium Prop':          { liq: 0.81, contact: 0.95, collected: 1.00 },
+  'Low Prop / High Bal':  { liq: 0.70, contact: 0.74, collected: 1.35 },
+  'Low Prop / Low Bal':   { liq: 0.15, contact: 0.32, collected: 0.15 },
+};
 
-  // When switching to All Time, force Monthly (weekly/daily don't make sense)
-  const handlePeriodChange = (p) => {
-    setPeriod(p);
-    if (p === 'All Time') setGranularity('Monthly');
-  };
-
-  const filters = { period, granularity, selectedCreditor, viewMode };
+export default function Performance() {
+  const [activeTab, setActiveTab] = React.useState('overview');
 
   return (
     <div className="min-h-full bg-gray-50">
 
-      {/* ── FIXED HERO STRIP ───────────────────────────────────────────────── */}
-      <div className="px-8 pt-8 pb-6 bg-white border-b border-gray-200">
-
-        {/* Title row */}
+      {/* ── PAGE HEADER ──────────────────────────────────────────────────── */}
+      <div className="px-8 pt-8 pb-0 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Performance</h1>
             <p className="text-sm text-gray-500 mt-0.5">Apex Recovery Partners · Hypercare Week 3 · Day 18</p>
           </div>
-          <div className="flex items-center gap-4 flex-wrap">
-
-            {/* Period */}
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Period</span>
-              <div className="flex bg-gray-100 rounded-lg p-0.5">
-                {PERIODS.map(p => (
-                  <button key={p} onClick={() => handlePeriodChange(p)}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${period === p ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                  >{p}</button>
-                ))}
-              </div>
-            </div>
-
-            {/* Granularity — disabled on All Time */}
-            <div className="flex items-center gap-2">
-              <span className={`text-[11px] font-semibold uppercase tracking-wider ${period === 'All Time' ? 'text-gray-300' : 'text-gray-400'}`}>Granularity</span>
-              <div className={`flex bg-gray-100 rounded-lg p-0.5 ${period === 'All Time' ? 'opacity-40 pointer-events-none' : ''}`}>
-                {GRANULARS.map(g => (
-                  <button key={g} onClick={() => setGranularity(g)}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${granularity === g ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                  >{g}</button>
-                ))}
-              </div>
-            </div>
-
-            {/* Creditor */}
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Creditor</span>
-              <select value={selectedCreditor} onChange={e => setSelectedCreditor(e.target.value)}
-                className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-400"
-              >
-                {CREDITORS.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-
-            {/* $ / Accounts */}
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">View</span>
-              <div className="flex bg-gray-100 rounded-lg p-0.5">
-                <button onClick={() => setViewMode('accounts')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'accounts' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                ># Accounts</button>
-                <button onClick={() => setViewMode('dollars')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'dollars' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >$ Value</button>
-              </div>
-            </div>
-            <span
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
-              style={{ background: 'linear-gradient(135deg, rgba(33,150,175,0.12), rgba(97,171,94,0.12))', color: '#2196af', border: '1px solid rgba(33,150,175,0.3)' }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#61ab5e' }} />
-              Above activation target
-            </span>
-          </div>
+          <span
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
+            style={{ background: 'rgba(76,110,245,0.08)', color: '#4c6ef5', border: '1px solid rgba(76,110,245,0.25)' }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#61ab5e' }} />
+            Above activation target
+          </span>
         </div>
-
-        {/* Hero cards */}
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-3 gap-5 pb-6">
           {/* Total Collected */}
           <div className="bg-white border border-gray-200 rounded-xl p-5">
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Total Collected</div>
@@ -1458,18 +1505,18 @@ export default function Performance({ onNavigate }) {
           </div>
 
           {/* Liquidation Rate */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5" style={{ borderColor: '#2196af40' }}>
-            <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#2196af' }}>Liquidation Rate</div>
+          <div className="bg-white border border-gray-200 rounded-xl p-5" style={{ borderColor: '#4c6ef540' }}>
+            <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#4c6ef5' }}>Liquidation Rate</div>
             <div className="flex items-end gap-3 mb-1">
               <div className="text-4xl font-extrabold text-gray-900">2.7%</div>
               <div className="mb-1.5 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(97,171,94,0.1)', color: '#61ab5e', border: '1px solid rgba(97,171,94,0.25)' }}>↑ +0.2% vs target</div>
             </div>
             <div className="text-xs text-gray-400 mb-3">Target: 2.5% · 6-mo avg: 2.1%</div>
-            <Sparkline data={dailyData} dataKey="liquidation" color="#2196af" />
+            <Sparkline data={dailyData} dataKey="liquidation" color="#4c6ef5" />
             <div className="mt-2 flex items-center gap-2 text-xs font-medium">
-              <span style={{ color: '#2196af' }}>Week 1: 1.8%</span>
+              <span style={{ color: '#4c6ef5' }}>Week 1: 1.8%</span>
               <span className="text-gray-300">→</span>
-              <span style={{ color: '#2196af' }}>Week 2: 2.3%</span>
+              <span style={{ color: '#4c6ef5' }}>Week 2: 2.3%</span>
               <span className="text-gray-300">→</span>
               <span className="font-bold" style={{ color: '#61ab5e' }}>Week 3: 2.7%</span>
             </div>
@@ -1491,19 +1538,19 @@ export default function Performance({ onNavigate }) {
                 { label: 'Agency A', val: 1.9 },
               ].map((a, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <div className={`text-[11px] w-16 flex-shrink-0 ${a.isSkit ? 'font-bold' : 'text-gray-400'}`} style={a.isSkit ? { color: '#2196af' } : {}}>
+                  <div className={`text-[11px] w-16 flex-shrink-0 ${a.isSkit ? 'font-bold' : 'text-gray-400'}`} style={a.isSkit ? { color: '#4c6ef5' } : {}}>
                     {a.label}
                   </div>
-                  <div className="flex-1 rounded-full h-1.5" style={{ backgroundColor: '#d4eae5' }}>
-                    <div className="h-1.5 rounded-full" style={{ width: `${(a.val / 3) * 100}%`, backgroundColor: a.isSkit ? '#2196af' : '#9ca3af' }} />
+                  <div className="flex-1 rounded-full h-1.5" style={{ backgroundColor: '#dee2e6' }}>
+                    <div className="h-1.5 rounded-full" style={{ width: `${(a.val / 3) * 100}%`, backgroundColor: a.isSkit ? '#4c6ef5' : '#9ca3af' }} />
                   </div>
-                  <div className={`text-[11px] w-8 text-right flex-shrink-0 tabular-nums ${a.isSkit ? 'font-bold' : 'text-gray-400'}`} style={a.isSkit ? { color: '#2196af' } : {}}>
+                  <div className={`text-[11px] w-8 text-right flex-shrink-0 tabular-nums ${a.isSkit ? 'font-bold' : 'text-gray-400'}`} style={a.isSkit ? { color: '#4c6ef5' } : {}}>
                     {a.val}%
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-3 text-xs font-medium" style={{ color: '#2196af' }}>12.5% above next best agency</div>
+            <div className="mt-3 text-xs font-medium" style={{ color: '#4c6ef5' }}>12.5% above next best agency</div>
           </div>
         </div>
       </div>
@@ -1528,10 +1575,9 @@ export default function Performance({ onNavigate }) {
       </div>
 
       {/* ── TAB CONTENT ─────────────────────────────────────────────────────── */}
-      {activeTab === 'overview'   && <OverviewTab onNavigate={onNavigate} filters={filters} />}
-      {activeTab === 'inbound'    && <InboundTab viewMode={viewMode} />}
-      {activeTab === 'promises'   && <PromisesTab viewMode={viewMode} />}
-      {activeTab === 'cohorts'    && <CohortsTab onNavigate={onNavigate} viewMode={viewMode} />}
+      {activeTab === 'overview'   && <OverviewTab />}
+      {activeTab === 'inbound'    && <InboundTab />}
+      {activeTab === 'promises'   && <PromisesTab />}
 
     </div>
   );

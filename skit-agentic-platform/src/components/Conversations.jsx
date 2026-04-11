@@ -387,16 +387,16 @@ const FilterDropdown = ({ label, options, selected, onToggle, isOpen, onOpenTogg
         onClick={() => onOpenToggle(!isOpen)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
         style={{
-          background: activeCount > 0 ? '#e8f4f1' : '#ffffff',
-          border: `1px solid ${activeCount > 0 ? '#2196af' : '#d4eae5'}`,
-          color: activeCount > 0 ? '#2196af' : '#6b7280',
+          background: activeCount > 0 ? '#f8f9fa' : '#ffffff',
+          border: `1px solid ${activeCount > 0 ? '#4c6ef5' : '#dee2e6'}`,
+          color: activeCount > 0 ? '#4c6ef5' : '#6b7280',
         }}
       >
         {label}
         {activeCount > 0 && (
           <span
             className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold text-white"
-            style={{ background: '#2196af' }}
+            style={{ background: '#4c6ef5' }}
           >
             {activeCount}
           </span>
@@ -404,7 +404,7 @@ const FilterDropdown = ({ label, options, selected, onToggle, isOpen, onOpenTogg
         <span className="material-symbols-outlined text-sm" style={{ fontSize: '14px' }}>expand_more</span>
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg z-30 py-1 min-w-[160px]" style={{ border: '1px solid #d4eae5' }}>
+        <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg z-30 py-1 min-w-[160px]" style={{ border: '1px solid #dee2e6' }}>
           {options.map(opt => {
             const isActive = selected.includes(opt);
             return (
@@ -416,8 +416,8 @@ const FilterDropdown = ({ label, options, selected, onToggle, isOpen, onOpenTogg
                 <span
                   className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0"
                   style={{
-                    border: `1.5px solid ${isActive ? '#2196af' : '#d4eae5'}`,
-                    background: isActive ? '#2196af' : '#ffffff',
+                    border: `1.5px solid ${isActive ? '#4c6ef5' : '#dee2e6'}`,
+                    background: isActive ? '#4c6ef5' : '#ffffff',
                   }}
                 >
                   {isActive && (
@@ -448,7 +448,7 @@ const MockWaveform = () => {
             className="flex-1 rounded-full"
             style={{
               height: `${Math.max(4, h)}%`,
-              background: i < 24 ? '#2196af' : '#d4eae5',
+              background: i < 24 ? '#4c6ef5' : '#dee2e6',
               minWidth: '2px',
             }}
           />
@@ -468,11 +468,11 @@ const ConversationRow = ({ conv, isSelected, onClick, compact }) => {
       className="w-full text-left transition-all"
       style={{
         padding: compact ? '12px 16px' : '14px 20px',
-        background: isSelected ? '#e8f4f1' : '#ffffff',
-        borderLeft: isSelected ? '3px solid #2196af' : '3px solid transparent',
-        borderBottom: '1px solid #ecf6f3',
+        background: isSelected ? '#f8f9fa' : '#ffffff',
+        borderLeft: isSelected ? '3px solid #4c6ef5' : '3px solid transparent',
+        borderBottom: '1px solid #f3f4f6',
       }}
-      onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#f0f8f6'; }}
+      onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#f8f9fa'; }}
       onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = '#ffffff'; }}
     >
       {/* Row 1: ID, outcome, amount, quality, age */}
@@ -526,9 +526,9 @@ const DetailPanel = ({ conv, onClose }) => {
   ];
 
   return (
-    <div className="h-full flex flex-col bg-white overflow-hidden" style={{ borderLeft: '1px solid #d4eae5' }}>
+    <div className="h-full flex flex-col bg-white overflow-hidden" style={{ borderLeft: '1px solid #dee2e6' }}>
       {/* Header */}
-      <div className="flex-shrink-0 px-6 py-4" style={{ borderBottom: '1px solid #d4eae5' }}>
+      <div className="flex-shrink-0 px-6 py-4" style={{ borderBottom: '1px solid #dee2e6' }}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <span className="text-base font-bold text-gray-900" style={{ fontFamily: 'monospace' }}>{conv.accountId}</span>
@@ -555,9 +555,9 @@ const DetailPanel = ({ conv, onClose }) => {
               onClick={() => handleAction(btn.id)}
               className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all"
               style={{
-                background: actionFeedback === btn.id ? '#e8f4f1' : '#ffffff',
-                border: `1px solid ${actionFeedback === btn.id ? '#2196af' : '#d4eae5'}`,
-                color: actionFeedback === btn.id ? '#2196af' : '#6b7280',
+                background: actionFeedback === btn.id ? '#f8f9fa' : '#ffffff',
+                border: `1px solid ${actionFeedback === btn.id ? '#4c6ef5' : '#dee2e6'}`,
+                color: actionFeedback === btn.id ? '#4c6ef5' : '#6b7280',
               }}
             >
               <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{btn.icon}</span>
@@ -568,7 +568,7 @@ const DetailPanel = ({ conv, onClose }) => {
       </div>
 
       {/* Tabs */}
-      <div className="flex-shrink-0 flex items-center gap-6 px-6 pt-3" style={{ borderBottom: '1px solid #d4eae5' }}>
+      <div className="flex-shrink-0 flex items-center gap-6 px-6 pt-3" style={{ borderBottom: '1px solid #dee2e6' }}>
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -577,7 +577,7 @@ const DetailPanel = ({ conv, onClose }) => {
           >
             {tab.label}
             {detailTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#2196af' }} />
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#4c6ef5' }} />
             )}
           </button>
         ))}
@@ -594,12 +594,12 @@ const DetailPanel = ({ conv, onClose }) => {
               if (msg.isChannelSwitch) {
                 return (
                   <div key={i} className="flex items-center gap-3 py-3">
-                    <div className="flex-1 h-px" style={{ background: '#d4eae5' }} />
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold" style={{ background: '#e8f4f1', color: '#2196af', border: '1px solid #d4eae5' }}>
+                    <div className="flex-1 h-px" style={{ background: '#dee2e6' }} />
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold" style={{ background: '#f8f9fa', color: '#4c6ef5', border: '1px solid #dee2e6' }}>
                       <span className="material-symbols-outlined" style={{ fontSize: 12 }}>swap_horiz</span>
                       {msg.text.replace('Channel switch: ', '')}
                     </span>
-                    <div className="flex-1 h-px" style={{ background: '#d4eae5' }} />
+                    <div className="flex-1 h-px" style={{ background: '#dee2e6' }} />
                   </div>
                 );
               }
@@ -649,13 +649,13 @@ const DetailPanel = ({ conv, onClose }) => {
               <div className="flex items-center gap-3 mt-3">
                 <button
                   className="w-9 h-9 rounded-full flex items-center justify-center"
-                  style={{ background: '#2196af', color: '#ffffff' }}
+                  style={{ background: '#4c6ef5', color: '#ffffff' }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>play_arrow</span>
                 </button>
                 <div className="flex-1">
-                  <div className="h-1.5 rounded-full" style={{ background: '#d4eae5' }}>
-                    <div className="h-1.5 rounded-full" style={{ background: '#2196af', width: '40%' }} />
+                  <div className="h-1.5 rounded-full" style={{ background: '#dee2e6' }}>
+                    <div className="h-1.5 rounded-full" style={{ background: '#4c6ef5', width: '40%' }} />
                   </div>
                 </div>
                 <span className="text-[11px] text-gray-400" style={{ fontFamily: 'monospace' }}>1:24 / 3:32</span>
@@ -671,7 +671,7 @@ const DetailPanel = ({ conv, onClose }) => {
                     <span
                       key={i}
                       className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-medium"
-                      style={{ background: '#e8f4f1', color: '#2196af', border: '1px solid #d4eae5' }}
+                      style={{ background: '#f8f9fa', color: '#4c6ef5', border: '1px solid #dee2e6' }}
                     >
                       {sig}
                     </span>
@@ -691,7 +691,7 @@ const DetailPanel = ({ conv, onClose }) => {
                       {conv.qualityScore}/100
                     </span>
                   </div>
-                  <div className="h-2 rounded-full" style={{ background: '#d4eae5' }}>
+                  <div className="h-2 rounded-full" style={{ background: '#dee2e6' }}>
                     <div
                       className="h-2 rounded-full"
                       style={{
@@ -711,7 +711,7 @@ const DetailPanel = ({ conv, onClose }) => {
           <div className="p-5">
             <div className="relative pl-6">
               {/* Vertical line */}
-              <div className="absolute left-[7px] top-2 bottom-2 w-0.5" style={{ background: '#d4eae5' }} />
+              <div className="absolute left-[7px] top-2 bottom-2 w-0.5" style={{ background: '#dee2e6' }} />
 
               {conv.timeline.map((event, i) => {
                 const prevDay = i > 0 ? conv.timeline[i - 1].day : null;
@@ -721,7 +721,7 @@ const DetailPanel = ({ conv, onClose }) => {
                     {/* Dot */}
                     <div
                       className="absolute -left-[17px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white"
-                      style={{ background: event.color, boxShadow: '0 0 0 2px #d4eae5' }}
+                      style={{ background: event.color, boxShadow: '0 0 0 2px #dee2e6' }}
                     />
                     {/* Content */}
                     <div>
@@ -836,9 +836,9 @@ export default function Conversations() {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by account ID, keyword, or transcript phrase..."
             className="w-full pl-8 pr-3 py-1.5 rounded-lg text-xs text-gray-700 placeholder-gray-400 focus:outline-none transition-all"
-            style={{ background: '#ffffff', border: '1px solid #d4eae5' }}
-            onFocus={(e) => { e.target.style.borderColor = '#2196af'; e.target.style.boxShadow = '0 0 0 2px rgba(33,150,175,0.1)'; }}
-            onBlur={(e) => { e.target.style.borderColor = '#d4eae5'; e.target.style.boxShadow = 'none'; }}
+            style={{ background: '#ffffff', border: '1px solid #dee2e6' }}
+            onFocus={(e) => { e.target.style.borderColor = '#4c6ef5'; e.target.style.boxShadow = '0 0 0 2px rgba(76,110,245,0.1)'; }}
+            onBlur={(e) => { e.target.style.borderColor = '#dee2e6'; e.target.style.boxShadow = 'none'; }}
           />
         </div>
       </div>
@@ -861,7 +861,7 @@ export default function Conversations() {
           <button
             onClick={clearAll}
             className="text-xs font-medium flex-shrink-0 transition-colors"
-            style={{ color: '#2196af' }}
+            style={{ color: '#4c6ef5' }}
           >
             Clear all
           </button>
@@ -875,13 +875,13 @@ export default function Conversations() {
             <span
               key={`${chip.key}-${chip.val}`}
               className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium"
-              style={{ background: '#e8f4f1', color: '#2196af', border: '1px solid #d4eae5' }}
+              style={{ background: '#f8f9fa', color: '#4c6ef5', border: '1px solid #dee2e6' }}
             >
               {chip.val}
               <button
                 onClick={() => toggleFilter(chip.key, chip.val)}
                 className="hover:opacity-70 transition-opacity"
-                style={{ color: '#2196af' }}
+                style={{ color: '#4c6ef5' }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>close</span>
               </button>
@@ -898,14 +898,14 @@ export default function Conversations() {
           style={{
             width: selectedId ? '55%' : '100%',
             transition: 'width 0.25s ease-in-out',
-            borderRight: selectedId ? '1px solid #d4eae5' : 'none',
+            borderRight: selectedId ? '1px solid #dee2e6' : 'none',
           }}
         >
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <span className="material-symbols-outlined text-gray-300 mb-2" style={{ fontSize: '36px' }}>search_off</span>
               <p className="text-sm text-gray-400">No conversations match your filters.</p>
-              <button onClick={clearAll} className="text-xs font-medium mt-2" style={{ color: '#2196af' }}>Clear all filters</button>
+              <button onClick={clearAll} className="text-xs font-medium mt-2" style={{ color: '#4c6ef5' }}>Clear all filters</button>
             </div>
           ) : (
             filtered.map(conv => (

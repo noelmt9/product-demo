@@ -140,8 +140,8 @@ const AgentCard = ({ name, onSelect }) => {
       <div className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#e8f4f1' }}>
-              <span className="material-symbols-outlined text-lg" style={{ color: '#2196af' }}>{agentIconMap[name]}</span>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#f8f9fa' }}>
+              <span className="material-symbols-outlined text-lg" style={{ color: '#4c6ef5' }}>{agentIconMap[name]}</span>
             </div>
             <div>
               <div className="text-sm font-bold text-gray-900">{name}</div>
@@ -156,7 +156,7 @@ const AgentCard = ({ name, onSelect }) => {
 
         <div className="flex gap-2">
           {metrics.map((m, i) => (
-            <div key={i} className="flex-1 rounded-lg px-2.5 py-2 text-center" style={{ background: '#f0f8f6' }}>
+            <div key={i} className="flex-1 rounded-lg px-2.5 py-2 text-center" style={{ background: '#f8f9fa' }}>
               <div className="text-[13px] font-bold text-gray-800" style={{ fontVariantNumeric: 'tabular-nums' }}>{m.value}</div>
               <div className="text-[10px] text-gray-400 leading-tight">{m.label}</div>
             </div>
@@ -184,8 +184,8 @@ const AgentDetail = ({ name }) => {
       <div className="card overflow-hidden mb-6">
         <div className="p-6">
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: '#e8f4f1' }}>
-              <span className="material-symbols-outlined text-2xl" style={{ color: '#2196af' }}>{agentIconMap[name]}</span>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: '#f8f9fa' }}>
+              <span className="material-symbols-outlined text-2xl" style={{ color: '#4c6ef5' }}>{agentIconMap[name]}</span>
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-1">
@@ -195,7 +195,7 @@ const AgentDetail = ({ name }) => {
               <div className="text-sm text-gray-400">{agentCategoryMap[name]}</div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500" style={{ background: '#ffffff', border: '1px solid #d4eae5' }}>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500" style={{ background: '#ffffff', border: '1px solid #dee2e6' }}>
                 <span className="material-symbols-outlined text-sm">edit</span>
                 Edit
               </button>
@@ -208,7 +208,7 @@ const AgentDetail = ({ name }) => {
 
           <p className="text-sm text-gray-600 leading-relaxed mb-5">{description}</p>
 
-          <div className="flex gap-3 p-4 rounded-xl" style={{ background: '#f0f8f6' }}>
+          <div className="flex gap-3 p-4 rounded-xl" style={{ background: '#f8f9fa' }}>
             {metrics.map((m, i) => (
               <div key={i} className="flex-1 text-center">
                 <div className="text-lg font-bold text-gray-900" style={{ fontVariantNumeric: 'tabular-nums' }}>{m.value}</div>
@@ -220,7 +220,7 @@ const AgentDetail = ({ name }) => {
       </div>
 
       {/* Detail tabs */}
-      <div className="flex items-center gap-6 mb-5" style={{ borderBottom: '1px solid #d4eae5' }}>
+      <div className="flex items-center gap-6 mb-5" style={{ borderBottom: '1px solid #dee2e6' }}>
         {[{ id: 'details', label: 'Details' }, { id: 'activity', label: 'Recent Activity' }].map(tab => (
           <button
             key={tab.id}
@@ -229,7 +229,7 @@ const AgentDetail = ({ name }) => {
           >
             {tab.label}
             {detailTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#2196af' }} />
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#4c6ef5' }} />
             )}
           </button>
         ))}
@@ -242,28 +242,28 @@ const AgentDetail = ({ name }) => {
           <div className="card p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Skills</h3>
-              <button className="text-[11px] font-semibold" style={{ color: '#2196af' }}>+ Add skill</button>
+              <button className="text-[11px] font-semibold" style={{ color: '#4c6ef5' }}>+ Add skill</button>
             </div>
             {skills.map((skill, i) => (
-              <div key={i} className="flex items-start gap-3 py-3 group" style={{ borderTop: i > 0 ? '1px solid #ecf6f3' : 'none' }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#f0f8f6' }}>
-                  <span className="material-symbols-outlined text-sm" style={{ color: '#2196af' }}>{skill.icon}</span>
+              <div key={i} className="flex items-start gap-3 py-3 group" style={{ borderTop: i > 0 ? '1px solid #f3f4f6' : 'none' }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#f8f9fa' }}>
+                  <span className="material-symbols-outlined text-sm" style={{ color: '#4c6ef5' }}>{skill.icon}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[13px] font-semibold text-gray-800">{skill.name}</div>
                   <div className="text-[11px] text-gray-400 leading-relaxed">{skill.desc}</div>
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                  <button className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600" style={{ border: '1px solid #d4eae5' }}>
+                  <button className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600" style={{ border: '1px solid #dee2e6' }}>
                     <span className="material-symbols-outlined text-xs">edit</span>
                   </button>
-                  <button className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500" style={{ border: '1px solid #d4eae5' }}>
+                  <button className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500" style={{ border: '1px solid #dee2e6' }}>
                     <span className="material-symbols-outlined text-xs">close</span>
                   </button>
                 </div>
               </div>
             ))}
-            <button className="w-full mt-3 py-2.5 rounded-lg text-[11px] font-medium text-gray-400 hover:text-teal-600 transition-all" style={{ border: '1px dashed #d4eae5' }}>
+            <button className="w-full mt-3 py-2.5 rounded-lg text-[11px] font-medium text-gray-400 hover:text-indigo-600 transition-all" style={{ border: '1px dashed #dee2e6' }}>
               + Add skill
             </button>
           </div>
@@ -272,11 +272,11 @@ const AgentDetail = ({ name }) => {
           <div className="card p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Connectors</h3>
-              <button className="text-[11px] font-semibold" style={{ color: '#2196af' }}>+ Add connector</button>
+              <button className="text-[11px] font-semibold" style={{ color: '#4c6ef5' }}>+ Add connector</button>
             </div>
             {connectors.map((conn, i) => (
-              <div key={i} className="flex items-center gap-3 py-3 group" style={{ borderTop: i > 0 ? '1px solid #ecf6f3' : 'none' }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#f0f8f6' }}>
+              <div key={i} className="flex items-center gap-3 py-3 group" style={{ borderTop: i > 0 ? '1px solid #f3f4f6' : 'none' }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#f8f9fa' }}>
                   <span className="material-symbols-outlined text-sm text-gray-500">{conn.icon}</span>
                 </div>
                 <div className="flex-1 text-[13px] font-medium text-gray-800">{conn.name}</div>
@@ -284,12 +284,12 @@ const AgentDetail = ({ name }) => {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Connected
                 </span>
-                <button className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all" style={{ border: '1px solid #d4eae5' }}>
+                <button className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all" style={{ border: '1px solid #dee2e6' }}>
                   <span className="material-symbols-outlined text-xs">close</span>
                 </button>
               </div>
             ))}
-            <button className="w-full mt-3 py-2.5 rounded-lg text-[11px] font-medium text-gray-400 hover:text-teal-600 transition-all" style={{ border: '1px dashed #d4eae5' }}>
+            <button className="w-full mt-3 py-2.5 rounded-lg text-[11px] font-medium text-gray-400 hover:text-indigo-600 transition-all" style={{ border: '1px dashed #dee2e6' }}>
               + Add connector
             </button>
           </div>
@@ -301,9 +301,9 @@ const AgentDetail = ({ name }) => {
             <span className="text-[11px] text-gray-400">{activity.length} events</span>
           </div>
           {activity.map((a, i) => (
-            <div key={i} className="py-3.5" style={{ borderTop: i > 0 ? '1px solid #ecf6f3' : 'none' }}>
+            <div key={i} className="py-3.5" style={{ borderTop: i > 0 ? '1px solid #f3f4f6' : 'none' }}>
               <div className="flex items-start gap-3">
-                <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: '#2196af' }} />
+                <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: '#4c6ef5' }} />
                 <div className="flex-1">
                   <div className="text-[13px] text-gray-600 leading-relaxed"><BoldText text={a.text} /></div>
                   <div className="text-[10px] text-gray-400 mt-1" style={{ fontFamily: 'monospace' }}>{a.time}</div>
@@ -346,15 +346,15 @@ export default function Agents() {
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-bold text-gray-900">Agents</h1>
-          <span className="text-[11px] font-semibold text-gray-400 px-2 py-0.5 rounded-full" style={{ background: '#e8f4f1', border: '1px solid #d4eae5' }}>{agentOrder.length} agents</span>
+          <span className="text-[11px] font-semibold text-gray-400 px-2 py-0.5 rounded-full" style={{ background: '#f8f9fa', border: '1px solid #dee2e6' }}>{agentOrder.length} agents</span>
         </div>
       </div>
 
       {/* Stats bar */}
       <div className="grid grid-cols-3 gap-4 mb-5">
         <div className="card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#e8f4f1' }}>
-            <span className="material-symbols-outlined text-lg" style={{ color: '#2196af' }}>smart_toy</span>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#f8f9fa' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#4c6ef5' }}>smart_toy</span>
           </div>
           <div>
             <div className="text-lg font-bold text-gray-900">{activeCount + busyCount}</div>
@@ -362,8 +362,8 @@ export default function Agents() {
           </div>
         </div>
         <div className="card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#e8f4f1' }}>
-            <span className="material-symbols-outlined text-lg" style={{ color: '#61ab5e' }}>people</span>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#f8f9fa' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#4c6ef5' }}>people</span>
           </div>
           <div>
             <div className="flex items-baseline gap-2">
@@ -374,8 +374,8 @@ export default function Agents() {
           </div>
         </div>
         <div className="card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#e8f4f1' }}>
-            <span className="material-symbols-outlined text-lg" style={{ color: '#2196af' }}>bolt</span>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#f8f9fa' }}>
+            <span className="material-symbols-outlined text-lg" style={{ color: '#4c6ef5' }}>bolt</span>
           </div>
           <div>
             <div className="text-lg font-bold text-gray-900">1,847</div>
@@ -385,7 +385,7 @@ export default function Agents() {
       </div>
 
       {/* Tabs — clean underline style */}
-      <div className="flex items-center gap-6 mb-6" style={{ borderBottom: '1px solid #d4eae5' }}>
+      <div className="flex items-center gap-6 mb-6" style={{ borderBottom: '1px solid #dee2e6' }}>
         {[
           { id: 'agents', label: 'All Agents' },
           { id: 'activity', label: 'Recent Activity' },
@@ -397,7 +397,7 @@ export default function Agents() {
           >
             {tab.label}
             {activeTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#2196af' }} />
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#4c6ef5' }} />
             )}
           </button>
         ))}
@@ -419,7 +419,7 @@ export default function Agents() {
           {combinedActivity.map((a, i) => {
             const c = agentColorMap[a.agent];
             return (
-              <div key={i} className="py-3.5" style={{ borderTop: i > 0 ? '1px solid #ecf6f3' : 'none' }}>
+              <div key={i} className="py-3.5" style={{ borderTop: i > 0 ? '1px solid #f3f4f6' : 'none' }}>
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${c}12` }}>
                     <span className="material-symbols-outlined text-sm" style={{ color: c }}>{agentIconMap[a.agent]}</span>

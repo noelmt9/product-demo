@@ -8,7 +8,7 @@ const mockMessages = [
     id: 2,
     type: 'agent',
     agent: 'Report Generator',
-    color: '#3BA7F6',
+    color: '#4c6ef5',
     content: 'INTELLIGENCE LAYER\n\nEXECUTIVE SUMMARY\nPerformance metrics indicate a 3% stabilization in high-intent conversion paths. Agent interventions have successfully mitigated compliance drift noticed in Q1.\n\nKPI MOVEMENT\n• Recovery Rate: 2.7% (+0.4%)\n• Contact Rate: 38% (-2% vs target)\n• Avg Latency: 4.2 days\n\nSTRATEGY CHANGES\n• Day 12: Voice AI increased to 5x/week on high-prop\n• Day 17: Settlement SMS launched for broken-PTP\n\nCOMPLIANCE STATUS\n• 43 violations prevented, $64.5K exposure avoided\n• Score: 99.86%\n\nENRICHMENT\n• $127K from previously unreachable accounts\n\nRECOMMENDED NEXT STEPS\n• Expand settlement strategy to medium-propensity\n• Schedule activation review with client'
   }
 ];
@@ -25,11 +25,11 @@ export default function ChatPanel({ isOpen, onClose }) {
       />
 
       {/* Chat Panel */}
-      <div className="fixed bottom-6 right-6 w-[420px] h-[560px] bg-white shadow-2xl rounded-2xl z-50 flex flex-col border border-gray-200/50 overflow-hidden">
+      <div className="fixed bottom-6 right-6 w-[420px] h-[560px] bg-white shadow-2xl rounded-2xl z-50 flex flex-col overflow-hidden" style={{ border: '1px solid #dee2e6' }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-slate-50 to-white">
+        <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-slate-50 to-white" style={{ borderBottom: '1px solid #f3f4f6' }}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background: '#4c6ef5'}}>
               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -71,7 +71,7 @@ export default function ChatPanel({ isOpen, onClose }) {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-gray-600 mb-1.5">{message.agent}</p>
-                    <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+                    <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm" style={{ border: '1px solid #f3f4f6' }}>
                       <p className="text-sm text-gray-900 leading-relaxed whitespace-pre-line">{message.content}</p>
                     </div>
                   </div>
@@ -80,7 +80,7 @@ export default function ChatPanel({ isOpen, onClose }) {
 
               {message.type === 'user' && (
                 <div className="max-w-[85%]">
-                  <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl rounded-br-sm px-4 py-3 shadow-sm">
+                  <div className="rounded-2xl rounded-br-sm px-4 py-3 shadow-sm" style={{background: 'linear-gradient(to bottom right, #4c6ef5, #6366f1)'}}>
                     <p className="text-sm text-white leading-relaxed">{message.content}</p>
                   </div>
                 </div>
@@ -90,19 +90,22 @@ export default function ChatPanel({ isOpen, onClose }) {
         </div>
 
         {/* Input */}
-        <div className="border-t border-gray-100 p-4 bg-white">
+        <div className="p-4 bg-white" style={{ borderTop: '1px solid #f3f4f6' }}>
           <div className="flex gap-2 items-center">
             <div className="flex-1 relative">
               <input
                 type="text"
                 placeholder="Ask for further details or adjustments..."
-                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all"
+                className="w-full px-4 py-2.5 text-sm rounded-xl focus:outline-none focus:bg-white transition-all"
+                style={{ backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}
+                onFocus={e => { e.target.style.borderColor = '#4c6ef5'; e.target.style.boxShadow = '0 0 0 2px rgba(76,110,245,0.2)'; e.target.style.backgroundColor = '#fff'; }}
+                onBlur={e => { e.target.style.borderColor = '#dee2e6'; e.target.style.boxShadow = ''; e.target.style.backgroundColor = '#f8f9fa'; }}
                 disabled
               />
             </div>
             <button
               className="w-10 h-10 text-white rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-              style={{background: 'linear-gradient(135deg, #3BA7F6, #5FCFC4)'}}
+              style={{background: '#4c6ef5'}}
               disabled
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

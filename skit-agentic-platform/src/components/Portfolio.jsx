@@ -263,7 +263,7 @@ export default function Portfolio() {
           <button
             onClick={() => setUploadStep('modal')}
             className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white rounded-lg shadow-sm transition-colors"
-            style={{ background: 'linear-gradient(135deg, #2196af, #1a7a96)' }}
+            style={{ background: '#4c6ef5' }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -307,7 +307,7 @@ export default function Portfolio() {
                   <button
                     onClick={() => setViewDropdownOpen(!viewDropdownOpen)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 transition-all"
-                    style={{ background: '#f0f8f6', border: '1px solid #d4eae5' }}
+                    style={{ background: '#f8f9fa', border: '1px solid #dee2e6' }}
                   >
                     View by: {viewBy === 'client' ? 'Client' : viewBy === 'debtType' ? 'Debt Type' : 'Ageing'}
                     <span className={`material-symbols-outlined text-xs transition-transform ${viewDropdownOpen ? 'rotate-180' : ''}`} style={{ fontSize: 14 }}>expand_more</span>
@@ -315,13 +315,13 @@ export default function Portfolio() {
                   {viewDropdownOpen && (
                     <>
                       <div className="fixed inset-0 z-10" onClick={() => setViewDropdownOpen(false)} />
-                      <div className="absolute top-9 left-0 w-40 rounded-xl shadow-lg z-20 py-1" style={{ background: '#ffffff', border: '1px solid #d4eae5' }}>
+                      <div className="absolute top-9 left-0 w-40 rounded-xl shadow-lg z-20 py-1" style={{ background: '#ffffff', border: '1px solid #dee2e6' }}>
                         {[{ id: 'client', label: 'Client' }, { id: 'debtType', label: 'Debt Type' }, { id: 'ageing', label: 'Ageing' }].map(opt => (
                           <button
                             key={opt.id}
                             onClick={() => { setViewBy(opt.id); setViewDropdownOpen(false); setExpandedCreditor(null); }}
                             className={`w-full text-left px-3 py-2 text-xs transition-colors ${viewBy === opt.id ? 'font-semibold text-gray-900' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}`}
-                            style={viewBy === opt.id ? { background: '#f0f8f6' } : {}}
+                            style={viewBy === opt.id ? { background: '#f8f9fa' } : {}}
                           >
                             {opt.label}
                           </button>
@@ -409,22 +409,22 @@ export default function Portfolio() {
                       const totalCollected = cohorts.reduce((s, ch) => s + ch.collected, 0);
                       const maxCohortCollected = Math.max(...cohorts.map(ch => ch.collected));
                       return (
-                      <div className="animate-fadeIn" style={{ background: '#f8fcfb' }}>
+                      <div className="animate-fadeIn" style={{ background: '#f8f9fa' }}>
                         {/* Toggle: Table / Chart */}
-                        <div className="flex items-center justify-between px-6 py-2 ml-6" style={{ borderBottom: '1px solid #ecf6f3' }}>
+                        <div className="flex items-center justify-between px-6 py-2 ml-6" style={{ borderBottom: '1px solid #f3f4f6' }}>
                           <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400">{cohorts.length} cohorts</div>
-                          <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
+                          <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid #dee2e6' }}>
                             <button
                               onClick={(e) => { e.stopPropagation(); setCohortView('table'); }}
                               className={`px-2.5 py-1 text-[10px] font-medium transition-all ${cohortView === 'table' ? 'text-white' : 'text-gray-500'}`}
-                              style={cohortView === 'table' ? { background: '#2196af' } : {}}
+                              style={cohortView === 'table' ? { background: '#4c6ef5' } : {}}
                             >
                               <span className="material-symbols-outlined" style={{ fontSize: 12 }}>table_rows</span>
                             </button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setCohortView('chart'); }}
                               className={`px-2.5 py-1 text-[10px] font-medium transition-all ${cohortView === 'chart' ? 'text-white' : 'text-gray-500'}`}
-                              style={cohortView === 'chart' ? { background: '#2196af' } : {}}
+                              style={cohortView === 'chart' ? { background: '#4c6ef5' } : {}}
                             >
                               <span className="material-symbols-outlined" style={{ fontSize: 12 }}>bar_chart</span>
                             </button>
@@ -434,7 +434,7 @@ export default function Portfolio() {
                         {cohortView === 'table' ? (
                           <>
                             {/* Table sub-header */}
-                            <div className="grid px-6 py-1.5 ml-6" style={{ gridTemplateColumns: '1fr 80px 80px 70px 60px 80px', borderBottom: '1px solid #ecf6f3' }}>
+                            <div className="grid px-6 py-1.5 ml-6" style={{ gridTemplateColumns: '1fr 80px 80px 70px 60px 80px', borderBottom: '1px solid #f3f4f6' }}>
                               <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Cohort</div>
                               <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">Collected</div>
                               <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 text-right">% Share</div>
@@ -453,7 +453,7 @@ export default function Portfolio() {
                                   onMouseEnter={() => setHoveredCohort(`${c.name}-${j}`)}
                                   onMouseLeave={() => setHoveredCohort(null)}
                                   className={`grid items-center px-6 py-2 ml-6 transition-all ${isHovered ? 'bg-white' : ''}`}
-                                  style={{ gridTemplateColumns: '1fr 80px 80px 70px 60px 80px', opacity: dimmed ? 0.25 : 1, borderBottom: '1px solid #ecf6f3' }}
+                                  style={{ gridTemplateColumns: '1fr 80px 80px 70px 60px 80px', opacity: dimmed ? 0.25 : 1, borderBottom: '1px solid #f3f4f6' }}
                                 >
                                   <div className="min-w-0">
                                     <div className="flex items-center gap-2">
@@ -496,8 +496,8 @@ export default function Portfolio() {
                           /* Chart view: dual bars — collected + liq rate */
                           <div className="px-6 py-3 ml-6">
                             <div className="flex items-center gap-4 mb-3">
-                              <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ background: '#2196af' }} /><span className="text-[9px] text-gray-400">Collected ($)</span></div>
-                              <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ background: '#61ab5e' }} /><span className="text-[9px] text-gray-400">Liq Rate (%)</span></div>
+                              <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ background: '#4c6ef5' }} /><span className="text-[9px] text-gray-400">Collected ($)</span></div>
+                              <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ background: '#868e96' }} /><span className="text-[9px] text-gray-400">Liq Rate (%)</span></div>
                             </div>
                             {cohorts.map((ch, j) => {
                               const collPct = (ch.collected / totalCollected) * 100;
@@ -512,7 +512,7 @@ export default function Portfolio() {
                                   onMouseEnter={() => setHoveredCohort(`${c.name}-${j}`)}
                                   onMouseLeave={() => setHoveredCohort(null)}
                                   className="transition-all cursor-pointer py-1.5"
-                                  style={{ opacity: dimmed ? 0.25 : 1, borderTop: j > 0 ? '1px solid #ecf6f3' : 'none' }}
+                                  style={{ opacity: dimmed ? 0.25 : 1, borderTop: j > 0 ? '1px solid #f3f4f6' : 'none' }}
                                 >
                                   <div className="flex items-center justify-between mb-1.5">
                                     <div className="flex items-center gap-2">
@@ -527,15 +527,15 @@ export default function Portfolio() {
                                   </div>
                                   {/* Collected bar */}
                                   <div className="flex items-center gap-2 mb-1">
-                                    <div className="flex-1 h-3 rounded" style={{ background: '#e8f4f8' }}>
-                                      <div className="h-3 rounded" style={{ width: `${collPct}%`, background: isHovered ? '#2196af' : '#2196af80', minWidth: '4px' }} />
+                                    <div className="flex-1 h-3 rounded" style={{ background: '#edf2ff' }}>
+                                      <div className="h-3 rounded" style={{ width: `${collPct}%`, background: isHovered ? '#4c6ef5' : '#4c6ef580', minWidth: '4px' }} />
                                     </div>
                                     <span className="text-[10px] font-bold text-gray-700 tabular-nums w-12 text-right">${(ch.collected/1000).toFixed(0)}K</span>
                                   </div>
                                   {/* Liq rate bar */}
                                   <div className="flex items-center gap-2">
-                                    <div className="flex-1 h-3 rounded" style={{ background: '#e8f5e2' }}>
-                                      <div className="h-3 rounded" style={{ width: `${liqBarPct}%`, background: isHovered ? '#61ab5e' : '#61ab5e80', minWidth: '4px' }} />
+                                    <div className="flex-1 h-3 rounded" style={{ background: '#e9ecef' }}>
+                                      <div className="h-3 rounded" style={{ width: `${liqBarPct}%`, background: isHovered ? '#868e96' : '#868e9680', minWidth: '4px' }} />
                                     </div>
                                     <span className="text-[10px] font-bold text-gray-700 tabular-nums w-12 text-right">{ch.liqRate}%</span>
                                   </div>
@@ -552,7 +552,7 @@ export default function Portfolio() {
               })}
             </div>
             {/* Footer */}
-            <div className="grid px-6 py-3 border-t-2" style={{ gridTemplateColumns: '1fr 90px 100px 100px 80px', borderColor: '#d4eae5', backgroundColor: '#f8fcfb' }}>
+            <div className="grid px-6 py-3 border-t-2" style={{ gridTemplateColumns: '1fr 90px 100px 100px 80px', borderColor: '#dee2e6', backgroundColor: '#f8f9fa' }}>
               <div className="text-xs font-bold text-gray-900 pl-5">Total · {filtered.length} creditors</div>
               <div className="text-right text-xs font-bold text-gray-900 tabular-nums">{originalCreditors.reduce((s,c)=>s+c.accounts,0).toLocaleString()}</div>
               <div className="text-right text-xs font-bold text-gray-900 tabular-nums">${(originalCreditors.reduce((s,c)=>s+c.totalBalance,0)/1000000).toFixed(1)}M</div>
@@ -601,10 +601,10 @@ export default function Portfolio() {
                       </div>
                     </div>
                     {isExpanded && (
-                      <div className="px-6 pb-4 animate-fadeIn" style={{ background: '#f8fcfb' }}>
-                        <div className="ml-5 pl-4 space-y-0" style={{ borderLeft: '2px solid #d4eae5' }}>
+                      <div className="px-6 pb-4 animate-fadeIn" style={{ background: '#f8f9fa' }}>
+                        <div className="ml-5 pl-4 space-y-0" style={{ borderLeft: '2px solid #dee2e6' }}>
                           {creditors.map((cr, j) => (
-                            <div key={j} className="flex items-center gap-4 py-2.5" style={{ borderTop: j > 0 ? '1px solid #ecf6f3' : 'none' }}>
+                            <div key={j} className="flex items-center gap-4 py-2.5" style={{ borderTop: j > 0 ? '1px solid #f3f4f6' : 'none' }}>
                               <div className="w-40"><div className="text-xs font-medium text-gray-800">{cr.name}</div><div className="text-[10px] text-gray-400">{cr.accounts.toLocaleString()} accounts</div></div>
                               <div className="flex-1 text-xs text-gray-500">Contact {cr.contactRate}% · PTP {cr.ptpRate}%</div>
                               <div className="text-right w-20"><div className="text-sm font-bold text-gray-900 tabular-nums">{cr.liquidationRate}%</div></div>
@@ -636,8 +636,8 @@ export default function Portfolio() {
                     <div className="text-sm font-semibold text-gray-900">{b.label}</div>
                     <div className="px-1">
                       <div className="flex items-center gap-3">
-                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#e8f4f8' }}>
-                          <div className="h-5 rounded flex items-center px-2" style={{ width: `${pct}%`, backgroundColor: '#2196af', minWidth: '40px' }}>
+                        <div className="flex-1 h-5 rounded" style={{ backgroundColor: '#edf2ff' }}>
+                          <div className="h-5 rounded flex items-center px-2" style={{ width: `${pct}%`, backgroundColor: '#4c6ef5', minWidth: '40px' }}>
                             <span className="text-[10px] font-semibold text-white whitespace-nowrap">{b.accounts.toLocaleString()}</span>
                           </div>
                         </div>
@@ -667,7 +667,7 @@ export default function Portfolio() {
                     <span className="font-bold text-gray-900">{d.pct}%</span>
                   </div>
                   <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#e5e7eb' }}>
-                    <div className="h-2 rounded-full" style={{ width: `${d.pct}%`, backgroundColor: ['#2196af','#ef4444','#8b5cf6'][i] }} />
+                    <div className="h-2 rounded-full" style={{ width: `${d.pct}%`, backgroundColor: ['#4c6ef5','#ef4444','#8b5cf6'][i] }} />
                   </div>
                 </div>
               ))}
@@ -685,7 +685,7 @@ export default function Portfolio() {
                     <span className="font-bold text-gray-900">{s.pct}%</span>
                   </div>
                   <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#e5e7eb' }}>
-                    <div className="h-2 rounded-full" style={{ width: `${s.pct}%`, backgroundColor: i === 5 ? '#9ca3af' : '#2196af' }} />
+                    <div className="h-2 rounded-full" style={{ width: `${s.pct}%`, backgroundColor: i === 5 ? '#9ca3af' : '#4c6ef5' }} />
                   </div>
                 </div>
               ))}
@@ -703,7 +703,7 @@ export default function Portfolio() {
                     <span className="font-bold text-gray-900">{p.pct}%</span>
                   </div>
                   <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#e5e7eb' }}>
-                    <div className="h-2 rounded-full" style={{ width: `${p.pct}%`, backgroundColor: ['#61ab5e','#f59e0b','#ef4444'][i] }} />
+                    <div className="h-2 rounded-full" style={{ width: `${p.pct}%`, backgroundColor: ['#10b981','#f59e0b','#ef4444'][i] }} />
                   </div>
                 </div>
               ))}
@@ -711,7 +711,7 @@ export default function Portfolio() {
             <div className="pt-4 border-t border-gray-100">
               <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Data Quality</h3>
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-lg p-2" style={{ backgroundColor: '#f0faf8' }}>
+                <div className="rounded-lg p-2" style={{ backgroundColor: '#f8f9fa' }}>
                   <div className="text-lg font-bold text-gray-900">{placementMeta.cleanRows.toLocaleString()}</div>
                   <div className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700 inline-block">Clean</div>
                 </div>
@@ -746,9 +746,9 @@ export default function Portfolio() {
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="text-[10px] mb-0.5" style={{ color: '#2196af' }}>Now ({c.after}%)</div>
+                    <div className="text-[10px] mb-0.5" style={{ color: '#4c6ef5' }}>Now ({c.after}%)</div>
                     <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#e5e7eb' }}>
-                      <div className="h-2 rounded-full" style={{ width: `${c.after}%`, backgroundColor: '#2196af' }} />
+                      <div className="h-2 rounded-full" style={{ width: `${c.after}%`, backgroundColor: '#4c6ef5' }} />
                     </div>
                   </div>
                   <div className="w-16 text-right"><span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-50 text-green-700">+{c.after - c.before}pts</span></div>
@@ -814,7 +814,7 @@ export default function Portfolio() {
                       ))}
                     </ol>
                   </div>
-                  <button onClick={handleUpload} className="w-full px-6 py-3 text-white text-sm font-semibold rounded-lg" style={{ background: 'linear-gradient(135deg, #2196af, #1a7a96)' }}>
+                  <button onClick={handleUpload} className="w-full px-6 py-3 text-white text-sm font-semibold rounded-lg" style={{ background: '#4c6ef5' }}>
                     Process File
                   </button>
                 </div>
@@ -887,7 +887,7 @@ export default function Portfolio() {
                         <span className="text-sm font-semibold text-green-900">Processing Complete</span>
                       </div>
                       <p className="text-sm text-green-800 mb-4">3,000 accounts validated, 4 cohorts created, campaign plan ready. 3 items sent to Approvals for your review before go-live.</p>
-                      <button className="w-full px-4 py-2.5 text-white text-sm font-semibold rounded-lg" style={{ background: 'linear-gradient(135deg, #2196af, #1a7a96)' }}>
+                      <button className="w-full px-4 py-2.5 text-white text-sm font-semibold rounded-lg" style={{ background: '#4c6ef5' }}>
                         Go to Approvals →
                       </button>
                     </div>

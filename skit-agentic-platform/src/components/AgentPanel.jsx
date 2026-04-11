@@ -89,7 +89,7 @@ export default function AgentPanel({ agent, onClose }) {
       {/* Panel */}
       <div className="fixed top-0 right-0 bottom-0 w-[600px] bg-white shadow-2xl z-50 overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+        <div className="sticky top-0 bg-white border-b px-6 py-4" style={{ borderColor: '#dee2e6' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
@@ -140,7 +140,7 @@ export default function AgentPanel({ agent, onClose }) {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-900">Configuration / SOP</h3>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg border border-blue-200 transition-colors">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors" style={{ color: '#4c6ef5', border: '1px solid #dee2e6' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f8f9fa'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -153,7 +153,10 @@ export default function AgentPanel({ agent, onClose }) {
               {documents.map((doc, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors cursor-pointer group"
+                  className="flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer group"
+                  style={{ backgroundColor: '#f8f9fa', border: '1px solid #dee2e6' }}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = '#f8f9fa'}
                 >
                   <div className="flex-shrink-0">
                     {getFileIcon(doc.type)}
@@ -180,7 +183,7 @@ export default function AgentPanel({ agent, onClose }) {
             </div>
 
             {/* Configuration Text */}
-            <div className="pt-4 border-t border-gray-200">
+            <div className="pt-4 border-t" style={{ borderColor: '#dee2e6' }}>
               <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">Active Configuration</p>
               <div className="space-y-1.5">
                 {data.configuration.map((config, idx) => (

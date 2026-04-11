@@ -32,7 +32,7 @@ export const Section = ({ title, children, className = "" }) => (
 export const DataTable = ({ headers, rows, alignments = [] }) => (
   <table className="w-full text-sm">
     <thead>
-      <tr style={{borderBottom: '1px solid #d4eae5'}}>
+      <tr style={{borderBottom: '1px solid #dee2e6'}}>
         {headers.map((header, idx) => (
           <th
             key={idx}
@@ -47,7 +47,7 @@ export const DataTable = ({ headers, rows, alignments = [] }) => (
     </thead>
     <tbody>
       {rows.map((row, idx) => (
-        <tr key={idx} style={{borderBottom: '1px solid #ecf6f3'}}>
+        <tr key={idx} style={{borderBottom: '1px solid #f3f4f6'}}>
           {row.map((cell, cellIdx) => (
             <td
               key={cellIdx}

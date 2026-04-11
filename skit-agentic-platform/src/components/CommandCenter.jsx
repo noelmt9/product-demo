@@ -1,4 +1,5 @@
 import React from 'react';
+import Orb from './Orb';
 
 
 const allSuggestions = [
@@ -24,7 +25,6 @@ const mockAnswer = {
 };
 
 
-// News items — two sets that rotate
 const newsSetA = [
   { headline: 'RPC rate crossed 28%', body: 'Up from 25% last week. High Prop/High Bal cohort is leading the lift at 38%, driven by the increased voice AI cadence.', time: '2h ago', agent: 'Analyst', agentColor: '#3b82f6', icon: 'trending_up' },
   { headline: 'Inbound volume up 12%', body: '85 inbound calls today with 78% IVR completion, above the 75% target. Payment bot handled 68 calls autonomously.', time: '3h ago', agent: 'Collector', agentColor: '#f59e0b', icon: 'call_received' },
@@ -39,7 +39,6 @@ const newsSetB = [
   { headline: 'Spanish SMS outperforming English', body: '8% higher response rate in TX/FL for Spanish-preference accounts. 180 accounts contacted in first batch with strong early engagement.', time: '8h ago', agent: 'Collector', agentColor: '#f59e0b', icon: 'translate' },
 ];
 
-// Actionable items — require decisions (manager persona)
 const actionItems = [
   { title: 'Increase attempt limits', text: 'Compliance allows 7, currently at 5. Projected +$35K/week for Medium Propensity.', icon: 'speed' },
   { title: '89 PTP-breakers need escalation', text: 'Collector proposes 15% settlement SMS for repeat broken promises.', icon: 'warning' },
@@ -63,12 +62,22 @@ function pickTwo(arr) {
 
 function getGreeting() {
   const hour = new Date().getHours();
-  const greetings = hour < 12
-    ? ['Good morning, Alex', 'Morning, Alex. Here\'s your brief', 'Rise and grind, Alex']
+  const options = hour < 12
+    ? [
+        { main: 'Good morning, Alex.', sub: 'What can I dig into?' },
+        { main: 'Morning, Alex.', sub: "Here's your brief." },
+      ]
     : hour < 17
-    ? ['Good afternoon, Alex', 'Afternoon, Alex. What can I dig into?', 'Hey Alex, how can I help?']
-    : ['Good evening, Alex', 'Evening, Alex. Wrapping up?', 'Hey Alex, still at it?'];
-  return greetings[Math.floor(Math.random() * greetings.length)];
+    ? [
+        { main: 'Afternoon, Alex.', sub: 'What can I dig into?' },
+        { main: 'Good afternoon, Alex.', sub: 'What can I dig into?' },
+        { main: 'Hey Alex,', sub: 'how can I help?' },
+      ]
+    : [
+        { main: 'Good evening, Alex.', sub: 'Wrapping up?' },
+        { main: 'Evening, Alex.', sub: 'What can I dig into?' },
+      ];
+  return options[Math.floor(Math.random() * options.length)];
 }
 
 function getSubtext() {
@@ -89,15 +98,13 @@ export default function CommandCenter({ onNavigate }) {
   const [suggestions, setSuggestions] = React.useState(() => pickTwo(allSuggestions));
   const [greeting] = React.useState(getGreeting);
   const [subtext] = React.useState(getSubtext);
-  const [newsSet, setNewsSet] = React.useState(true); // true = A, false = B
+  const [showSetB, setShowSetB] = React.useState(true);
 
-  // Rotate news every 20s
   React.useEffect(() => {
-    const interval = setInterval(() => setNewsSet(prev => !prev), 20000);
+    const interval = setInterval(() => setShowSetB(prev => !prev), 20000);
     return () => clearInterval(interval);
   }, []);
 
-  // Rotate suggestions every 15s
   React.useEffect(() => {
     const interval = setInterval(() => {
       setSuggestions(pickTwo(allSuggestions));
@@ -122,14 +129,13 @@ export default function CommandCenter({ onNavigate }) {
     setAnimStep(0);
   };
 
-  // --- CHAT VIEW ---
+  // --- CHAT VIEW (unchanged) ---
   if (chatQuestion !== null) {
     const question = allSuggestions[chatQuestion]?.q || allSuggestions[0].q;
     const answer = answers[chatQuestion] || answers[0];
 
     return (
       <div className="min-h-screen" style={{background: '#e8f4f1'}}>
-        {/* Chat Header */}
         <div className="sticky top-0 z-10 backdrop-blur-md px-8 py-3 flex items-center gap-4" style={{background: 'rgba(232,244,241,0.92)', borderBottom: '1px solid #d4eae5'}}>
           <button
             onClick={handleBackFromChat}
@@ -141,7 +147,6 @@ export default function CommandCenter({ onNavigate }) {
         </div>
 
         <div className="p-8 max-w-3xl mx-auto">
-          {/* User question */}
           <div className="flex items-start gap-3 mb-8">
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5" style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)'}}>
               AR
@@ -149,7 +154,6 @@ export default function CommandCenter({ onNavigate }) {
             <div className="text-sm font-medium text-gray-900 pt-1.5">{question}</div>
           </div>
 
-          {/* Agent processing steps */}
           {!showAnswer && (
             <div className="flex items-start gap-3 mb-6">
               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{background: '#e8f4f1'}}>
@@ -171,26 +175,22 @@ export default function CommandCenter({ onNavigate }) {
             </div>
           )}
 
-          {/* Response */}
           {showAnswer && (
             <div className="flex items-start gap-3 animate-fadeIn">
               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{background: '#e8f4f1'}}>
                 <span className="material-symbols-outlined text-base" style={{color: '#2196af'}}>auto_awesome</span>
               </div>
               <div className="flex-1 min-w-0">
-                {/* Sources pill */}
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-[10px] font-semibold text-gray-400">Sources:</span>
                   {mockAnswer.steps.map((step, idx) => (
                     <span key={idx} className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{background: '#e8f4f1', color: '#2196af', border: '1px solid #d4eae5'}}>{step.agent}</span>
                   ))}
                 </div>
-                {/* Answer body */}
                 <div
                   className="text-[14px] text-gray-700 leading-[1.8] whitespace-pre-line"
                   dangerouslySetInnerHTML={{__html: answer.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900">$1</strong>')}}
                 />
-                {/* Follow-up input */}
                 <div className="mt-8 pt-5" style={{borderTop: '1px solid #d4eae5'}}>
                   <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl" style={{background: '#ffffff', border: '1px solid #d4eae5'}}>
                     <input
@@ -212,119 +212,172 @@ export default function CommandCenter({ onNavigate }) {
   }
 
   // --- MAIN INSIGHTS VIEW ---
+  const activeNews = showSetB ? newsSetB : newsSetA;
+
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      {/* AI Search — Hero */}
-      <div className="relative text-center mb-6 pt-8 pb-6 rounded-3xl overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="orb-1 absolute w-72 h-72 rounded-full -top-16 -left-16" style={{background: 'radial-gradient(circle, rgba(33,150,175,0.20) 0%, transparent 70%)', filter: 'blur(20px)'}} />
-          <div className="orb-2 absolute w-96 h-96 rounded-full -top-24 right-0" style={{background: 'radial-gradient(circle, rgba(97,171,94,0.15) 0%, transparent 70%)', filter: 'blur(28px)'}} />
-          <div className="orb-3 absolute w-64 h-64 rounded-full bottom-0 left-1/3" style={{background: 'radial-gradient(circle, rgba(33,150,175,0.12) 0%, transparent 70%)', filter: 'blur(24px)'}} />
-        </div>
-        <div className="relative z-10">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4" style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)'}}>
-            <span className="material-symbols-outlined text-white text-2xl" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{greeting}</h1>
-          <p className="text-sm text-gray-500">{subtext}</p>
-        </div>
-      </div>
+    <div
+      className="relative flex items-start justify-center h-full overflow-auto"
+      style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.5) 100%), radial-gradient(ellipse at center, #ffffff 0%, #eaf3ff 100%)' }}
+    >
+      {/* Background vectorized overlay from Figma */}
+      <img
+        src="/assets/bg-vectorized.svg"
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50 pointer-events-none"
+      />
 
-      {/* Search box — textarea style with file upload */}
-      <div className="mb-4">
-        <div className="card px-5 py-4">
-          <textarea
-            rows={3}
-            placeholder="Ask about collection performance, cohort trends, or strategy yields..."
-            className="w-full text-sm bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 resize-none leading-relaxed"
-          />
-          <div className="flex items-center justify-between pt-3 mt-1" style={{borderTop: '1px solid #ecf6f3'}}>
-            <label className="flex items-center gap-1.5 text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">
-              <span className="material-symbols-outlined text-lg">attach_file</span>
-              <span className="text-[11px] font-medium">Upload file</span>
-              <input type="file" className="hidden" />
-            </label>
-            <button className="w-8 h-8 rounded-xl flex items-center justify-center text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #2196af, #61ab5e)'}}>
-              <span className="material-symbols-outlined text-base">arrow_upward</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <div className="relative flex flex-col items-center w-full max-w-[1000px] px-10 pt-[104px] pb-16">
 
-      {/* Suggestion chips — below search */}
-      <div className="flex justify-center gap-3 mb-8">
-        {suggestions.map((s) => (
-          <button
-            key={s.q}
-            onClick={() => handleQuestionClick(s.q)}
-            className="group flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs transition-all animate-fadeIn"
-            style={{background: '#ffffff', border: '1px solid #d4eae5'}}
-          >
-            <span className="material-symbols-outlined text-sm text-gray-300 group-hover:text-teal-500 transition-colors" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
-            <span className="text-gray-500 group-hover:text-gray-800 transition-colors max-w-[200px] truncate leading-tight text-left">{s.q}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* ─── Unified feed: FYI + Actions ─── */}
-      <div className="grid grid-cols-5 gap-6 mb-6">
-
-        {/* FYI — takes 3 cols */}
-        <div className="col-span-3 flex flex-col">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="material-symbols-outlined text-base" style={{color: '#2196af'}}>newspaper</span>
-            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">What's happening</h2>
-          </div>
-          <div className="card flex-1 flex flex-col" style={{borderColor: '#d4eae5'}}>
-            {(newsSet ? newsSetA : newsSetB).map((item, idx) => (
-              <div key={item.headline} className="px-4 py-3.5 flex items-start gap-3 flex-1 animate-fadeIn" style={{borderTop: idx > 0 ? '1px solid #ecf6f3' : 'none'}}>
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{background: '#e8f4f1'}}>
-                  <span className="material-symbols-outlined text-base" style={{color: '#2196af'}}>{item.icon}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-[13px] font-semibold text-gray-800">{item.headline}</p>
-                    <span className="text-[10px] text-gray-400 flex-shrink-0">{item.time}</span>
-                  </div>
-                  <p className="text-[12px] text-gray-500 leading-relaxed">{item.body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Actions — takes 2 cols, stretches to match */}
-        <div className="col-span-2 flex flex-col">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-base" style={{color: '#61ab5e'}}>bolt</span>
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Needs attention</h2>
+        {/* ── Hero: Orb + Greeting ── */}
+        <div className="pb-9">
+          <div className="flex flex-col gap-4 items-center">
+            {/* Orb from Figma */}
+            <div className="insight-orb-float">
+              <Orb />
             </div>
-            <button
-              onClick={() => onNavigate('approvals')}
-              className="flex items-center gap-1 text-[11px] font-semibold transition-colors"
-              style={{color: '#2196af'}}
-            >
-              View all
-              <span className="material-symbols-outlined text-xs">arrow_forward</span>
-            </button>
+
+            {/* Greeting + Subtext */}
+            <div className="flex flex-col gap-2 w-[440px]">
+              <p className="text-[26px] font-bold text-center leading-normal">
+                <span className="text-[#111827]">{greeting.main} </span>
+                <span className="bg-gradient-to-r from-[#7a7a7a] to-[#313131] bg-clip-text text-transparent">{greeting.sub}</span>
+              </p>
+              <p className="text-[15px] text-[#6b7280] text-center">{subtext}</p>
+            </div>
           </div>
-          <div className="card flex-1 flex flex-col" style={{borderColor: '#d4eae5'}}>
-            {actionItems.map((item, idx) => (
-              <div key={idx} className="px-4 py-3.5 flex items-start gap-3 flex-1" style={{borderTop: idx > 0 ? '1px solid #ecf6f3' : 'none'}}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{background: '#fef3c7'}}>
-                  <span className="material-symbols-outlined text-sm" style={{color: '#d97706'}}>{item.icon}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-gray-800 mb-0.5">{item.title}</p>
-                  <p className="text-[12px] text-gray-500 leading-relaxed">{item.text}</p>
-                </div>
-              </div>
+        </div>
+
+        {/* ── Search Box ── */}
+        <div className="pb-6 w-full">
+          <div
+            className="bg-white border border-[#dee2e6] rounded-2xl p-[25px] flex flex-col gap-3 overflow-hidden"
+            style={{ boxShadow: '0 0 20px 1px rgba(29,78,216,0.1)' }}
+          >
+            <div className="min-h-[80px]">
+              <textarea
+                rows={3}
+                placeholder="Ask about collection performance, cohort trends, or strategy yields..."
+                className="w-full text-[15px] bg-transparent border-none outline-none text-gray-800 placeholder-[#868e96] resize-none leading-relaxed"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <button className="flex items-center gap-2 px-3 py-2 border border-[#dee2e6] rounded-lg hover:bg-gray-50 transition-colors">
+                <span className="material-symbols-outlined text-[13px] text-[#868e96]">attach_file</span>
+                <span className="text-[13px] text-[#868e96]">Upload file</span>
+              </button>
+              <button
+                className="w-8 h-8 rounded-2xl flex items-center justify-center text-white"
+                style={{ background: '#4c6ef5', boxShadow: '0 2px 8px rgba(76,110,245,0.25)' }}
+              >
+                <span className="material-symbols-outlined text-base">arrow_upward</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Suggestion Chips ── */}
+        <div className="pb-12">
+          <div className="flex gap-3 items-start justify-center">
+            {suggestions.map((s) => (
+              <button
+                key={s.q}
+                onClick={() => handleQuestionClick(s.q)}
+                className="group flex items-center gap-2 px-[17px] py-[11px] bg-white border border-[#dee2e6] rounded-full animate-fadeIn hover:border-[#4c6ef5]/30 transition-colors"
+                style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}
+              >
+                <span
+                  className="material-symbols-outlined text-[14px] text-[#adb5bd] group-hover:text-[#4c6ef5] transition-colors"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >auto_awesome</span>
+                <span className="text-[12px] text-[#6b7280] group-hover:text-gray-800 transition-colors max-w-[240px] truncate leading-tight text-left">{s.q}</span>
+              </button>
             ))}
           </div>
         </div>
-      </div>
 
+        {/* ── Dashboard Grid ── */}
+        <div className="grid grid-cols-2 gap-8 w-full">
+
+          {/* Left Column: What's Happening */}
+          <div>
+            <div
+              className="bg-white border border-[#dee2e6] rounded-xl overflow-hidden"
+              style={{ boxShadow: '0 0 4px rgba(76,110,245,0.1)' }}
+            >
+              {/* Header */}
+              <div className="bg-[#f8f9fa] px-4 py-3 flex items-center">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[12px] text-[#868e96]">browse_activity</span>
+                  <span className="text-[12px] font-semibold text-[#868e96] uppercase tracking-[0.6px]" style={{ fontFamily: 'Inter, sans-serif' }}>What's happening</span>
+                </div>
+              </div>
+              {/* Items */}
+              {activeNews.map((item, idx) => (
+                <div
+                  key={item.headline}
+                  className={`px-5 pt-5 flex items-start gap-4 animate-fadeIn ${idx < activeNews.length - 1 ? 'pb-[21px] border-b border-[#f3f4f6]' : 'pb-5'}`}
+                >
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(76,110,245,0.1)' }}
+                  >
+                    <span className="material-symbols-outlined text-base" style={{ color: '#4c6ef5' }}>{item.icon}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2 mb-[3px]">
+                      <p className="text-[14px] font-medium text-[#111827] flex-1">{item.headline}</p>
+                      <span className="text-[12px] text-[#adb5bd] flex-shrink-0">{item.time}</span>
+                    </div>
+                    <p className="text-[13px] text-[#6b7280] leading-[19.5px]">{item.body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column: Needs Attention */}
+          <div>
+            <div
+              className="bg-white border border-[#dee2e6] rounded-xl overflow-hidden"
+              style={{ boxShadow: '0 0 4px rgba(76,110,245,0.1)' }}
+            >
+              {/* Header */}
+              <div className="bg-[#f8f9fa] px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[12px] text-[#868e96]">flag</span>
+                  <span className="text-[12px] font-semibold text-[#868e96] uppercase tracking-[0.6px]" style={{ fontFamily: 'Inter, sans-serif' }}>Needs attention</span>
+                </div>
+                <button
+                  onClick={() => onNavigate('approvals')}
+                  className="flex items-center gap-1 hover:opacity-80 transition-opacity"
+                >
+                  <span className="text-[13px] font-medium text-[#4c6ef5]" style={{ fontFamily: 'Inter, sans-serif' }}>View all</span>
+                  <span className="material-symbols-outlined text-[13px] text-[#4c6ef5]">chevron_right</span>
+                </button>
+              </div>
+              {/* Items */}
+              {actionItems.map((item, idx) => (
+                <div
+                  key={idx}
+                  className={`px-5 pt-5 flex items-start gap-4 ${idx < actionItems.length - 1 ? 'pb-[21px] border-b border-[#f3f4f6]' : 'pb-5'}`}
+                >
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(250,176,5,0.1)' }}
+                  >
+                    <span className="material-symbols-outlined text-base" style={{ color: '#d97706' }}>{item.icon}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-medium text-[#111827] mb-[3px]">{item.title}</p>
+                    <p className="text-[13px] text-[#6b7280] leading-[19.5px]">{item.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }

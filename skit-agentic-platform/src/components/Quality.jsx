@@ -23,7 +23,7 @@ const DIMENSIONS = [
 const agentScoreCards = [
   {
     name: 'Jason',
-    process: 'Chase Bank',
+    process: 'Meridian Bank',
     callsScored: 12,
     compliancePass: true,
     trend: 'up',
@@ -34,7 +34,7 @@ const agentScoreCards = [
   },
   {
     name: 'Rachel',
-    process: 'Chase Bank · Synchrony Financial',
+    process: 'Meridian Bank · Pinnacle Financial',
     callsScored: 14,
     compliancePass: true,
     trend: 'up',
@@ -45,7 +45,7 @@ const agentScoreCards = [
   },
   {
     name: 'Carlos',
-    process: 'Avant LLC · LendingClub',
+    process: 'Crestline Lending · Harbor Finance',
     callsScored: 10,
     compliancePass: true,
     trend: 'stable',
@@ -56,7 +56,7 @@ const agentScoreCards = [
   },
   {
     name: 'Brittany',
-    process: 'LendingClub · Avant LLC',
+    process: 'Harbor Finance · Crestline Lending',
     callsScored: 11,
     compliancePass: false,
     trend: 'down',
@@ -67,18 +67,18 @@ const agentScoreCards = [
   },
   {
     name: 'Nicole',
-    process: 'Envision Healthcare · LifePoint Health',
+    process: 'Clearview Medical Group · Summit Health Systems',
     callsScored: 9,
     compliancePass: true,
     trend: 'up',
     scores: { opening: 4, empathy: 5, listening: 4, control: 5, language: 5, objection: 5, rapport: 5, confidence: 4, closing: 4, sentence: 5 },
     topStrength: 'Empathy & product knowledge',
     coachingNeed: 'Assumptive opening on new placements; recap on inbound calls',
-    auditorNote: 'Handled non-payment calls well. Needs assumptive opening — said "I am not sure why you got the call" on one call. Long hold on LifePoint Health accounts without engaging consumer.',
+    auditorNote: 'Handled non-payment calls well. Needs assumptive opening — said "I am not sure why you got the call" on one call. Long hold on Summit Health Systems accounts without engaging consumer.',
   },
   {
     name: 'Kevin',
-    process: 'Envision Healthcare',
+    process: 'Clearview Medical Group',
     callsScored: 8,
     compliancePass: true,
     trend: 'stable',
@@ -284,7 +284,7 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
             className={`pb-3 text-sm font-medium transition-all relative ${activeTab === tab.id ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
           >
             {tab.label}
-            {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#2196af' }} />}
+            {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full" style={{ background: '#4c6ef5' }} />}
           </button>
         ))}
       </div>
@@ -308,7 +308,7 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
                 value: complianceFlags.length,
                 sub: `${complianceFlags.filter(f=>f.status==='Resolved').length}/${complianceFlags.length} resolved · avg 18 hrs`,
                 badge: '99.86% score',
-                badgeStyle: { background: 'rgba(33,150,175,0.08)', color: '#2196af', border: '1px solid rgba(33,150,175,0.2)' },
+                badgeStyle: { background: 'rgba(76,110,245,0.08)', color: '#4c6ef5', border: '1px solid rgba(76,110,245,0.2)' },
               },
               {
                 label: 'Conversion-Impact Issues',
@@ -354,7 +354,7 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
                       <div className="text-sm text-gray-800 mb-1">{e.error}</div>
                       <div className="flex items-center gap-2">
                         <div className="w-32 h-1.5 rounded-full bg-gray-100 flex-shrink-0">
-                          <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: '#2196af', opacity: 0.6 }} />
+                          <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: '#4c6ef5', opacity: 0.6 }} />
                         </div>
                         <span className="text-[11px] text-gray-400">{e.agents.slice(0,3).join(', ')}{e.agents.length > 3 ? ` +${e.agents.length-3}` : ''}</span>
                       </div>
@@ -421,7 +421,7 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
                   key={agent.name}
                   onClick={() => setSelectedAgent(isSelected ? null : agent.name)}
                   className="bg-white border rounded-xl p-4 text-left transition-all hover:border-gray-300"
-                  style={isSelected ? { borderColor: '#2196af', boxShadow: '0 0 0 2px rgba(33,150,175,0.12)' } : { borderColor: '#e5e7eb' }}
+                  style={isSelected ? { borderColor: '#4c6ef5', boxShadow: '0 0 0 2px rgba(76,110,245,0.12)' } : { borderColor: '#e5e7eb' }}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -558,7 +558,7 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
               { key: 'technical',  label: 'Technical',         color: '#ef4444', bg: 'rgba(239,68,68,0.07)' },
               { key: 'flow',       label: 'Flow & Logic',      color: '#f59e0b', bg: 'rgba(245,158,11,0.07)' },
               { key: 'compliance', label: 'Compliance',        color: '#8b5cf6', bg: 'rgba(139,92,246,0.07)' },
-              { key: 'collection', label: 'Collection Gaps',   color: '#2196af', bg: 'rgba(33,150,175,0.07)' },
+              { key: 'collection', label: 'Collection Gaps',   color: '#4c6ef5', bg: 'rgba(76,110,245,0.07)' },
             ].map(cat => {
               const issues = botIssues[cat.key];
               const openCount = issues.filter(i => i.status === 'open').length;
@@ -651,8 +651,8 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
                 ].map(step => (
                   <div key={step.num} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(33,150,175,0.1)' }}>
-                        <span className="text-xs font-semibold" style={{ color: '#2196af' }}>{step.num}</span>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(76,110,245,0.1)' }}>
+                        <span className="text-xs font-semibold" style={{ color: '#4c6ef5' }}>{step.num}</span>
                       </div>
                       <div className="w-0.5 flex-1 mt-2" style={{ background: '#e5e7eb' }} />
                     </div>
@@ -663,8 +663,8 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
                   </div>
                 ))}
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(33,150,175,0.1)' }}>
-                    <span className="text-xs font-semibold" style={{ color: '#2196af' }}>4</span>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(76,110,245,0.1)' }}>
+                    <span className="text-xs font-semibold" style={{ color: '#4c6ef5' }}>4</span>
                   </div>
                   <div className="flex-1">
                     <p className="text-xs uppercase tracking-wide text-gray-400 mb-3 font-bold">Deployment</p>
@@ -682,12 +682,12 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
                 </div>
               </div>
               <div className="mt-6 pt-5" style={{ borderTop: '1px solid #f3f4f6' }}>
-                <div className="rounded-xl p-4" style={{ background: 'rgba(33,150,175,0.05)', border: '1px solid rgba(33,150,175,0.15)' }}>
-                  <p className="text-xs uppercase tracking-wide font-bold mb-2" style={{ color: '#2196af' }}>Projected Impact</p>
+                <div className="rounded-xl p-4" style={{ background: 'rgba(76,110,245,0.05)', border: '1px solid rgba(76,110,245,0.15)' }}>
+                  <p className="text-xs uppercase tracking-wide font-bold mb-2" style={{ color: '#4c6ef5' }}>Projected Impact</p>
                   <p className="text-sm text-gray-700 mb-2">{caseItem.projectedImpact}</p>
                   {caseItem.earlySignal && (
-                    <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(33,150,175,0.15)' }}>
-                      <p className="text-xs uppercase tracking-wide font-bold mb-1" style={{ color: '#2196af' }}>Early Signal</p>
+                    <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(76,110,245,0.15)' }}>
+                      <p className="text-xs uppercase tracking-wide font-bold mb-1" style={{ color: '#4c6ef5' }}>Early Signal</p>
                       <p className="text-sm text-gray-700">{caseItem.earlySignal}</p>
                     </div>
                   )}

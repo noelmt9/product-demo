@@ -5,8 +5,8 @@ import React from 'react';
 const AGENT_META = {
   Manager:   { color: '#8b5cf6', bg: 'bg-purple-100', text: 'text-purple-700', dot: '#8b5cf6' },
   Auditor:   { color: '#ef4444', bg: 'bg-red-100',    text: 'text-red-700',    dot: '#ef4444' },
-  Coach:     { color: '#06b6d4', bg: 'bg-cyan-100',   text: 'text-cyan-700',   dot: '#06b6d4' },
-  Analyst:   { color: '#2196af', bg: 'bg-blue-100',   text: 'text-blue-700',   dot: '#2196af' },
+  Coach:     { color: '#4c6ef5', bg: 'bg-indigo-100',  text: 'text-indigo-700',  dot: '#4c6ef5' },
+  Analyst:   { color: '#4c6ef5', bg: 'bg-indigo-100',  text: 'text-indigo-700',  dot: '#4c6ef5' },
   Collector: { color: '#f59e0b', bg: 'bg-amber-100',  text: 'text-amber-700',  dot: '#f59e0b' },
 };
 
@@ -174,7 +174,7 @@ const ApprovalCard = ({ a, onAgentClick }) => {
 
         {/* Business case */}
         {a.businessCase && (
-          <div className="rounded-lg px-3 py-2.5 mb-2 text-xs" style={{ backgroundColor: '#f0faf8', border: '1px solid #d4eae5' }}>
+          <div className="rounded-lg px-3 py-2.5 mb-2 text-xs" style={{ backgroundColor: 'rgba(76,110,245,0.05)', border: '1px solid #dee2e6' }}>
             <span className="font-bold text-gray-500 uppercase tracking-wider text-[10px]">Business Case · </span>
             <span className="text-gray-700">{a.businessCase}</span>
           </div>
@@ -195,7 +195,7 @@ const ApprovalCard = ({ a, onAgentClick }) => {
           <span className="text-xs text-gray-500"><span className="font-medium text-gray-700">To:</span> {a.approver}</span>
           {a.status === 'pending' && (
             <div className="ml-auto flex gap-2">
-              <button className="px-4 py-1.5 text-xs font-bold text-white rounded-full" style={{ background: 'linear-gradient(135deg, #2196af, #61ab5e)' }}>Approve</button>
+              <button className="px-4 py-1.5 text-xs font-bold text-white rounded-full" style={{ background: '#4c6ef5' }}>Approve</button>
               <button className="px-4 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">Reject</button>
             </div>
           )}
@@ -295,14 +295,14 @@ function AgentTab({ agent, onAgentClick }) {
             <div>
               <div className="text-3xl font-extrabold text-gray-900">{stats.approvedDollar > 0 ? `$${(stats.approvedDollar/1000).toFixed(0)}K` : '—'}</div>
               <div className="mt-1">
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(33,150,175,0.08)', color: '#2196af', border: '1px solid rgba(33,150,175,0.2)' }}>$ Unlocked</span>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(76,110,245,0.08)', color: '#4c6ef5', border: '1px solid rgba(76,110,245,0.2)' }}>$ Unlocked</span>
               </div>
             </div>
           </div>
           {(stats.approved + stats.rejected) > 0 && (
             <>
               <div className="mt-4 h-2 rounded-full bg-gray-100 overflow-hidden">
-                <div className="h-2 rounded-full" style={{ backgroundColor: '#2196af', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
+                <div className="h-2 rounded-full" style={{ backgroundColor: '#4c6ef5', width: `${(stats.approved / (stats.approved + stats.rejected)) * 100}%` }} />
               </div>
               <div className="text-xs text-gray-400 mt-1">{Math.round((stats.approved / (stats.approved + stats.rejected)) * 100)}% approval rate · {stats.approved + stats.rejected} total decisions</div>
             </>
@@ -442,7 +442,7 @@ export default function Approvals({ onAgentClick }) {
             <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Potential Gain</div>
             <div className="text-4xl font-extrabold text-gray-900">${(totalStake/1000).toFixed(0)}K</div>
             <div className="text-xs text-gray-400 mt-1">Across {pending.length} pending decisions</div>
-            <div className="text-xs font-semibold mt-1" style={{ color: '#2196af' }}>↑ Act now to capture</div>
+            <div className="text-xs font-semibold mt-1" style={{ color: '#4c6ef5' }}>↑ Act now to capture</div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5">
@@ -461,7 +461,7 @@ export default function Approvals({ onAgentClick }) {
             <div className="text-4xl font-extrabold text-gray-900">{pending.length}</div>
             <div className="text-xs text-gray-400 mt-1">Awaiting human sign-off</div>
             <div className="mt-1">
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(33,150,175,0.08)', color: '#2196af', border: '1px solid rgba(33,150,175,0.2)' }}>
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(76,110,245,0.08)', color: '#4c6ef5', border: '1px solid rgba(76,110,245,0.2)' }}>
                 ${(totalStake/1000).toFixed(0)}K potential gain
               </span>
             </div>
@@ -493,11 +493,11 @@ export default function Approvals({ onAgentClick }) {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                  isActive ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300'
+                  isActive ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300'
                 }`}
               >
                 {tab.label}
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500'}`}>
                   {tab.count}
                 </span>
               </button>
