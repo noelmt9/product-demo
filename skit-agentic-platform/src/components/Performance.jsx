@@ -557,6 +557,45 @@ function InboundTab() {
         </div>
       </div>
 
+      {/* Calling reason + sentiment */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">Calling Reason Breakdown & Sentiment</h3>
+        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
+                {['Reason', 'Count', 'Share', 'Sentiment', 'Resolution'].map(h => (
+                  <th key={h} className={`py-2 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Reason' || h === 'Resolution' ? 'text-left' : 'text-center'}`}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sentimentData.callingReasons.map((row, i) => (
+                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
+                  <td className="py-2.5 px-3 font-medium text-gray-900">{row.reason}</td>
+                  <td className="py-2.5 px-3 text-center tabular-nums text-gray-700">{row.count}</td>
+                  <td className="py-2.5 px-3 text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <div className="w-14 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#d4eae5' }}>
+                        <div className="h-full rounded-full" style={{ width: `${row.pct * 2.7}%`, backgroundColor: '#2196af' }} />
+                      </div>
+                      <span className="text-xs text-gray-600 tabular-nums w-7">{row.pct}%</span>
+                    </div>
+                  </td>
+                  <td className="py-2.5 px-3 text-center">
+                    <span className={`inline-flex items-center gap-1 text-xs font-medium ${sentColor(row.sentiment)}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${sentDot(row.sentiment)}`} />
+                      {row.sentiment.charAt(0).toUpperCase() + row.sentiment.slice(1)}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-3 text-xs text-gray-600">{row.resolution}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Inbound routing breakdown */}
       <div className="grid grid-cols-2 gap-6">
         <div className="bg-white border border-gray-200 rounded-xl p-5">
@@ -596,45 +635,6 @@ function InboundTab() {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Calling reason + sentiment */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4">Calling Reason Breakdown & Sentiment</h3>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
-                {['Reason', 'Count', 'Share', 'Sentiment', 'Resolution'].map(h => (
-                  <th key={h} className={`py-2 px-3 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Reason' || h === 'Resolution' ? 'text-left' : 'text-center'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sentimentData.callingReasons.map((row, i) => (
-                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
-                  <td className="py-2.5 px-3 font-medium text-gray-900">{row.reason}</td>
-                  <td className="py-2.5 px-3 text-center tabular-nums text-gray-700">{row.count}</td>
-                  <td className="py-2.5 px-3 text-center">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <div className="w-14 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#d4eae5' }}>
-                        <div className="h-full rounded-full" style={{ width: `${row.pct * 2.7}%`, backgroundColor: '#2196af' }} />
-                      </div>
-                      <span className="text-xs text-gray-600 tabular-nums w-7">{row.pct}%</span>
-                    </div>
-                  </td>
-                  <td className="py-2.5 px-3 text-center">
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium ${sentColor(row.sentiment)}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${sentDot(row.sentiment)}`} />
-                      {row.sentiment.charAt(0).toUpperCase() + row.sentiment.slice(1)}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-3 text-xs text-gray-600">{row.resolution}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
