@@ -235,29 +235,224 @@ const BarFunnel = ({ viewMode }) => {
   );
 };
 
+// ── KPI / Chart data keyed by period + granularity ───────────────────────────
+
+const KPI_METRICS = [
+  { key: 'liq',     metric: 'Liquidation Rate', unit: '%', target: 2.5 },
+  { key: 'contact', metric: 'Contact Rate',      unit: '%', target: 40  },
+  { key: 'rpc',     metric: 'RPC Rate',          unit: '%', target: 30  },
+  { key: 'ptp',     metric: 'PTP Rate',          unit: '%', target: 12  },
+  { key: 'kptp',    metric: 'Kept-PTP Rate',     unit: '%', target: 70  },
+  { key: 'res',     metric: 'Resolution Rate',   unit: '%', target: null },
+];
+
+// Base KPI values per period (All Creditors baseline)
+const BASE_KPI = {
+  'All Time': { monthly: [
+    { label: 'Jan', liq: 1.4, contact: 28, rpc: 19, ptp: 6,  kptp: 58, res: 1.2 },
+    { label: 'Feb', liq: 1.9, contact: 32, rpc: 23, ptp: 9,  kptp: 63, res: 2.8 },
+    { label: 'Mar', liq: 2.4, contact: 36, rpc: 26, ptp: 11, kptp: 66, res: 4.6 },
+    { label: 'Apr', liq: 2.7, contact: 38, rpc: 28, ptp: 12, kptp: 68, res: 6.2 },
+  ]},
+  Jan: {
+    monthly: [{ label: 'Jan', liq: 1.4, contact: 28, rpc: 19, ptp: 6, kptp: 58, res: 1.2 }],
+    weekly:  [
+      { label: 'Wk 1', liq: 1.1, contact: 25, rpc: 16, ptp: 4, kptp: 54, res: 0.3 },
+      { label: 'Wk 2', liq: 1.3, contact: 27, rpc: 18, ptp: 6, kptp: 57, res: 0.7 },
+      { label: 'Wk 3', liq: 1.5, contact: 29, rpc: 20, ptp: 7, kptp: 60, res: 1.1 },
+      { label: 'Wk 4', liq: 1.7, contact: 31, rpc: 22, ptp: 8, kptp: 62, res: 1.5 },
+    ],
+    daily: Array.from({length:31},(_,i) => ({ label: `${i+1}`, liq: +(1.1+i*0.029).toFixed(2), contact: 25+Math.round(i*0.2), rpc: 16+Math.round(i*0.19), ptp: 4+Math.round(i*0.13), kptp: 54+Math.round(i*0.26), res: +(i*0.039).toFixed(1) })),
+  },
+  Feb: {
+    monthly: [{ label: 'Feb', liq: 1.9, contact: 32, rpc: 23, ptp: 9, kptp: 63, res: 2.8 }],
+    weekly:  [
+      { label: 'Wk 1', liq: 1.7, contact: 30, rpc: 21, ptp: 7,  kptp: 60, res: 1.7 },
+      { label: 'Wk 2', liq: 1.9, contact: 32, rpc: 23, ptp: 9,  kptp: 62, res: 2.1 },
+      { label: 'Wk 3', liq: 2.0, contact: 33, rpc: 24, ptp: 9,  kptp: 64, res: 2.5 },
+      { label: 'Wk 4', liq: 2.1, contact: 34, rpc: 25, ptp: 10, kptp: 65, res: 2.9 },
+    ],
+    daily: Array.from({length:28},(_,i) => ({ label: `${i+1}`, liq: +(1.7+i*0.015).toFixed(2), contact: 30+Math.round(i*0.14), rpc: 21+Math.round(i*0.15), ptp: 7+Math.round(i*0.11), kptp: 60+Math.round(i*0.18), res: +(1.7+i*0.043).toFixed(1) })),
+  },
+  Mar: {
+    monthly: [{ label: 'Mar', liq: 2.4, contact: 36, rpc: 26, ptp: 11, kptp: 66, res: 4.6 }],
+    weekly:  [
+      { label: 'Wk 1', liq: 2.1, contact: 33, rpc: 23, ptp: 9,  kptp: 63, res: 3.2 },
+      { label: 'Wk 2', liq: 2.3, contact: 35, rpc: 25, ptp: 10, kptp: 65, res: 3.8 },
+      { label: 'Wk 3', liq: 2.5, contact: 37, rpc: 27, ptp: 11, kptp: 67, res: 4.4 },
+      { label: 'Wk 4', liq: 2.6, contact: 38, rpc: 27, ptp: 12, kptp: 67, res: 5.0 },
+    ],
+    daily: Array.from({length:31},(_,i) => ({ label: `${i+1}`, liq: +(2.1+i*0.016).toFixed(2), contact: 33+Math.round(i*0.16), rpc: 23+Math.round(i*0.16), ptp: 9+Math.round(i*0.097), kptp: 63+Math.round(i*0.13), res: +(3.2+i*0.058).toFixed(1) })),
+  },
+  Apr: {
+    monthly: [{ label: 'Apr', liq: 2.7, contact: 38, rpc: 28, ptp: 12, kptp: 68, res: 6.2 }],
+    weekly:  [
+      { label: 'Wk 1', liq: 2.6, contact: 37, rpc: 27, ptp: 11, kptp: 67, res: 5.5 },
+      { label: 'Wk 2', liq: 2.7, contact: 38, rpc: 28, ptp: 12, kptp: 68, res: 6.2 },
+    ],
+    daily: Array.from({length:13},(_,i) => ({ label: `${i+1}`, liq: +(2.6+i*0.008).toFixed(2), contact: 37+Math.round(i*0.08), rpc: 27+Math.round(i*0.08), ptp: 11+Math.round(i*0.077), kptp: 67+Math.round(i*0.077), res: +(5.5+i*0.058).toFixed(1) })),
+  },
+};
+
+// Collections over time data per period
+const COLLECTIONS_DATA = {
+  'All Time': [
+    { label: 'Jan', daily: 62400,  cumulative: 62400  },
+    { label: 'Feb', daily: 75200,  cumulative: 137600 },
+    { label: 'Mar', daily: 98400,  cumulative: 236000 },
+    { label: 'Apr', daily: 51400,  cumulative: 287400 },
+  ],
+  Jan: Array.from({length:31},(_,i) => ({ label: `${i+1}`, daily: 1200+Math.round(i*62), cumulative: (i+1)*2010+Math.round(i*i*3) })),
+  Feb: Array.from({length:28},(_,i) => ({ label: `${i+1}`, daily: 1800+Math.round(i*78), cumulative: 62400+(i+1)*2685+Math.round(i*i*4) })),
+  Mar: Array.from({length:31},(_,i) => ({ label: `${i+1}`, daily: 2400+Math.round(i*95), cumulative: 137600+(i+1)*3174+Math.round(i*i*5) })),
+  Apr: Array.from({length:13},(_,i) => ({ label: `${i+1}`, daily: 8200+Math.round(i*1309), cumulative: 236000+[8200,20600,36200,54400,69200,85400,96800,114600,133800,155200,172000,193600,216800,240000][i]||0 })),
+};
+
+// Apply creditor multiplier to a data point
+function applyCreditorMult(point, creditor) {
+  const m = CREDITOR_MULTIPLIERS[creditor] || CREDITOR_MULTIPLIERS['All Creditors'];
+  return {
+    ...point,
+    liq:     +(point.liq     * m.liq).toFixed(2),
+    contact: Math.round(point.contact * m.contact),
+    rpc:     Math.round((point.rpc || 0) * m.contact),
+    ptp:     Math.round((point.ptp || 0) * m.liq),
+    kptp:    Math.round((point.kptp || 0) * ((m.liq + 1) / 2)),
+    res:     +((point.res || 0) * m.liq).toFixed(1),
+    daily:        point.daily        ? Math.round(point.daily        * m.collected) : undefined,
+    cumulative:   point.cumulative   ? Math.round(point.cumulative   * m.collected) : undefined,
+  };
+}
+
+// Derive the periods array to show in KPI cards
+function getKpiPeriods(period, granularity, creditor) {
+  const gran = granularity === 'Monthly' ? 'monthly' : granularity === 'Weekly' ? 'weekly' : 'daily';
+  const raw = BASE_KPI[period]?.[gran] || BASE_KPI['All Time'].monthly;
+  return raw.map(p => applyCreditorMult(p, creditor));
+}
+
+// Derive chart data for Collections Over Time
+function getCollectionsData(period, granularity, creditor) {
+  if (period === 'All Time') {
+    return COLLECTIONS_DATA['All Time'].map(p => applyCreditorMult(p, creditor));
+  }
+  const gran = granularity === 'Daily' ? period : period; // weekly also maps to daily data, sliced
+  const raw = COLLECTIONS_DATA[period] || COLLECTIONS_DATA['Apr'];
+  if (granularity === 'Weekly') {
+    // Aggregate daily into weeks
+    const weeks = [];
+    for (let w = 0; w < 4; w++) {
+      const slice = raw.slice(w*7, (w+1)*7);
+      if (!slice.length) break;
+      const sum = slice.reduce((a, b) => a + b.daily, 0);
+      const last = slice[slice.length - 1];
+      weeks.push({ label: `Wk ${w+1}`, daily: sum, cumulative: last.cumulative });
+    }
+    return weeks.map(p => applyCreditorMult(p, creditor));
+  }
+  return raw.map(p => applyCreditorMult(p, creditor));
+}
+
+function getXLabel(period, granularity) {
+  if (period === 'All Time') return 'Month';
+  if (granularity === 'Weekly') return 'Week';
+  return 'Day';
+}
+
+// ── KPI Summary ───────────────────────────────────────────────────────────────
+
+function KpiSummary({ filters }) {
+  const { period, granularity, selectedCreditor } = filters;
+  const periods = getKpiPeriods(period, granularity, selectedCreditor);
+  const latest  = periods[periods.length - 1];
+
+  const periodLabel = period === 'All Time'
+    ? `Jan – Apr 13 · ${granularity}`
+    : `${period} · ${granularity}`;
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-6">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">KPI Summary</h2>
+        <span className="text-xs text-gray-400">{periodLabel}{selectedCreditor !== 'All Creditors' ? ` · ${selectedCreditor}` : ''}</span>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {KPI_METRICS.map((m, i) => {
+          const vals   = periods.map(p => p[m.key]);
+          const current = latest[m.key];
+          const maxVal  = Math.max(...vals, m.target || 0);
+          const barW    = v => `${Math.min(Math.round((v / maxVal) * 100), 100)}%`;
+          const beat    = m.target ? current >= m.target : null;
+          return (
+            <div key={i} className="border border-gray-100 rounded-xl p-4">
+              <div className="flex items-start justify-between mb-3">
+                <span className="text-xs font-semibold text-gray-600">{m.metric}</span>
+                {beat !== null && (
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${beat ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {beat ? 'Above target' : 'Near target'}
+                  </span>
+                )}
+              </div>
+              <div className="text-2xl font-extrabold mb-0.5" style={{ color: '#2196af' }}>{current}{m.unit}</div>
+              <div className="text-[10px] text-gray-400 mb-3">{latest.label} · {m.target ? `Target: ${m.target}${m.unit}` : 'No target set'}</div>
+              <div className="space-y-1.5">
+                {periods.map((p, j) => (
+                  <div key={j} className="flex items-center gap-2">
+                    <span className="text-[9px] text-gray-400 w-7 flex-shrink-0 truncate">{p.label}</span>
+                    <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: '#f3f4f6' }}>
+                      <div className="h-2 rounded-full transition-all" style={{ width: barW(p[m.key]), backgroundColor: j === periods.length - 1 ? '#2196af' : '#93c5fd' }} />
+                    </div>
+                    <span className="text-[10px] font-semibold tabular-nums text-gray-700 w-8 text-right">{p[m.key]}{m.unit}</span>
+                  </div>
+                ))}
+                {m.target && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] text-gray-400 w-7 flex-shrink-0">Goal</span>
+                    <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: '#f3f4f6' }}>
+                      <div className="h-2 rounded-full" style={{ width: barW(m.target), backgroundColor: '#61ab5e', opacity: 0.55 }} />
+                    </div>
+                    <span className="text-[10px] font-semibold tabular-nums text-gray-700 w-8 text-right">{m.target}{m.unit}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── TAB: Overview ─────────────────────────────────────────────────────────────
 
-function OverviewTab({ onNavigate, viewMode }) {
+function OverviewTab({ onNavigate, filters }) {
+  const { period, granularity, selectedCreditor, viewMode } = filters;
+  const chartData  = getCollectionsData(period, granularity, selectedCreditor);
+  const xLabel     = getXLabel(period, granularity);
+
+  const fmtTick = v => viewMode === 'dollars' ? `$${(v/1000).toFixed(0)}K` : v.toLocaleString();
+
+  const funnelLabel = period === 'All Time'
+    ? 'All Time · All channels'
+    : `${period} · ${granularity}`;
+
   return (
     <div className="px-8 py-6 space-y-6">
 
-      {/* Collections funnel — bar chart style */}
+      {/* Collections funnel */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-6 pt-5 pb-4">
           <div className="flex items-center justify-between mb-1">
             <div>
               <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Collections Funnel</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Week 3 · All channels · End-to-end conversion</p>
+              <p className="text-xs text-gray-400 mt-0.5">{funnelLabel} · End-to-end conversion{selectedCreditor !== 'All Creditors' ? ` · ${selectedCreditor}` : ''}</p>
             </div>
             <span className="text-xs text-gray-400">Viewing by: <strong className="text-gray-700">{viewMode === 'accounts' ? '# Accounts' : '$ Value'}</strong></span>
           </div>
-
           <div className="mt-5 px-2">
             <BarFunnel viewMode={viewMode} />
           </div>
         </div>
-
-        {/* Drop-off strip */}
         <div className="grid grid-cols-5 gap-px" style={{ borderTop: '1px solid #d4eae5' }}>
           {[
             { label: 'Unreached',   accounts: '7,440', dollars: '$18.6M', note: 'Skip trace / re-attempt in progress' },
@@ -275,74 +470,41 @@ function OverviewTab({ onNavigate, viewMode }) {
         </div>
       </div>
 
-      {/* Collections over time */}
+      {/* Collections over time — driven by filters */}
       <div className="bg-white border border-gray-200 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Collections Over Time</h2>
-          <span className="text-xs text-gray-400">Daily + cumulative · 18 days</span>
+          <div>
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Collections Over Time</h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {period === 'All Time' ? 'Jan – Apr 13' : period} · {granularity}{selectedCreditor !== 'All Creditors' ? ` · ${selectedCreditor}` : ''}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ backgroundColor: '#2196af' }} /><span className="text-xs text-gray-500">Daily collected</span></div>
+            <div className="flex items-center gap-1.5"><span className="w-3 h-2 rounded-sm" style={{ backgroundColor: '#61ab5e' }} /><span className="text-xs text-gray-500">Cumulative</span></div>
+          </div>
         </div>
-        <ResponsiveContainer width="100%" height={280}>
-          <AreaChart data={dailyData}>
+        <ResponsiveContainer width="100%" height={260}>
+          <AreaChart data={chartData} key={`${period}-${granularity}-${selectedCreditor}`}>
             <defs>
               <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="#2196af" stopOpacity={0.2} />
+                <stop offset="5%"  stopColor="#2196af" stopOpacity={0.18} />
                 <stop offset="95%" stopColor="#2196af" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="day" label={{ value: 'Day', position: 'insideBottom', offset: -5 }} stroke="#9ca3af" />
-            <YAxis yAxisId="left"  label={{ value: 'Daily ($)', angle: -90, position: 'insideLeft' }} stroke="#9ca3af" />
-            <YAxis yAxisId="right" orientation="right" label={{ value: 'Cumulative ($)', angle: 90, position: 'insideRight' }} stroke="#9ca3af" />
-            <Tooltip />
-            <Area  yAxisId="left"  type="monotone" dataKey="dailyCollections"      stroke="#2196af" fill="url(#grad)" />
-            <Line  yAxisId="right" type="monotone" dataKey="cumulativeCollections" stroke="#61ab5e" strokeWidth={2} dot={false} />
-            <ReferenceLine yAxisId="left" x={3}  stroke="#2196af" strokeDasharray="3 3" label={{ value: 'Day 3: SMS-first',    position: 'top', fill: '#2196af', fontSize: 11 }} />
-            <ReferenceLine yAxisId="left" x={12} stroke="#2196af" strokeDasharray="3 3" label={{ value: 'Day 12: Voice 5x/wk', position: 'top', fill: '#2196af', fontSize: 11 }} />
-            <ReferenceLine yAxisId="left" x={17} stroke="#2196af" strokeDasharray="3 3" label={{ value: 'Day 17: Settlements',  position: 'top', fill: '#2196af', fontSize: 11 }} />
+            <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke="#9ca3af" label={{ value: xLabel, position: 'insideBottom', offset: -2, fontSize: 11 }} />
+            <YAxis yAxisId="left"  tickFormatter={v => `$${(v/1000).toFixed(0)}K`} stroke="#9ca3af" tick={{ fontSize: 10 }} width={52} />
+            <YAxis yAxisId="right" orientation="right" tickFormatter={v => `$${(v/1000).toFixed(0)}K`} stroke="#9ca3af" tick={{ fontSize: 10 }} width={52} />
+            <Tooltip formatter={(v, name) => [`$${v.toLocaleString()}`, name === 'daily' ? 'Daily collected' : 'Cumulative']} labelFormatter={l => `${xLabel} ${l}`} />
+            <Area yAxisId="left"  type="monotone" dataKey="daily"      name="daily"      stroke="#2196af" fill="url(#grad)" strokeWidth={2} />
+            <Line yAxisId="right" type="monotone" dataKey="cumulative" name="cumulative" stroke="#61ab5e" strokeWidth={2} dot={false} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Weekly KPI Table */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Weekly KPI Summary</h2>
-        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
-                {['Metric', 'Week 1', 'Week 2', 'Week 3', 'Target'].map(h => (
-                  <th key={h} className={`py-2.5 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Metric' ? 'text-left' : 'text-center'}`}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { metric: 'Liquidation Rate', w1: '1.8%', w2: '2.3%', w3: '2.7%', target: '2.5%', beat: true },
-                { metric: 'Contact Rate',      w1: '31%',  w2: '35%',  w3: '38%',  target: '40%',  beat: false },
-                { metric: 'RPC Rate',          w1: '22%',  w2: '25%',  w3: '28%',  target: '30%',  beat: false },
-                { metric: 'PTP Rate',          w1: '8%',   w2: '10%',  w3: '12%',  target: '12%',  beat: true },
-                { metric: 'Kept-PTP',          w1: '62%',  w2: '65%',  w3: '68%',  target: '70%',  beat: false },
-                { metric: 'Resolution Rate',   w1: '1.8%', w2: '3.9%', w3: '6.2%', target: '—',    beat: null },
-                { metric: 'Compliance Score',  w1: '99.91%', w2: '99.88%', w3: '99.86%', target: '99.5%', beat: true },
-              ].map((row, i) => (
-                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
-                  <td className="py-2.5 px-4 font-medium text-gray-900">{row.metric}</td>
-                  <td className="py-2.5 px-4 text-center text-gray-500 tabular-nums">{row.w1}</td>
-                  <td className="py-2.5 px-4 text-center text-gray-600 tabular-nums">{row.w2}</td>
-                  <td className="py-2.5 px-4 text-center font-bold tabular-nums" style={{ color: '#2196af' }}>{row.w3}</td>
-                  <td className="py-2.5 px-4 text-center">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      row.beat === true ? 'bg-green-100 text-green-700' :
-                      row.beat === false ? 'bg-amber-100 text-amber-700' :
-                      'bg-gray-100 text-gray-500'
-                    }`}>{row.target}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* KPI Summary */}
+      <KpiSummary filters={filters} />
     </div>
   );
 }
@@ -600,6 +762,57 @@ function PromisesTab() {
               <div className={`text-xs ${r.urgency === 'high' ? 'text-red-700' : 'text-amber-700'}`}>→ {r.action}</div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Payment Plans section */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Payment Plans</h3>
+          <span className="text-xs text-gray-400">Active installment arrangements</span>
+        </div>
+        <div className="grid grid-cols-4 gap-4 mb-5">
+          {[
+            { label: 'Active Plans', value: '94', sub: 'In good standing', color: 'text-green-600' },
+            { label: 'Total Plan Value', value: '$218K', sub: 'Outstanding balance', color: 'text-gray-900' },
+            { label: 'Avg Monthly Payment', value: '$184', sub: 'Across all plans', color: 'text-gray-900' },
+            { label: 'Plans at Risk', value: '23', sub: 'Missed last installment', color: 'text-red-600' },
+          ].map((c, i) => (
+            <div key={i} className="border border-gray-100 rounded-lg p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{c.label}</div>
+              <div className={`text-2xl font-extrabold ${c.color}`}>{c.value}</div>
+              <div className="text-[10px] text-gray-400 mt-0.5">{c.sub}</div>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #d4eae5' }}>
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ backgroundColor: '#f0faf8', borderBottom: '1px solid #d4eae5' }}>
+                {['Cohort', 'Active Plans', 'Avg Plan ($)', 'Avg Term', 'On Track', 'At Risk'].map(h => (
+                  <th key={h} className={`py-2.5 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide ${h === 'Cohort' ? 'text-left' : 'text-center'}`}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { cohort: 'High prop / High bal',  plans: 32, avg: 4200, term: '6 mo', onTrack: 28, atRisk: 4 },
+                { cohort: 'Medium prop / All bal',  plans: 41, avg: 2100, term: '4 mo', onTrack: 33, atRisk: 8 },
+                { cohort: 'Low prop / High bal',    plans: 18, avg: 4800, term: '8 mo', onTrack: 9,  atRisk: 9 },
+                { cohort: 'High prop / Low bal',    plans: 3,  avg: 980,  term: '3 mo', onTrack: 3,  atRisk: 0 },
+                { cohort: 'Low prop / Low bal',     plans: 0,  avg: 0,    term: '—',    onTrack: 0,  atRisk: 2 },
+              ].map((row, i) => (
+                <tr key={i} className="last:border-0" style={{ borderBottom: '1px solid #ecf6f3' }}>
+                  <td className="py-2.5 px-4 font-medium text-gray-900">{row.cohort}</td>
+                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-700">{row.plans}</td>
+                  <td className="py-2.5 px-4 text-center tabular-nums text-gray-700">{row.avg > 0 ? `$${row.avg.toLocaleString()}` : '—'}</td>
+                  <td className="py-2.5 px-4 text-center text-gray-600">{row.term}</td>
+                  <td className="py-2.5 px-4 text-center tabular-nums font-semibold text-green-700">{row.onTrack}</td>
+                  <td className="py-2.5 px-4 text-center tabular-nums font-semibold text-red-600">{row.atRisk > 0 ? row.atRisk : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1123,18 +1336,41 @@ function CohortsTab({ onNavigate }) {
 const TABS = [
   { id: 'overview',   label: 'Overview' },
   { id: 'inbound',    label: 'Inbound' },
-  { id: 'promises',   label: 'Promises' },
-  { id: 'agents',     label: 'Agent Performance' },
-  { id: 'benchmark',  label: 'Benchmark' },
-  { id: 'enrichment', label: 'Enrichment' },
+  { id: 'promises',   label: 'Promises & Plans' },
   { id: 'cohorts',    label: 'Cohorts' },
 ];
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
+const PERIODS   = ['All Time', 'Jan', 'Feb', 'Mar', 'Apr'];
+const GRANULARS = ['Monthly', 'Weekly', 'Daily'];
+const CREDITORS = ['All Creditors', 'Chase Bank', 'Synchrony Financial', 'Avant LLC', 'LendingClub', 'Envision Healthcare', 'LifePoint Health'];
+
+// Per-creditor multipliers so charts shift when creditor changes
+const CREDITOR_MULTIPLIERS = {
+  'All Creditors':        { liq: 1.00, contact: 1.00, collected: 1.00 },
+  'Chase Bank':           { liq: 1.12, contact: 1.08, collected: 0.77 },
+  'Synchrony Financial':  { liq: 0.94, contact: 1.00, collected: 0.50 },
+  'Avant LLC':            { liq: 0.70, contact: 0.82, collected: 0.42 },
+  'LendingClub':          { liq: 0.74, contact: 0.74, collected: 0.33 },
+  'Envision Healthcare':  { liq: 1.48, contact: 1.24, collected: 0.47 },
+  'LifePoint Health':     { liq: 1.63, contact: 1.34, collected: 0.31 },
+};
+
 export default function Performance({ onNavigate }) {
-  const [activeTab, setActiveTab] = React.useState('overview');
-  const [viewMode, setViewMode] = React.useState('accounts'); // 'accounts' | 'dollars'
+  const [activeTab,        setActiveTab]        = React.useState('overview');
+  const [viewMode,         setViewMode]         = React.useState('accounts');
+  const [period,           setPeriod]           = React.useState('All Time');
+  const [granularity,      setGranularity]      = React.useState('Monthly');
+  const [selectedCreditor, setSelectedCreditor] = React.useState('All Creditors');
+
+  // When switching to All Time, force Monthly (weekly/daily don't make sense)
+  const handlePeriodChange = (p) => {
+    setPeriod(p);
+    if (p === 'All Time') setGranularity('Monthly');
+  };
+
+  const filters = { period, granularity, selectedCreditor, viewMode };
 
   return (
     <div className="min-h-full bg-gray-50">
@@ -1148,23 +1384,52 @@ export default function Performance({ onNavigate }) {
             <h1 className="text-xl font-bold text-gray-900">Performance</h1>
             <p className="text-sm text-gray-500 mt-0.5">Apex Recovery Partners · Hypercare Week 3 · Day 18</p>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Global Account / $ toggle */}
+          <div className="flex items-center gap-4 flex-wrap">
+
+            {/* Period */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400">View by:</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Period</span>
               <div className="flex bg-gray-100 rounded-lg p-0.5">
-                <button
-                  onClick={() => setViewMode('accounts')}
+                {PERIODS.map(p => (
+                  <button key={p} onClick={() => handlePeriodChange(p)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${period === p ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                  >{p}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Granularity — disabled on All Time */}
+            <div className="flex items-center gap-2">
+              <span className={`text-[11px] font-semibold uppercase tracking-wider ${period === 'All Time' ? 'text-gray-300' : 'text-gray-400'}`}>Granularity</span>
+              <div className={`flex bg-gray-100 rounded-lg p-0.5 ${period === 'All Time' ? 'opacity-40 pointer-events-none' : ''}`}>
+                {GRANULARS.map(g => (
+                  <button key={g} onClick={() => setGranularity(g)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${granularity === g ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                  >{g}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Creditor */}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Creditor</span>
+              <select value={selectedCreditor} onChange={e => setSelectedCreditor(e.target.value)}
+                className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-blue-400"
+              >
+                {CREDITORS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            {/* $ / Accounts */}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">View</span>
+              <div className="flex bg-gray-100 rounded-lg p-0.5">
+                <button onClick={() => setViewMode('accounts')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'accounts' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                  # Accounts
-                </button>
-                <button
-                  onClick={() => setViewMode('dollars')}
+                ># Accounts</button>
+                <button onClick={() => setViewMode('dollars')}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${viewMode === 'dollars' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                  $ Value
-                </button>
+                >$ Value</button>
               </div>
             </div>
             <span
@@ -1263,12 +1528,9 @@ export default function Performance({ onNavigate }) {
       </div>
 
       {/* ── TAB CONTENT ─────────────────────────────────────────────────────── */}
-      {activeTab === 'overview'   && <OverviewTab onNavigate={onNavigate} viewMode={viewMode} />}
+      {activeTab === 'overview'   && <OverviewTab onNavigate={onNavigate} filters={filters} />}
       {activeTab === 'inbound'    && <InboundTab viewMode={viewMode} />}
       {activeTab === 'promises'   && <PromisesTab viewMode={viewMode} />}
-      {activeTab === 'agents'     && <AgentPerformanceTab />}
-      {activeTab === 'benchmark'  && <BenchmarkTab />}
-      {activeTab === 'enrichment' && <EnrichmentTab />}
       {activeTab === 'cohorts'    && <CohortsTab onNavigate={onNavigate} viewMode={viewMode} />}
 
     </div>
