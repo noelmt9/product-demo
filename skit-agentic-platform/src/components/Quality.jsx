@@ -23,7 +23,7 @@ const DIMENSIONS = [
 const agentScoreCards = [
   {
     name: 'Jason',
-    process: 'Tate & Kirlin',
+    process: 'Chase Bank',
     callsScored: 12,
     compliancePass: true,
     trend: 'up',
@@ -34,7 +34,7 @@ const agentScoreCards = [
   },
   {
     name: 'Rachel',
-    process: 'Tate & Kirlin',
+    process: 'Chase Bank · Synchrony Financial',
     callsScored: 14,
     compliancePass: true,
     trend: 'up',
@@ -45,7 +45,7 @@ const agentScoreCards = [
   },
   {
     name: 'Carlos',
-    process: 'Autofinance USA',
+    process: 'Avant LLC · LendingClub',
     callsScored: 10,
     compliancePass: true,
     trend: 'stable',
@@ -56,7 +56,7 @@ const agentScoreCards = [
   },
   {
     name: 'Brittany',
-    process: 'Autofinance USA',
+    process: 'LendingClub · Avant LLC',
     callsScored: 11,
     compliancePass: false,
     trend: 'down',
@@ -67,18 +67,18 @@ const agentScoreCards = [
   },
   {
     name: 'Nicole',
-    process: 'Autofinance USA / Global Finance',
+    process: 'Envision Healthcare · LifePoint Health',
     callsScored: 9,
     compliancePass: true,
     trend: 'up',
     scores: { opening: 4, empathy: 5, listening: 4, control: 5, language: 5, objection: 5, rapport: 5, confidence: 4, closing: 4, sentence: 5 },
     topStrength: 'Empathy & product knowledge',
     coachingNeed: 'Assumptive opening on new placements; recap on inbound calls',
-    auditorNote: 'Handled non-payment calls well. Needs assumptive opening — said "I am not sure why you got the call" on one call. Long hold on Global Finance without engaging consumer.',
+    auditorNote: 'Handled non-payment calls well. Needs assumptive opening — said "I am not sure why you got the call" on one call. Long hold on LifePoint Health accounts without engaging consumer.',
   },
   {
     name: 'Kevin',
-    process: 'Lane Health',
+    process: 'Envision Healthcare',
     callsScored: 8,
     compliancePass: true,
     trend: 'stable',
@@ -441,20 +441,22 @@ export default function Quality({ initialTab = 'overview', onTabChange }) {
 
                   {/* Mini dimension heatmap */}
                   <div className="grid grid-cols-5 gap-1 mb-3">
-                    {DIMENSIONS.slice(0,10).map(dim => {
+                    {DIMENSIONS.map(dim => {
                       const sc = agent.scores[dim.key];
                       const { bg, text } = dimScore(sc);
+                      // Short abbreviations for each dimension
+                      const abbrev = {
+                        opening: 'Open', empathy: 'Empathy', listening: 'Listen',
+                        control: 'Control', language: 'Language', objection: 'Object.',
+                        rapport: 'Rapport', confidence: 'Confid.', closing: 'Closing', sentence: 'Sentence',
+                      };
                       return (
-                        <div key={dim.key} className={`rounded px-1 py-1 text-center ${bg}`} title={dim.label}>
+                        <div key={dim.key} className={`rounded px-1 py-1.5 text-center ${bg}`} title={dim.label}>
                           <div className={`text-[11px] font-bold ${text}`}>{sc}</div>
+                          <div className={`text-[8px] mt-0.5 leading-tight ${text} opacity-80`}>{abbrev[dim.key]}</div>
                         </div>
                       );
                     })}
-                  </div>
-                  <div className="grid grid-cols-5 gap-1 mb-3">
-                    {DIMENSIONS.slice(0,10).map(dim => (
-                      <div key={dim.key} className="text-[9px] text-gray-400 text-center leading-tight truncate">{dim.label.split(' ')[0]}</div>
-                    ))}
                   </div>
 
                   {agent.coachingNeed && (
